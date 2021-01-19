@@ -395,6 +395,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 614f7dfc0d14cec45897550bc115aa64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  opening1: {fileID: 1532401229}
+  opening2: {fileID: 1225141973}
+  opening3: {fileID: 1341939110}
+  opening4: {fileID: 735471343}
+  radius: 0
 --- !u!1 &511262673
 GameObject:
   m_ObjectHideFlags: 0
