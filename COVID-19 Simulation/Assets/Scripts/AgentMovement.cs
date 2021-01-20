@@ -22,4 +22,9 @@ public class AgentMovement : MonoBehaviour
             }
         }
     }
+
+    void Destroy()
+    {
+        Destroy(gameObject);
+    }
 }
