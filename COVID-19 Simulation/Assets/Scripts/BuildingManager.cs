@@ -11,6 +11,7 @@ public class BuildingManager : MonoBehaviour
     public Transform opening4;
 
     public GameObject northDoor;
+    public GameObject[] storedTourists
 
     public string touristTag = "Tourist";
     public int range = 3;
@@ -22,9 +23,10 @@ public class BuildingManager : MonoBehaviour
         Debug.Log(opening2.position);
         Debug.Log(opening3.position);
         Debug.Log(opening4.position);
-        InvokeRepeating("UpdateOpening", 0f, 0.5f);
-
+        //InvokeRepeating("UpdateOpening", 0f, 0.5f);
     }
+
+    
 
 
 }
