@@ -1387,6 +1387,7 @@ GameObject:
   - component: {fileID: 1433596632}
   - component: {fileID: 1433596631}
   - component: {fileID: 1433596630}
+  - component: {fileID: 1433596633}
   m_Layer: 0
   m_Name: Door West
   m_TagString: Untagged
@@ -1468,6 +1469,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1433596628}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1433596633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433596628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e6dde452d686d44bd5ac57e5376f95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  core: {fileID: 1999071321}
+  doorType: 1
 --- !u!1 &1508476479
 GameObject:
   m_ObjectHideFlags: 0
@@ -1856,6 +1871,7 @@ GameObject:
   - component: {fileID: 1835671569}
   - component: {fileID: 1835671568}
   - component: {fileID: 1835671567}
+  - component: {fileID: 1835671570}
   m_Layer: 0
   m_Name: Door South
   m_TagString: Untagged
@@ -1937,6 +1953,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1835671565}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1835671570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835671565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e6dde452d686d44bd5ac57e5376f95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  core: {fileID: 1999071321}
+  doorType: 0
 --- !u!1 &1865904463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1949,6 +1979,7 @@ GameObject:
   - component: {fileID: 1865904467}
   - component: {fileID: 1865904466}
   - component: {fileID: 1865904465}
+  - component: {fileID: 1865904468}
   m_Layer: 0
   m_Name: Door East
   m_TagString: Untagged
@@ -2030,6 +2061,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1865904463}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1865904468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865904463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17e6dde452d686d44bd5ac57e5376f95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  core: {fileID: 1999071321}
+  doorType: 1
 --- !u!1 &1893545796
 GameObject:
   m_ObjectHideFlags: 0
@@ -2152,12 +2197,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 614f7dfc0d14cec45897550bc115aa64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  opening1: {fileID: 2108121964}
-  opening2: {fileID: 1835671566}
-  opening3: {fileID: 1865904464}
-  opening4: {fileID: 1433596629}
-  northDoor: {fileID: 2108121960}
   stored: []
+  doors: []
+  northDoor: {fileID: 2108121960}
+  southDoor: {fileID: 1835671565}
+  eastDoor: {fileID: 1865904463}
+  westDoor: {fileID: 1433596628}
   touristTag: Tourist
   range: 3
 --- !u!4 &1999071322
@@ -2373,7 +2418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   core: {fileID: 1999071321}
-  storedTourists: []
+  doorType: 0
 --- !u!1 &2136050495
 GameObject:
   m_ObjectHideFlags: 0
