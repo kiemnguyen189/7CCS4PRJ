@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
 {
-    
-    public Transform opening1;
-    public Transform opening2;
-    public Transform opening3;
-    public Transform opening4;
+
+    public List<GameObject> stored = new List<GameObject>();
+    public List<GameObject> doors = new List<GameObject>();
 
     public GameObject northDoor;
-    public List<GameObject> stored = new List<GameObject>();
-
+    public GameObject southDoor;
+    public GameObject eastDoor;
+    public GameObject westDoor;
+    
 
     public string touristTag = "Tourist";
     public int range = 3;
@@ -20,20 +20,28 @@ public class BuildingManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log(opening1.position);
-        Debug.Log(opening2.position);
-        Debug.Log(opening3.position);
-        Debug.Log(opening4.position);
-        //InvokeRepeating("UpdateOpening", 0f, 0.5f);
-        //Debug.Log(northDoor.gameObject.name);
-        //storedTourists = new List<GameObject>();
-        //stored.Add(northDoor);
-        //Debug.Log(stored[0]);
+        doors.Add(northDoor);
+        doors.Add(southDoor);
+        doors.Add(eastDoor);
+        doors.Add(westDoor);
+
+        Debug.Log(doors[0].transform.position);
+        /*
+        Debug.Log(northDoor.transform.position);
+        Debug.Log(southDoor.transform.position);
+        Debug.Log(eastDoor.transform.position);
+        Debug.Log(westDoor.transform.position);
+        */
     }
 
     public void AddTourist(GameObject tourist)
     {
         stored.Add(tourist);
+    }
+
+    public void RemoveTourist(GameObject tourist)
+    {
+        stored.Remove(tourist);
     }    
 
 
