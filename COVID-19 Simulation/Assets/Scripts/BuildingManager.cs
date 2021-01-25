@@ -18,8 +18,7 @@ public class BuildingManager : MonoBehaviour
     public int range = 3;
     
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         doors.Add(northDoor);
         doors.Add(southDoor);
         doors.Add(eastDoor);
@@ -34,13 +33,11 @@ public class BuildingManager : MonoBehaviour
         */
     }
 
-    public void AddTourist(GameObject tourist)
-    {
+    public void AddTourist(GameObject tourist) {
         stored.Add(tourist);
     }
 
-    public void RemoveTourist(GameObject tourist)
-    {
+    public void RemoveTourist(GameObject tourist) {
         stored.Remove(tourist);
     }    
 
