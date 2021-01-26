@@ -15,19 +15,20 @@ public class BuildingDoor : MonoBehaviour
 
     private void Start() {
         rend = GetComponent<Renderer>();
-        arrow = GetComponent<TextMeshPro>();
+        //arrow = GetComponent<TMP_Text>();
         var textRot = transform.rotation.eulerAngles;
         switch (doorType) {
             case DoorType.Entrance: 
                 color = new Color(0,1,0,0.5f);
-                arrow.color = new Color(0,1,0,1);
-                //textRot.y = 90;
-                //arrow.transform.rotation = Quaternion.Euler(textRot);
+                arrow.faceColor = new Color(0,1,0,1);
+                textRot.z = 0;
+                arrow.transform.Rotate(0,0,0);
                 break;
             case DoorType.Exit:
                 color = new Color(1,0,0,0.5f);
-                //textRot.y = 270;
-                //arrow.transform.rotation = Quaternion.Euler(textRot);
+                arrow.faceColor = new Color(1,0,0,1);
+                textRot.y = 180;
+                arrow.transform.Rotate(0,0,180);
                 break;
             case DoorType.Both: 
                 color = new Color(0,0,1,0.5f);
