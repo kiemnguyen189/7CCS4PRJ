@@ -1,45 +1,71 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BuildingManager : MonoBehaviour
 {
 
-    public List<GameObject> stored = new List<GameObject>();
-    public List<GameObject> doors = new List<GameObject>();
+    public List<GameObject> tourists = new List<GameObject>();
+    public List<BuildingDoor> doors = new List<BuildingDoor>();
+    public List<BuildingDoor> temp = new List<BuildingDoor>();
 
-    public GameObject northDoor;
-    public GameObject southDoor;
-    public GameObject eastDoor;
-    public GameObject westDoor;
-    
+    public BuildingDoor northDoor;
+    public BuildingDoor southDoor;
+    public BuildingDoor eastDoor;
+    public BuildingDoor westDoor;
+
+    public TextMeshPro text;
 
     public string touristTag = "Tourist";
     public int range = 3;
     
     // Start is called before the first frame update
     void Start() {
+        Random rand = new Random();
+
         doors.Add(northDoor);
         doors.Add(southDoor);
         doors.Add(eastDoor);
         doors.Add(westDoor);
 
         Debug.Log(doors[0].transform.position);
-        /*
-        Debug.Log(northDoor.transform.position);
-        Debug.Log(southDoor.transform.position);
-        Debug.Log(eastDoor.transform.position);
-        Debug.Log(westDoor.transform.position);
-        */
+        Debug.Log(""+doors[0].doorType);
+        
+    }
+
+    private void Update() {
+        StartCoroutine(UpdateText());
     }
 
     public void AddTourist(GameObject tourist) {
-        stored.Add(tourist);
+
+        tourists.Add(tourist);
     }
 
     public void RemoveTourist(GameObject tourist) {
-        stored.Remove(tourist);
+        // TODO: Add a timer buffer when an agent gets removed so that they don't instantly go back in of they leave via a "Both" door
+        tourists.Remove(tourist);
     }    
 
+    public Transform ReturnExitDoor() {
+        //List<BuildingDoor> temp = new List<BuildingDoor>();
+        foreach (BuildingDoor door in doors) {
+            //Debug.Log(""+door.doorType.ToString());
+            if (door.doorType.ToString().Equals(DoorType.Exit.ToString()) || door.doorType.ToString().Equals(DoorType.Both.ToString())){
+                temp.Add(door);
+            }
+        }
+        //int r = rand.Next(temp.Count);
+        //Debug.Log("" + temp.Count);
+        Transform ret = temp[Random.Range(0, temp.Count)].transform;
+        temp.Clear();
+        return ret;
+    }
+
+    IEnumerator UpdateText() {
+        text.SetText("" + tourists.Count);
+        yield return new WaitForSeconds(1);
+    }
 
 }

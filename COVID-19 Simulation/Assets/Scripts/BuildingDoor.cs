@@ -11,61 +11,63 @@ public class BuildingDoor : MonoBehaviour
     public DoorType doorType;
     Renderer rend;
     public Color color;
-    public TextMeshPro arrow;
+    public TextMeshPro text;
+    
+    private float bufferTime = 0;
 
     private void Start() {
+        Random rand = new Random();
         rend = GetComponent<Renderer>();
-        //arrow = GetComponent<TMP_Text>();
         var textRot = transform.rotation.eulerAngles;
         switch (doorType) {
             case DoorType.Entrance: 
                 color = new Color(0,1,0,0.5f);
-                arrow.faceColor = new Color(0,1,0,1);
+                text.faceColor = new Color(0,1,0,1);
                 textRot.z = 0;
-                arrow.transform.Rotate(0,0,0);
+                text.transform.Rotate(0,0,0);
                 break;
             case DoorType.Exit:
                 color = new Color(1,0,0,0.5f);
-                arrow.faceColor = new Color(1,0,0,1);
+                text.faceColor = new Color(1,0,0,1);
                 textRot.y = 180;
-                arrow.transform.Rotate(0,0,180);
+                text.transform.Rotate(0,0,180);
                 break;
             case DoorType.Both: 
                 color = new Color(0,0,1,0.5f);
+                text.faceColor = new Color(0,0,1,1);
+                text.SetText("=");
                 break;
         }
         rend.material.color = color;
         
     }
     
+    // Called when a Tourist collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
-        Debug.Log("ENTERED!");
-        Debug.Log("" + other.gameObject.name);
-        // TODO: Instead of Destroy, store the agents somewhere, whilst keeping agent states consistent.
-        switch (doorType) {
-            case DoorType.Entrance:
-                core.AddTourist(other.gameObject);
-                StartCoroutine(RecreateTourist(other.gameObject));
-                break;
-            case DoorType.Exit:
-                break;
-            case DoorType.Both:
-                core.AddTourist(other.gameObject);
-                StartCoroutine(RecreateTourist(other.gameObject));
-                break;
+        if (doorType == DoorType.Entrance) {
+            StartCoroutine(RecreateTourist(other.gameObject));
         }
-        
+    }
+
+    // Called when a Tourist stays inside Both door 'sphere'
+    private void OnTriggerStay(Collider other) {
+        if (doorType == DoorType.Both) {
+            bufferTime += Time.deltaTime;
+            if (bufferTime > 5) {
+                bufferTime = 0;
+                StartCoroutine(RecreateTourist(other.gameObject));
+            }
+        }
     }
 
     // Disables a Tourist for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction
     IEnumerator RecreateTourist(GameObject tourist) {
+        core.AddTourist(tourist);
         tourist.gameObject.SetActive(false);
-        yield return new WaitForSeconds(3);
-        // TODO: Change this position to a door with type Exit
-        tourist.transform.position = tourist.transform.position + new Vector3(-10, 0, -10);
+        yield return new WaitForSeconds(2);
+        tourist.transform.position = core.ReturnExitDoor().position;
         tourist.gameObject.SetActive(true);
         core.RemoveTourist(tourist.gameObject);
-        
     }
     
 

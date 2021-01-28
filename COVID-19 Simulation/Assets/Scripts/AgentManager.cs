@@ -7,6 +7,7 @@ public class AgentManager : MonoBehaviour
 {
     
     public Transform goal;
+    public float bufferTimer = 5;
     
     // Start is called before the first frame update
     void Start()
