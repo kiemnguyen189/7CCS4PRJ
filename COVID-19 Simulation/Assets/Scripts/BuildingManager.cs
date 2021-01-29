@@ -19,6 +19,8 @@ public class BuildingManager : MonoBehaviour
 
     public string touristTag = "Tourist";
     public int range = 3;
+
+    public bool showText = true;
     
     // Start is called before the first frame update
     void Start() {
@@ -34,12 +36,38 @@ public class BuildingManager : MonoBehaviour
         
     }
 
-    private void Update() {
-        StartCoroutine(UpdateText());
+    private void FixedUpdate() {
+        if (showText) {
+            StartCoroutine(UpdateText());
+            text.gameObject.SetActive(true);
+
+            foreach (BuildingDoor door in doors) {
+                door.TextToggle(true);
+                door.ColorToggle(true);
+                //door.gameObject.SetActive(true);
+            }
+
+            // northDoor.TextToggle(true);
+            // southDoor.TextToggle(true);
+            // eastDoor.TextToggle(true);
+            // westDoor.TextToggle(true);
+        } else {
+            text.gameObject.SetActive(false);
+
+            foreach (BuildingDoor door in doors) {
+                door.TextToggle(false);
+                door.ColorToggle(false);
+                //door.gameObject.SetActive(false);
+            }
+
+            // northDoor.TextToggle(false);
+            // southDoor.TextToggle(false);
+            // eastDoor.TextToggle(false);
+            // westDoor.TextToggle(false);
+        }
     }
 
     public void AddTourist(GameObject tourist) {
-
         tourists.Add(tourist);
     }
 
@@ -49,15 +77,11 @@ public class BuildingManager : MonoBehaviour
     }    
 
     public Transform ReturnExitDoor() {
-        //List<BuildingDoor> temp = new List<BuildingDoor>();
         foreach (BuildingDoor door in doors) {
-            //Debug.Log(""+door.doorType.ToString());
             if (door.doorType.ToString().Equals(DoorType.Exit.ToString()) || door.doorType.ToString().Equals(DoorType.Both.ToString())){
                 temp.Add(door);
             }
         }
-        //int r = rand.Next(temp.Count);
-        //Debug.Log("" + temp.Count);
         Transform ret = temp[Random.Range(0, temp.Count)].transform;
         temp.Clear();
         return ret;

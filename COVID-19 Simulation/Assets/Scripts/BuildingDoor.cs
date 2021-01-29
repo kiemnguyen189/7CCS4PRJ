@@ -8,15 +8,16 @@ public class BuildingDoor : MonoBehaviour
     
     public BuildingManager core;
     public Material mat;
-    public DoorType doorType;
-    Renderer rend;
-    public Color color;
     public TextMeshPro text;
+    public DoorType doorType;
+    public bool showText = false;
     
+    private Renderer rend;
+    private Color color;
     private float bufferTime = 0;
+    private int respawnTime = 10;
 
     private void Start() {
-        Random rand = new Random();
         rend = GetComponent<Renderer>();
         var textRot = transform.rotation.eulerAngles;
         switch (doorType) {
@@ -41,6 +42,22 @@ public class BuildingDoor : MonoBehaviour
         rend.material.color = color;
         
     }
+
+    public void TextToggle(bool b) {
+        if (b) {
+            text.gameObject.SetActive(true);
+        } else {
+            text.gameObject.SetActive(false);
+        }
+    }
+
+    public void ColorToggle(bool b) {
+        if (b) {
+            rend.enabled = true;
+        } else {
+            rend.enabled = false;
+        }
+    }
     
     // Called when a Tourist collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
@@ -49,22 +66,32 @@ public class BuildingDoor : MonoBehaviour
         }
     }
 
-    // Called when a Tourist stays inside Both door 'sphere'
+    // Called when a Tourist stays inside Both door 'sphere'.
     private void OnTriggerStay(Collider other) {
         if (doorType == DoorType.Both) {
-            bufferTime += Time.deltaTime;
-            if (bufferTime > 5) {
-                bufferTime = 0;
+            float otherTimer = other.GetComponent<AgentMovement>().UpdateBuildingBufferTime();
+            if (otherTimer <= 0f) {
                 StartCoroutine(RecreateTourist(other.gameObject));
+                other.GetComponent<AgentMovement>().ResetBuildingBufferTime();
             }
         }
     }
 
-    // Disables a Tourist for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction
+    // Called when a Tourist leaves the Both door 'sphere' before their buildingBufferTimer runs out.
+    private void OnTriggerExit(Collider other) {
+        if (doorType == DoorType.Both) {
+            Debug.Log("" + other.gameObject.name + " " + other.GetComponent<AgentMovement>().buildingBufferTimer);
+            other.GetComponent<AgentMovement>().ResetBuildingBufferTime();
+        }
+    }
+
+    // Disables a Tourist for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
     IEnumerator RecreateTourist(GameObject tourist) {
         core.AddTourist(tourist);
         tourist.gameObject.SetActive(false);
-        yield return new WaitForSeconds(2);
+        // TODO: Choose random time to respawn between ranges.
+        int res = Random.Range(1, respawnTime);
+        yield return new WaitForSeconds(res);
         tourist.transform.position = core.ReturnExitDoor().position;
         tourist.gameObject.SetActive(true);
         core.RemoveTourist(tourist.gameObject);
