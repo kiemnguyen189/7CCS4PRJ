@@ -1121,6 +1121,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 2068727496}
   agent: {fileID: 409967320}
+  agentType: 0
+  buildingBufferTimer: 5
 --- !u!54 &409967326
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2082,6 +2084,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cam: {fileID: 2068727496}
   agent: {fileID: 1391966259}
+  agentType: 1
+  buildingBufferTimer: 5
 --- !u!195 &1391966259
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2304,9 +2308,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 1999071321}
   mat: {fileID: 2100000, guid: 02951907ecb767a4d928d3318856c069, type: 2}
-  doorType: 2
-  color: {r: 0, g: 0, b: 0, a: 0}
   text: {fileID: 271122071}
+  doorType: 2
+  showText: 0
 --- !u!1 &1508476479
 GameObject:
   m_ObjectHideFlags: 0
@@ -2997,9 +3001,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 1999071321}
   mat: {fileID: 2100000, guid: 02951907ecb767a4d928d3318856c069, type: 2}
-  doorType: 1
-  color: {r: 0, g: 0, b: 0, a: 0}
   text: {fileID: 936694454}
+  doorType: 1
+  showText: 0
 --- !u!1 &1865904463
 GameObject:
   m_ObjectHideFlags: 0
@@ -3109,9 +3113,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 1999071321}
   mat: {fileID: 2100000, guid: 02951907ecb767a4d928d3318856c069, type: 2}
-  doorType: 1
-  color: {r: 0, g: 0, b: 0, a: 0}
   text: {fileID: 59121246}
+  doorType: 1
+  showText: 0
 --- !u!1 &1893545796
 GameObject:
   m_ObjectHideFlags: 0
@@ -3244,6 +3248,7 @@ MonoBehaviour:
   text: {fileID: 1604876921}
   touristTag: Tourist
   range: 3
+  showText: 1
 --- !u!4 &1999071322
 Transform:
   m_ObjectHideFlags: 0
@@ -3460,9 +3465,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   core: {fileID: 1999071321}
   mat: {fileID: 2100000, guid: 02951907ecb767a4d928d3318856c069, type: 2}
-  doorType: 0
-  color: {r: 0, g: 0, b: 0, a: 0}
   text: {fileID: 292131993}
+  doorType: 0
+  showText: 0
 --- !u!1 &2136050495
 GameObject:
   m_ObjectHideFlags: 0

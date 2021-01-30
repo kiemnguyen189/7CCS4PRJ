@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+public enum DoorType {
+    Entrance,
+    Exit,
+    Both
+}
+
 public class BuildingDoor : MonoBehaviour
 {
     
@@ -69,10 +75,10 @@ public class BuildingDoor : MonoBehaviour
     // Called when a Tourist stays inside Both door 'sphere'.
     private void OnTriggerStay(Collider other) {
         if (doorType == DoorType.Both) {
-            float otherTimer = other.GetComponent<AgentMovement>().UpdateBuildingBufferTime();
+            float otherTimer = other.GetComponent<AgentManager>().UpdateBuildingBufferTime();
             if (otherTimer <= 0f) {
                 StartCoroutine(RecreateTourist(other.gameObject));
-                other.GetComponent<AgentMovement>().ResetBuildingBufferTime();
+                other.GetComponent<AgentManager>().ResetBuildingBufferTime();
             }
         }
     }
@@ -80,8 +86,8 @@ public class BuildingDoor : MonoBehaviour
     // Called when a Tourist leaves the Both door 'sphere' before their buildingBufferTimer runs out.
     private void OnTriggerExit(Collider other) {
         if (doorType == DoorType.Both) {
-            Debug.Log("" + other.gameObject.name + " " + other.GetComponent<AgentMovement>().buildingBufferTimer);
-            other.GetComponent<AgentMovement>().ResetBuildingBufferTime();
+            Debug.Log("" + other.gameObject.name + " " + other.GetComponent<AgentManager>().buildingBufferTimer);
+            other.GetComponent<AgentManager>().ResetBuildingBufferTime();
         }
     }
 
