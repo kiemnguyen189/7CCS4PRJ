@@ -38,8 +38,9 @@ public class Spawner : MonoBehaviour
         }
     }
 
-    void SpawnEnemy()
+    public void SpawnEnemy()
     {
         Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
+        
     }
 }

@@ -4,8 +4,16 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - ShopOpening
   - Tourist
+  - Entrance
+  - Exit
+  - Both
+  - None
+  - Commuter
+  - Spawner
+  - SpawnNode
+  - Building
+  - BuildingComponent
   layers:
   - Default
   - TransparentFX
