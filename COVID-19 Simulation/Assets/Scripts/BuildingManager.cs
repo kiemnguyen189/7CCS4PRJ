@@ -44,26 +44,18 @@ public class BuildingManager : MonoBehaviour
             foreach (BuildingDoor door in doors) {
                 door.TextToggle(true);
                 door.ColorToggle(true);
-                //door.gameObject.SetActive(true);
+
             }
 
-            // northDoor.TextToggle(true);
-            // southDoor.TextToggle(true);
-            // eastDoor.TextToggle(true);
-            // westDoor.TextToggle(true);
         } else {
             text.gameObject.SetActive(false);
 
             foreach (BuildingDoor door in doors) {
                 door.TextToggle(false);
                 door.ColorToggle(false);
-                //door.gameObject.SetActive(false);
+
             }
 
-            // northDoor.TextToggle(false);
-            // southDoor.TextToggle(false);
-            // eastDoor.TextToggle(false);
-            // westDoor.TextToggle(false);
         }
     }
 

@@ -14,9 +14,38 @@ public class AgentManager : MonoBehaviour
     public Camera cam;
     public NavMeshAgent agent;
     public AgentType agentType;
-    public static float baseBuildingBufferTime = 5;
-    public float buildingBufferTimer = 5;
+    public Transform startNode;
+    public Transform endNode;
 
+    private static float baseBuildingBufferTime = 5;
+    private float buildingBufferTimer = 5;
+    private Renderer rend;
+    private Color color;
+
+    // Start is called before the first frame update
+    void Start() {
+        rend = GetComponent<Renderer>();
+        switch (agentType) {
+            case AgentType.Tourist: 
+                color = new Color(1,0,0,1);
+                
+                break;
+            case AgentType.Commuter:
+                color = new Color(0,1,0,1);
+
+                break;
+        }
+        rend.material.color = color;
+
+        // TODO: Set the start and end nodes for each agent, assigned randomly.
+        // TODO: If the agent is a Tourist, normal randomness
+        // TODO: If the agent is a Commuter, random from set of possible end nodes.
+
+
+        // TODO: Set all of the buildings an agent would visit, if they are a Tourist agent.
+    }
+    
+    
     // Update is called once per frame
     void Update()
     {
@@ -40,8 +69,7 @@ public class AgentManager : MonoBehaviour
         return buildingBufferTimer;
     }
 
-    void Destroy()
-    {
-        Destroy(gameObject);
-    }
+    //public 
+
+
 }

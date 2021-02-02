@@ -6,7 +6,8 @@ using TMPro;
 public enum DoorType {
     Entrance,
     Exit,
-    Both
+    Both,
+    None
 }
 
 public class BuildingDoor : MonoBehaviour
@@ -20,7 +21,6 @@ public class BuildingDoor : MonoBehaviour
     
     private Renderer rend;
     private Color color;
-    private float bufferTime = 0;
     private int respawnTime = 10;
 
     private void Start() {
@@ -44,50 +44,52 @@ public class BuildingDoor : MonoBehaviour
                 text.faceColor = new Color(0,0,1,1);
                 text.SetText("=");
                 break;
+            case DoorType.None:
+                color = new Color(0,0,0,0.5f);
+                text.faceColor = new Color(0,0,0,1);
+                text.SetText("x");
+                break;
         }
         rend.material.color = color;
         
     }
 
     public void TextToggle(bool b) {
-        if (b) {
-            text.gameObject.SetActive(true);
-        } else {
-            text.gameObject.SetActive(false);
+        if (b) { text.gameObject.SetActive(true);
+        } else { text.gameObject.SetActive(false);
         }
     }
 
     public void ColorToggle(bool b) {
-        if (b) {
-            rend.enabled = true;
-        } else {
-            rend.enabled = false;
+        if (b) { rend.enabled = true;
+        } else { rend.enabled = false;
         }
     }
     
     // Called when a Tourist collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
-        if (doorType == DoorType.Entrance) {
+        if (doorType == DoorType.Entrance && other.GetComponent<AgentManager>().agentType == AgentType.Tourist) {
             StartCoroutine(RecreateTourist(other.gameObject));
         }
     }
 
     // Called when a Tourist stays inside Both door 'sphere'.
     private void OnTriggerStay(Collider other) {
-        if (doorType == DoorType.Both) {
-            float otherTimer = other.GetComponent<AgentManager>().UpdateBuildingBufferTime();
+        AgentManager agent = other.GetComponent<AgentManager>();
+        if (doorType == DoorType.Both && agent.agentType == AgentType.Tourist) {
+            float otherTimer = agent.UpdateBuildingBufferTime();
             if (otherTimer <= 0f) {
                 StartCoroutine(RecreateTourist(other.gameObject));
-                other.GetComponent<AgentManager>().ResetBuildingBufferTime();
+                agent.ResetBuildingBufferTime();
             }
         }
     }
 
     // Called when a Tourist leaves the Both door 'sphere' before their buildingBufferTimer runs out.
     private void OnTriggerExit(Collider other) {
-        if (doorType == DoorType.Both) {
-            Debug.Log("" + other.gameObject.name + " " + other.GetComponent<AgentManager>().buildingBufferTimer);
-            other.GetComponent<AgentManager>().ResetBuildingBufferTime();
+        AgentManager agent = other.GetComponent<AgentManager>();
+        if (doorType == DoorType.Both && agent.agentType == AgentType.Tourist) {
+            agent.ResetBuildingBufferTime();
         }
     }
 

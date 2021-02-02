@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PersonSpawner : MonoBehaviour
+public class Spawner : MonoBehaviour
 {
 
     public Transform agentPrefab;

@@ -23,4 +23,37 @@ public class SimManager : MonoBehaviour
     {
         
     }
+
+    // Increases the number of agents of the respective type as well as total
+    public void AddTotalAgents(AgentType type) {
+        if (type == AgentType.Tourist) {
+            totalTourists += 1;
+            totalAgents += 1;
+        } else {
+            totalCommuters += 1;
+            totalAgents += 1;
+        }
+    }
+
+
+    public void ReduceTotalAgents(AgentType type) {
+        // Don't have a negative number of agents in the simulation.
+        if (totalAgents > 0 && totalTourists > 0 && totalCommuters > 0) {
+            if (type == AgentType.Tourist) {
+                totalTourists -= 1;
+                totalAgents -= 1;
+            } else {
+                totalCommuters -= 1;
+                totalAgents -= 1;
+            }
+        }
+        
+    }
+
+    // Updates the total numbers to Susceptible and Infectious agents.
+    public void UpdateSI() {
+
+    }
+
+
 }
