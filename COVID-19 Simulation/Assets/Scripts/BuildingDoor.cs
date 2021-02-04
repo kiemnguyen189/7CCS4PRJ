@@ -17,7 +17,6 @@ public class BuildingDoor : MonoBehaviour
     public Material mat;
     public TextMeshPro text;
     public DoorType doorType;
-    public bool showText = false;
     
     private Renderer rend;
     private Color color;
@@ -79,7 +78,10 @@ public class BuildingDoor : MonoBehaviour
     
     // Called when a Tourist collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
-        if (doorType == DoorType.Entrance && other.GetComponent<AgentManager>().agentType == AgentType.Tourist) {
+        // Check if current door is part of the list of destinations for each agent.
+        AgentManager agent = other.GetComponent<AgentManager>();
+        // Checks for valid Entry.
+        if (agent.destinations.Contains(gameObject.transform) && doorType == DoorType.Entrance && agent.agentType == AgentType.Tourist) {
             StartCoroutine(RecreateTourist(other.gameObject));
         }
     }
@@ -87,7 +89,7 @@ public class BuildingDoor : MonoBehaviour
     // Called when a Tourist stays inside Both door 'sphere'.
     private void OnTriggerStay(Collider other) {
         AgentManager agent = other.GetComponent<AgentManager>();
-        if (doorType == DoorType.Both && agent.agentType == AgentType.Tourist) {
+        if (agent.destinations.Contains(gameObject.transform) && doorType == DoorType.Both && agent.agentType == AgentType.Tourist) {
             float otherTimer = agent.UpdateBuildingBufferTime();
             if (otherTimer <= 0f) {
                 StartCoroutine(RecreateTourist(other.gameObject));
@@ -111,7 +113,7 @@ public class BuildingDoor : MonoBehaviour
         // TODO: Choose random time to respawn between ranges.
         int res = Random.Range(1, respawnTime);
         yield return new WaitForSeconds(res);
-        tourist.transform.position = core.ReturnExitDoor().position;
+        tourist.transform.position = core.ReturnRandomDoor("Exit").position;
         tourist.gameObject.SetActive(true);
         core.RemoveTourist(tourist.gameObject);
     }

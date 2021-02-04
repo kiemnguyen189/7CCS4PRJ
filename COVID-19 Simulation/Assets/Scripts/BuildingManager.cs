@@ -15,9 +15,6 @@ public class BuildingManager : MonoBehaviour
 
     public TextMeshPro text;
 
-    public string touristTag = "Tourist";
-    public int range = 3;
-
     public bool showText = true;
     
     // Start is called before the first frame update
@@ -30,11 +27,8 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        Debug.Log(manager.doorMode);
-
         switch (manager.doorMode) {
             case DoorwayMode.OneWay:
-                Debug.Log("ONEWAY");
                 int rand = Random.Range(0, 2);
                 if (rand == 0) {
                     // Entrance NS, Exit EW
@@ -51,13 +45,11 @@ public class BuildingManager : MonoBehaviour
                 }
                 break;
             case DoorwayMode.TwoWay:
-                Debug.Log("TWOWAY");
                 foreach (BuildingDoor door in doors) {
                     door.doorType = DoorType.Both;
                 }
                 break;
             case DoorwayMode.Mixed:
-                Debug.Log("MIXED");
                 foreach (BuildingDoor door in doors) {
                     door.doorType = (DoorType)Random.Range(0, 3);
                 }
@@ -93,18 +85,18 @@ public class BuildingManager : MonoBehaviour
 
     public void RemoveTourist(GameObject tourist) {
         tourists.Remove(tourist);
-    }    
+    }
 
-    public Transform ReturnExitDoor() {
+
+    // Returns a random door, depending or the type parameter. Will either return Entrance/Both or Exit/Both.
+    public Transform ReturnRandomDoor(string type) {
         List<BuildingDoor> temp = new List<BuildingDoor>();
         foreach (BuildingDoor door in doors) {
-            if (door.doorType.ToString().Equals(DoorType.Exit.ToString()) || door.doorType.ToString().Equals(DoorType.Both.ToString())){
+            if (door.doorType.ToString().Equals(type) || door.doorType.ToString().Equals(DoorType.Both.ToString())){
                 temp.Add(door);
             }
         }
-        Transform ret = temp[Random.Range(0, temp.Count)].transform;
-        //temp.Clear();
-        return ret;
+        return temp[Random.Range(0, temp.Count)].transform;
     }
 
     IEnumerator UpdateText() {

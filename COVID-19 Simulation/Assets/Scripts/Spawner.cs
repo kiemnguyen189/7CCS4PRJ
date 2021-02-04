@@ -14,18 +14,24 @@ public class Spawner : MonoBehaviour
 
     private int waveIndex = 0;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (countdown <= 0f)
-        {
-            StartCoroutine(SpawnWave());
-            countdown = timeBetweenWaves;
-        }
-
-        countdown -= Time.deltaTime;
-
+    
+    void Start() {
+        SpawnEnemy();
     }
+    
+    
+    // Update is called once per frame
+    // void Update()
+    // {
+    //     if (countdown <= 0f)
+    //     {
+    //         StartCoroutine(SpawnWave());
+    //         countdown = timeBetweenWaves;
+    //     }
+
+    //     countdown -= Time.deltaTime;
+
+    // }
 
     IEnumerator SpawnWave()
     {

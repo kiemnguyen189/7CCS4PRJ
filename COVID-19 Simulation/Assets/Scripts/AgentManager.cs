@@ -17,8 +17,10 @@ public class AgentManager : MonoBehaviour
     public AgentType agentType;
     public Transform startNode;
     public Transform endNode;
+    public int maxDestinations = 5;
     public List<Transform> destinations;
 
+    private Transform currentDestination;
     private static float baseBuildingBufferTime = 2;
     private float buildingBufferTimer = baseBuildingBufferTime;
     private Renderer rend;
@@ -27,9 +29,11 @@ public class AgentManager : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
 
+        startNode = gameObject.transform;
+
         // TODO: Retrieve spawning probability of Tourists vs Commuters (and groups) from SimManager.
         int chance = Random.Range(0, 100);
-        if (chance >= manager.ratioTourists) {
+        if (chance <= manager.ratioTourists) {
             agentType = AgentType.Tourist;
             gameObject.tag = "Tourist";
             color = new Color(1,0,0,1);
@@ -45,8 +49,15 @@ public class AgentManager : MonoBehaviour
         // TODO: If the agent is a Tourist, normal randomness.
         // TODO: If the agent is a Commuter, random from set of possible end nodes.
 
-
-        // TODO: Set all of the buildings an agent would visit, if they are a Tourist agent.
+        destinations = new List<Transform>();
+        int numDest = Random.Range(1, maxDestinations);
+        if (agentType == AgentType.Tourist) {
+            destinations = manager.SetDestinations(numDest);
+        }
+        // TODO: Find a random endNode that is not the startNode.
+        endNode = manager.SetEndNode(startNode);
+        destinations.Add(endNode);
+            
     }
     
     
@@ -55,15 +66,14 @@ public class AgentManager : MonoBehaviour
     {
         // TODO: Temporary movement for all agents using mouse clicks
         if (Input.GetMouseButtonDown(0)) {
-
             Ray ray = manager.GetComponent<SimManager>().cam.ScreenPointToRay(Input.mousePosition);
-
-            //Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit)) {
                 agent.SetDestination(hit.point);
             }
         }
+
+        // TODO: Dynamic destination allocation for each agent.
 
 
     }

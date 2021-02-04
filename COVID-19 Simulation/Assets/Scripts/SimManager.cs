@@ -30,8 +30,9 @@ public class SimManager : MonoBehaviour
     private int totalGroupSusceptible = 0;
     private int totalGroupInfected = 0;
 
-    private GameObject[] spawners;
-    private GameObject[] buildings;
+    public static GameObject[] spawners;
+    public static GameObject[] buildings;
+    public static Transform[] temp;
     
     
     // Start is called before the first frame update
@@ -39,14 +40,55 @@ public class SimManager : MonoBehaviour
     {
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
-        //Debug.Log("" + spawners.Length);
-        //Debug.Log("" + spawners[1].name);
+        // //temp = spawners.Select(f => f.transform).ToArray();
+
+        // temp = new Transform[spawners.Length];
+        // for (int i = 0; i < spawners.Length; i++) {
+        //     temp[i] = spawners[i].transform;
+        // }
+
     }
+
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+
+    // Returns the Transform of the EndNode unique from the StartNode passed in.
+    public Transform SetEndNode(Transform startNode) {
+        List<GameObject> tempEnds = new List<GameObject>(spawners);
+        foreach (GameObject i in tempEnds) {
+            if (i.transform.position == startNode.position) {
+                tempEnds.Remove(i);
+                break;
+            }
+        }
+        int rand = Random.Range(0, tempEnds.Count);
+        return tempEnds[rand].transform;
+    }
+
+
+    // Returns a list of building locations that the agent can visit
+    // 
+    public List<Transform> SetDestinations(int numDest) {
+        List<GameObject> tempBuildings = new List<GameObject>(buildings);
+        List<Transform> ret = new List<Transform>();
+        for (int i = 0; i <= numDest; i++) {
+            // Randomly select a building
+            // Only add one entrance per building
+            if (tempBuildings.Count > 0) {
+                int rand = Random.Range(0, tempBuildings.Count);
+                BuildingManager building = tempBuildings[rand].GetComponent<BuildingManager>();
+                tempBuildings.Remove(tempBuildings[rand]);
+                ret.Add(building.ReturnRandomDoor("Entrance"));
+            } else {
+                break;
+            }
+        }
+        return ret;
     }
 
     // Increases the number of agents of the respective type as well as total
@@ -60,7 +102,7 @@ public class SimManager : MonoBehaviour
         }
     }
 
-
+    // Decreases the number of agents of the respective type as well as total
     public void ReduceTotalAgents(AgentType type) {
         // Don't have a negative number of agents in the simulation.
         if (totalAgents > 0 && totalTourists > 0 && totalCommuters > 0) {
