@@ -8,7 +8,7 @@ public class BuildingManager : MonoBehaviour
 
     public SimManager manager;
 
-    public List<GameObject> tourists = new List<GameObject>();
+    public List<GameObject> shoppers = new List<GameObject>();
     public List<BuildingDoor> doors = new List<BuildingDoor>();
     public List<BuildingDoor> exits = new List<BuildingDoor>();
     public List<BuildingDoor> entrances = new List<BuildingDoor>();
@@ -79,12 +79,12 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
-    public void AddTourist(GameObject tourist) {
-        tourists.Add(tourist);
+    public void AddShopper(GameObject shopper) {
+        shoppers.Add(shopper);
     }
 
-    public void RemoveTourist(GameObject tourist) {
-        tourists.Remove(tourist);
+    public void RemoveShopper(GameObject shopper) {
+        shoppers.Remove(shopper);
     }
 
 
@@ -100,7 +100,7 @@ public class BuildingManager : MonoBehaviour
     }
 
     IEnumerator UpdateText() {
-        text.SetText("" + tourists.Count);
+        text.SetText("" + shoppers.Count);
         yield return new WaitForSeconds(1);
     }
 

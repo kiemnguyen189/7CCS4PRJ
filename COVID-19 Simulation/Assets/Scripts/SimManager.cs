@@ -14,18 +14,18 @@ public class SimManager : MonoBehaviour
     
     public Camera cam;
 
-    public float ratioTourists;
+    public float ratioShoppers;
     public float ratioCommuters;
-    public float ratioGroupTourists;
+    public float ratioGroupShoppers;
     public float ratioGroupCommuters;
     public DoorwayMode doorMode;
 
     private int totalAgents = 0;
-    private int totalTourists = 0;
+    private int totalShoppers = 0;
     private int totalCommuters = 0;
     private int totalSusceptible = 0;
     private int totalInfected = 0;
-    private int totalGroupTourists = 0;
+    private int totalGroupShoppers = 0;
     private int totalGroupCommuters = 0;
     private int totalGroupSusceptible = 0;
     private int totalGroupInfected = 0;
@@ -40,12 +40,6 @@ public class SimManager : MonoBehaviour
     {
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
-        // //temp = spawners.Select(f => f.transform).ToArray();
-
-        // temp = new Transform[spawners.Length];
-        // for (int i = 0; i < spawners.Length; i++) {
-        //     temp[i] = spawners[i].transform;
-        // }
 
     }
 
@@ -93,8 +87,8 @@ public class SimManager : MonoBehaviour
 
     // Increases the number of agents of the respective type as well as total
     public void AddTotalAgents(AgentType type) {
-        if (type == AgentType.Tourist) {
-            totalTourists += 1;
+        if (type == AgentType.Shopper) {
+            totalShoppers += 1;
             totalAgents += 1;
         } else {
             totalCommuters += 1;
@@ -105,9 +99,9 @@ public class SimManager : MonoBehaviour
     // Decreases the number of agents of the respective type as well as total
     public void ReduceTotalAgents(AgentType type) {
         // Don't have a negative number of agents in the simulation.
-        if (totalAgents > 0 && totalTourists > 0 && totalCommuters > 0) {
-            if (type == AgentType.Tourist) {
-                totalTourists -= 1;
+        if (totalAgents > 0 && totalShoppers > 0 && totalCommuters > 0) {
+            if (type == AgentType.Shopper) {
+                totalShoppers -= 1;
                 totalAgents -= 1;
             } else {
                 totalCommuters -= 1;

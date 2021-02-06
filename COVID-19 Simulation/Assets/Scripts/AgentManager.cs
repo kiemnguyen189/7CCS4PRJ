@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public enum AgentType {
-    Tourist,
+    Shopper,
     Commuter
 }
 
@@ -19,8 +19,8 @@ public class AgentManager : MonoBehaviour
     public Transform endNode;
     public int maxDestinations = 5;
     public List<Transform> destinations;
-
-    private Transform currentDestination;
+    public Transform currentDestination;
+    
     private static float baseBuildingBufferTime = 2;
     private float buildingBufferTimer = baseBuildingBufferTime;
     private Renderer rend;
@@ -31,11 +31,11 @@ public class AgentManager : MonoBehaviour
 
         startNode = gameObject.transform;
 
-        // TODO: Retrieve spawning probability of Tourists vs Commuters (and groups) from SimManager.
+        // TODO: Retrieve spawning probability of Shoppers vs Commuters (and groups) from SimManager.
         int chance = Random.Range(0, 100);
-        if (chance <= manager.ratioTourists) {
-            agentType = AgentType.Tourist;
-            gameObject.tag = "Tourist";
+        if (chance <= manager.ratioShoppers) {
+            agentType = AgentType.Shopper;
+            gameObject.tag = "Shopper";
             color = new Color(1,0,0,1);
         } else {
             agentType = AgentType.Commuter;
@@ -45,16 +45,11 @@ public class AgentManager : MonoBehaviour
         rend = GetComponent<Renderer>();
         rend.material.color = color;
 
-        // TODO: Set the start and end nodes for each agent, assigned randomly.
-        // TODO: If the agent is a Tourist, normal randomness.
-        // TODO: If the agent is a Commuter, random from set of possible end nodes.
-
         destinations = new List<Transform>();
         int numDest = Random.Range(1, maxDestinations);
-        if (agentType == AgentType.Tourist) {
+        if (agentType == AgentType.Shopper) {
             destinations = manager.SetDestinations(numDest);
         }
-        // TODO: Find a random endNode that is not the startNode.
         endNode = manager.SetEndNode(startNode);
         destinations.Add(endNode);
             
@@ -74,9 +69,19 @@ public class AgentManager : MonoBehaviour
         }
 
         // TODO: Dynamic destination allocation for each agent.
-
+        if (destinations.Count != 0) {
+            currentDestination = destinations[0];
+            agent.SetDestination(currentDestination.position);
+        }   
+        
 
     }
+
+    // Updates the list of destinations each agent has.
+    public void UpdateDestinations() {
+        destinations.RemoveAt(0);
+    }
+
 
     public float UpdateBuildingBufferTime() {
         buildingBufferTimer -= Time.deltaTime;
@@ -89,6 +94,9 @@ public class AgentManager : MonoBehaviour
     }
 
     //public 
+    public void Despawn() {
+        Destroy(gameObject);
+    }
 
 
 }

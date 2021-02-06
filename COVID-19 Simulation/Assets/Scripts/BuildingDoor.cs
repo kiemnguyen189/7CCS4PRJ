@@ -76,46 +76,50 @@ public class BuildingDoor : MonoBehaviour
         }
     }
     
-    // Called when a Tourist collides with Entrance door 'sphere'.
+    // Called when a Shopper collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        if (agent.destinations.Contains(gameObject.transform) && doorType == DoorType.Entrance && agent.agentType == AgentType.Tourist) {
-            StartCoroutine(RecreateTourist(other.gameObject));
+        // TODO: Check if the current door is at the top of the list of Directions.
+        if (agent.destinations[0] == gameObject.transform && doorType == DoorType.Entrance && agent.agentType == AgentType.Shopper) {
+            StartCoroutine(RecreateShopper(other.gameObject));
         }
     }
 
-    // Called when a Tourist stays inside Both door 'sphere'.
+    // Called when a Shopper stays inside Both door 'sphere'.
     private void OnTriggerStay(Collider other) {
         AgentManager agent = other.GetComponent<AgentManager>();
-        if (agent.destinations.Contains(gameObject.transform) && doorType == DoorType.Both && agent.agentType == AgentType.Tourist) {
+        // TODO: Check if the current door is at the top of the list of Directions.
+        // ? agent.destinations.Contains(gameObject.transform)
+        if (agent.destinations[0] == gameObject.transform && doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
             float otherTimer = agent.UpdateBuildingBufferTime();
             if (otherTimer <= 0f) {
-                StartCoroutine(RecreateTourist(other.gameObject));
+                StartCoroutine(RecreateShopper(other.gameObject));
                 agent.ResetBuildingBufferTime();
             }
         }
     }
 
-    // Called when a Tourist leaves the Both door 'sphere' before their buildingBufferTimer runs out.
+    // Called when a Shopper leaves the Both door 'sphere' before their buildingBufferTimer runs out.
     private void OnTriggerExit(Collider other) {
         AgentManager agent = other.GetComponent<AgentManager>();
-        if (doorType == DoorType.Both && agent.agentType == AgentType.Tourist) {
+        if (doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
             agent.ResetBuildingBufferTime();
         }
     }
 
-    // Disables a Tourist for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
-    IEnumerator RecreateTourist(GameObject tourist) {
-        core.AddTourist(tourist);
-        tourist.gameObject.SetActive(false);
+    // Disables a Shopper for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
+    IEnumerator RecreateShopper(GameObject shopper) {
+        core.AddShopper(shopper);
+        shopper.gameObject.SetActive(false);
         // TODO: Choose random time to respawn between ranges.
         int res = Random.Range(1, respawnTime);
         yield return new WaitForSeconds(res);
-        tourist.transform.position = core.ReturnRandomDoor("Exit").position;
-        tourist.gameObject.SetActive(true);
-        core.RemoveTourist(tourist.gameObject);
+        shopper.transform.position = core.ReturnRandomDoor("Exit").position;
+        shopper.gameObject.SetActive(true);
+        shopper.GetComponent<AgentManager>().UpdateDestinations();
+        core.RemoveShopper(shopper);
     }
     
 

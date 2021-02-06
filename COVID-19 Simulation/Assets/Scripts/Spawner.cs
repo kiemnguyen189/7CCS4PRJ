@@ -49,4 +49,16 @@ public class Spawner : MonoBehaviour
         Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
         
     }
+
+
+    private void OnTriggerEnter(Collider other) {
+        // Check if current door is part of the list of destinations for each agent.
+        AgentManager agent = other.GetComponent<AgentManager>();
+        // Checks for valid Entry.
+        // TODO: Check if the current door is at the top of the list of Directions.
+        if (agent.currentDestination == gameObject.transform) {
+            agent.Despawn();
+        }
+    }
+
 }
