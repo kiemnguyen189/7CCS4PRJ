@@ -11,12 +11,12 @@ public enum AgentType {
 public class AgentManager : MonoBehaviour
 {
 
-    public SimManager manager;
+    public GameObject manager;
 
     public NavMeshAgent agent;
     public AgentType agentType;
-    public Transform startNode;
-    public Transform endNode;
+    private Transform startNode;
+    private Transform endNode;
     public int maxDestinations = 5;
     public List<Transform> destinations;
     public Transform currentDestination;
@@ -29,11 +29,12 @@ public class AgentManager : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
 
+        // TODO: Group Agent spawning.
+
         startNode = gameObject.transform;
 
-        // TODO: Retrieve spawning probability of Shoppers vs Commuters (and groups) from SimManager.
         int chance = Random.Range(0, 100);
-        if (chance <= manager.ratioShoppers) {
+        if (chance <= manager.GetComponent<SimManager>().ratioShoppers) {
             agentType = AgentType.Shopper;
             gameObject.tag = "Shopper";
             color = new Color(1,0,0,1);
@@ -48,10 +49,13 @@ public class AgentManager : MonoBehaviour
         destinations = new List<Transform>();
         int numDest = Random.Range(1, maxDestinations);
         if (agentType == AgentType.Shopper) {
-            destinations = manager.SetDestinations(numDest);
+            destinations = manager.GetComponent<SimManager>().SetDestinations(numDest);
         }
-        endNode = manager.SetEndNode(startNode);
+        endNode = manager.GetComponent<SimManager>().SetEndNode(startNode);
         destinations.Add(endNode);
+
+        manager.GetComponent<SimManager>().AddTotalAgents(agentType);
+        //manager.AddTotalAgents(agentType);
             
     }
     
@@ -59,14 +63,14 @@ public class AgentManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // TODO: Temporary movement for all agents using mouse clicks
-        if (Input.GetMouseButtonDown(0)) {
-            Ray ray = manager.GetComponent<SimManager>().cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit)) {
-                agent.SetDestination(hit.point);
-            }
-        }
+        // // ? Temporary movement for all agents using mouse clicks
+        // if (Input.GetMouseButtonDown(0)) {
+        //     Ray ray = manager.GetComponent<SimManager>().cam.ScreenPointToRay(Input.mousePosition);
+        //     RaycastHit hit;
+        //     if (Physics.Raycast(ray, out hit)) {
+        //         agent.SetDestination(hit.point);
+        //     }
+        // }
 
         // TODO: Dynamic destination allocation for each agent.
         if (destinations.Count != 0) {
@@ -95,6 +99,8 @@ public class AgentManager : MonoBehaviour
 
     //public 
     public void Despawn() {
+        manager.GetComponent<SimManager>().ReduceTotalAgents(agentType);
+        //manager.ReduceTotalAgents(agentType);
         Destroy(gameObject);
     }
 

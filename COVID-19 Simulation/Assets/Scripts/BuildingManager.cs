@@ -10,8 +10,8 @@ public class BuildingManager : MonoBehaviour
 
     public List<GameObject> shoppers = new List<GameObject>();
     public List<BuildingDoor> doors = new List<BuildingDoor>();
-    public List<BuildingDoor> exits = new List<BuildingDoor>();
-    public List<BuildingDoor> entrances = new List<BuildingDoor>();
+    // public List<BuildingDoor> exits = new List<BuildingDoor>();
+    // public List<BuildingDoor> entrances = new List<BuildingDoor>();
 
     public TextMeshPro text;
 
@@ -51,8 +51,10 @@ public class BuildingManager : MonoBehaviour
                 break;
             case DoorwayMode.Mixed:
                 foreach (BuildingDoor door in doors) {
-                    door.doorType = (DoorType)Random.Range(0, 3);
+                    door.doorType = (DoorType)Random.Range(0, doors.Count - 1);
                 }
+                // Randomly change one of the doors to type Both as assurance.
+                doors[Random.Range(0, doors.Count)].doorType = DoorType.Both;
                 break;
         }  
 

@@ -6,6 +6,7 @@ public class Spawner : MonoBehaviour
 {
 
     public Transform agentPrefab;
+    public Transform groupAgentPrefab;
     public Transform spawnPoint;
 
     public float timeBetweenWaves = 3f;
@@ -21,17 +22,17 @@ public class Spawner : MonoBehaviour
     
     
     // Update is called once per frame
-    // void Update()
-    // {
-    //     if (countdown <= 0f)
-    //     {
-    //         StartCoroutine(SpawnWave());
-    //         countdown = timeBetweenWaves;
-    //     }
+    void Update()
+    {
+        if (countdown <= 0f)
+        {
+            StartCoroutine(SpawnWave());
+            countdown = timeBetweenWaves;
+        }
 
-    //     countdown -= Time.deltaTime;
+        countdown -= Time.deltaTime;
 
-    // }
+    }
 
     IEnumerator SpawnWave()
     {
@@ -46,6 +47,7 @@ public class Spawner : MonoBehaviour
 
     public void SpawnEnemy()
     {
+        // TODO: Chance to spawn group agents as well as single agents.
         Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
         
     }

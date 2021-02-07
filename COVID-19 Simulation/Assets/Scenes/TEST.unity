@@ -948,6 +948,49 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1968042495
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1968042497}
+  - component: {fileID: 1968042496}
+  m_Layer: 0
+  m_Name: GroupAgent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1968042496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968042495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2b61f14a8c7a494c9f8d7c7c330cc7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1968042497
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968042495}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &2038054894
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1233,7 +1276,22 @@ PrefabInstance:
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
       propertyPath: ratioShoppers
-      value: 50
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
+        type: 3}
+      propertyPath: totalShoppers
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
+        type: 3}
+      propertyPath: totalAgents
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
+        type: 3}
+      propertyPath: totalCommuters
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 633487431973451591, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}

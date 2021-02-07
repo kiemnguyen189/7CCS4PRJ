@@ -49,3 +49,6 @@ MonoBehaviour:
   ratioGroupShoppers: 0
   ratioGroupCommuters: 0
   doorMode: 0
+  totalAgents: 0
+  totalShoppers: 0
+  totalCommuters: 0

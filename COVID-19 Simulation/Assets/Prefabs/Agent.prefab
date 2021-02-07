@@ -48,13 +48,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c106a066dc59ade408c7c160634b1f96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
+  manager: {fileID: 633487431973451591, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
   agent: {fileID: 8418691987860001813}
   agentType: 0
   startNode: {fileID: 0}
   endNode: {fileID: 0}
   maxDestinations: 5
   destinations: []
+  currentDestination: {fileID: 0}
 --- !u!33 &8418691987860001814
 MeshFilter:
   m_ObjectHideFlags: 0

@@ -20,15 +20,15 @@ public class SimManager : MonoBehaviour
     public float ratioGroupCommuters;
     public DoorwayMode doorMode;
 
-    private int totalAgents = 0;
-    private int totalShoppers = 0;
-    private int totalCommuters = 0;
-    private int totalSusceptible = 0;
-    private int totalInfected = 0;
-    private int totalGroupShoppers = 0;
-    private int totalGroupCommuters = 0;
-    private int totalGroupSusceptible = 0;
-    private int totalGroupInfected = 0;
+    public static int totalAgents;
+    public static int totalShoppers;
+    public static int totalCommuters;
+    private int totalSusceptible;
+    private int totalInfected;
+    private int totalGroupShoppers;
+    private int totalGroupCommuters;
+    private int totalGroupSusceptible;
+    private int totalGroupInfected;
 
     public static GameObject[] spawners;
     public static GameObject[] buildings;
@@ -40,14 +40,26 @@ public class SimManager : MonoBehaviour
     {
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
+        
+        ResetMetrics();
 
+        Debug.Log(totalAgents);
+
+    }
+
+    private void ResetMetrics() {
+        totalAgents = 0;
+        totalShoppers = 0;
+        totalCommuters = 0;
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        
+        // totalAgents = totalAgents;
+        // totalShoppers = totalShoppers;
+        // totalCommuters = totalCommuters;
     }
 
 
@@ -88,9 +100,11 @@ public class SimManager : MonoBehaviour
     // Increases the number of agents of the respective type as well as total
     public void AddTotalAgents(AgentType type) {
         if (type == AgentType.Shopper) {
+            Debug.Log("More shopper: " + totalShoppers + ", " + totalAgents);
             totalShoppers += 1;
             totalAgents += 1;
         } else {
+            Debug.Log("More commuter: " + totalCommuters + ", " + totalAgents);
             totalCommuters += 1;
             totalAgents += 1;
         }
@@ -101,9 +115,11 @@ public class SimManager : MonoBehaviour
         // Don't have a negative number of agents in the simulation.
         if (totalAgents > 0 && totalShoppers > 0 && totalCommuters > 0) {
             if (type == AgentType.Shopper) {
+                Debug.Log("Less shopper: " + totalShoppers + ", " + totalAgents);
                 totalShoppers -= 1;
                 totalAgents -= 1;
             } else {
+                Debug.Log("Less commuter: " + totalCommuters + ", " + totalAgents);
                 totalCommuters -= 1;
                 totalAgents -= 1;
             }

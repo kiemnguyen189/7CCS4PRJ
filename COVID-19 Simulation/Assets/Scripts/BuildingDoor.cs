@@ -78,28 +78,28 @@ public class BuildingDoor : MonoBehaviour
     
     // Called when a Shopper collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
+        // TODO: Check for group agent entry aswell;
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        // TODO: Check if the current door is at the top of the list of Directions.
-        if (agent.destinations[0] == gameObject.transform && doorType == DoorType.Entrance && agent.agentType == AgentType.Shopper) {
+        if (agent.destinations[0] == gameObject.transform && doorType != DoorType.Exit && agent.agentType == AgentType.Shopper) {
             StartCoroutine(RecreateShopper(other.gameObject));
         }
     }
 
-    // Called when a Shopper stays inside Both door 'sphere'.
-    private void OnTriggerStay(Collider other) {
-        AgentManager agent = other.GetComponent<AgentManager>();
-        // TODO: Check if the current door is at the top of the list of Directions.
-        // ? agent.destinations.Contains(gameObject.transform)
-        if (agent.destinations[0] == gameObject.transform && doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
-            float otherTimer = agent.UpdateBuildingBufferTime();
-            if (otherTimer <= 0f) {
-                StartCoroutine(RecreateShopper(other.gameObject));
-                agent.ResetBuildingBufferTime();
-            }
-        }
-    }
+    // // Called when a Shopper stays inside Both door 'sphere'.
+    // private void OnTriggerStay(Collider other) {
+    //     AgentManager agent = other.GetComponent<AgentManager>();
+    //     // TODO: Check if the current door is at the top of the list of Directions.
+    //     // ? agent.destinations.Contains(gameObject.transform)
+    //     if (agent.destinations[0] == gameObject.transform && doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
+    //         float otherTimer = agent.UpdateBuildingBufferTime();
+    //         if (otherTimer <= 0f) {
+    //             StartCoroutine(RecreateShopper(other.gameObject));
+    //             agent.ResetBuildingBufferTime();
+    //         }
+    //     }
+    // }
 
     // Called when a Shopper leaves the Both door 'sphere' before their buildingBufferTimer runs out.
     private void OnTriggerExit(Collider other) {
