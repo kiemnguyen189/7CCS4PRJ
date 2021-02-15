@@ -82,11 +82,19 @@ public class BuildingDoor : MonoBehaviour
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        if (agent.destinations[0] == gameObject.transform && doorType != DoorType.Exit && agent.agentType == AgentType.Shopper) {
+        // * Check if the current destination of the agent is the current door.
+        bool targetCheck = (agent.destinations[0] == gameObject.transform);
+        // * Check if the current door is not an Exit door.
+        bool typeCheck = (doorType != DoorType.Exit);
+        // * Check if the agent is of type shopper (group or not).
+        bool groupCheck = (agent.agentType == AgentType.Shopper || agent.agentType == AgentType.GroupShopper);
+        // * Are all three conditions satisfied?
+        if (targetCheck && typeCheck && groupCheck) {
             StartCoroutine(RecreateShopper(other.gameObject));
         }
     }
 
+    // ! Don't need OnTriggerStay for buffering due to entering checks.
     // // Called when a Shopper stays inside Both door 'sphere'.
     // private void OnTriggerStay(Collider other) {
     //     AgentManager agent = other.GetComponent<AgentManager>();

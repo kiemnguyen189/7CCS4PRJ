@@ -46,9 +46,6 @@ MonoBehaviour:
   cam: {fileID: 6752185705461577800, guid: e14b3356620df6644a8830ad92efa6dd, type: 3}
   ratioShoppers: 50
   ratioCommuters: 0
-  ratioGroupShoppers: 0
-  ratioGroupCommuters: 0
+  ratioGroupShoppers: 50
+  ratioGroupCommuters: 50
   doorMode: 0
-  totalAgents: 0
-  totalShoppers: 0
-  totalCommuters: 0

@@ -23,10 +23,11 @@ public class SimManager : MonoBehaviour
     public static int totalAgents;
     public static int totalShoppers;
     public static int totalCommuters;
+    public static int totalGroupShoppers;
+    public static int totalGroupCommuters;
+
     private int totalSusceptible;
     private int totalInfected;
-    private int totalGroupShoppers;
-    private int totalGroupCommuters;
     private int totalGroupSusceptible;
     private int totalGroupInfected;
 
@@ -103,9 +104,17 @@ public class SimManager : MonoBehaviour
             Debug.Log("More shopper: " + totalShoppers + ", " + totalAgents);
             totalShoppers += 1;
             totalAgents += 1;
-        } else {
+        } else if (type == AgentType.GroupShopper) {
+            Debug.Log("More group shoppers: " + totalGroupShoppers + ", " + totalAgents);
+            totalGroupShoppers += 1;
+            totalAgents += 1;
+        } else if (type == AgentType.Commuter) {
             Debug.Log("More commuter: " + totalCommuters + ", " + totalAgents);
             totalCommuters += 1;
+            totalAgents += 1;
+        } else {
+            Debug.Log("More group commuter: " + totalGroupCommuters + ", " + totalAgents);
+            totalGroupCommuters += 1;
             totalAgents += 1;
         }
     }
@@ -118,9 +127,17 @@ public class SimManager : MonoBehaviour
                 Debug.Log("Less shopper: " + totalShoppers + ", " + totalAgents);
                 totalShoppers -= 1;
                 totalAgents -= 1;
-            } else {
+            } else if (type == AgentType.GroupShopper) {
+                Debug.Log("Less group shoppers: " + totalGroupShoppers + ", " + totalAgents);
+                totalGroupShoppers -= 1;
+                totalAgents -= 1;
+            } else if (type == AgentType.Commuter) {
                 Debug.Log("Less commuter: " + totalCommuters + ", " + totalAgents);
                 totalCommuters -= 1;
+                totalAgents -= 1;
+            } else {
+                Debug.Log("Less group commuters: " + totalGroupCommuters + ", " + totalAgents);
+                totalGroupCommuters -= 1;
                 totalAgents -= 1;
             }
         }

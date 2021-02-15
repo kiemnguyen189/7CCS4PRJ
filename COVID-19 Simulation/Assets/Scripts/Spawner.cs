@@ -47,7 +47,6 @@ public class Spawner : MonoBehaviour
 
     public void SpawnEnemy()
     {
-        // TODO: Chance to spawn group agents as well as single agents.
         Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
         
     }
@@ -55,9 +54,9 @@ public class Spawner : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
+        // TODO: Resolve for follower agents aswell.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        // TODO: Check if the current door is at the top of the list of Directions.
         if (agent.currentDestination == gameObject.transform) {
             agent.Despawn();
         }

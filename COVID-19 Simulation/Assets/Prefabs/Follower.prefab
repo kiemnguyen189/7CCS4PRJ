@@ -9,14 +9,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8418691987860001809}
-  - component: {fileID: 8418691987860001808}
+  - component: {fileID: -3563901210975028666}
   - component: {fileID: 8418691987860001814}
   - component: {fileID: 8418691987860001815}
   - component: {fileID: 8418691987860001812}
   - component: {fileID: 8418691987860001811}
   - component: {fileID: 8418691987860001813}
   m_Layer: 0
-  m_Name: Agent
+  m_Name: Follower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36,7 +36,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8418691987860001808
+--- !u!114 &-3563901210975028666
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,17 +45,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8418691987860001818}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c106a066dc59ade408c7c160634b1f96, type: 3}
+  m_Script: {fileID: 11500000, guid: c2b61f14a8c7a494c9f8d7c7c330cc7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   manager: {fileID: 633487431973451591, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
-  followerPrefab: {fileID: 8418691987860001809, guid: 7fe5c64a6a4204841a8c533997de76fa,
-    type: 3}
+  leader: {fileID: 8418691987860001818, guid: c8f1bac53e859c34286e2f1441642241, type: 3}
   agent: {fileID: 8418691987860001813}
-  agentType: 0
-  maxDestinations: 5
-  destinations: []
-  currentDestination: {fileID: 0}
+  leaderPos: {x: 0, y: 0, z: 0}
 --- !u!33 &8418691987860001814
 MeshFilter:
   m_ObjectHideFlags: 0
