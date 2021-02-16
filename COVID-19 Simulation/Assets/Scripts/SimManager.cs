@@ -19,6 +19,7 @@ public class SimManager : MonoBehaviour
     public float ratioGroupShoppers;
     public float ratioGroupCommuters;
     public DoorwayMode doorMode;
+    public int maxGroupSize;
 
     public static int totalAgents;
     public static int totalShoppers;
@@ -43,8 +44,8 @@ public class SimManager : MonoBehaviour
         buildings = GameObject.FindGameObjectsWithTag("Building");
         
         ResetMetrics();
-
-        Debug.Log(totalAgents);
+        Debug.Log(maxGroupSize);
+        Debug.Log(doorMode);
 
     }
 
@@ -101,19 +102,19 @@ public class SimManager : MonoBehaviour
     // Increases the number of agents of the respective type as well as total
     public void AddTotalAgents(AgentType type) {
         if (type == AgentType.Shopper) {
-            Debug.Log("More shopper: " + totalShoppers + ", " + totalAgents);
+            //Debug.Log("More shopper: " + totalShoppers + ", " + totalAgents);
             totalShoppers += 1;
             totalAgents += 1;
         } else if (type == AgentType.GroupShopper) {
-            Debug.Log("More group shoppers: " + totalGroupShoppers + ", " + totalAgents);
+            //Debug.Log("More group shoppers: " + totalGroupShoppers + ", " + totalAgents);
             totalGroupShoppers += 1;
             totalAgents += 1;
         } else if (type == AgentType.Commuter) {
-            Debug.Log("More commuter: " + totalCommuters + ", " + totalAgents);
+            //Debug.Log("More commuter: " + totalCommuters + ", " + totalAgents);
             totalCommuters += 1;
             totalAgents += 1;
         } else {
-            Debug.Log("More group commuter: " + totalGroupCommuters + ", " + totalAgents);
+            //Debug.Log("More group commuter: " + totalGroupCommuters + ", " + totalAgents);
             totalGroupCommuters += 1;
             totalAgents += 1;
         }

@@ -6,19 +6,18 @@ using TMPro;
 public class BuildingManager : MonoBehaviour
 {
 
-    public SimManager manager;
+    public GameObject manager;
 
     public List<GameObject> shoppers = new List<GameObject>();
     public List<BuildingDoor> doors = new List<BuildingDoor>();
-    // public List<BuildingDoor> exits = new List<BuildingDoor>();
-    // public List<BuildingDoor> entrances = new List<BuildingDoor>();
 
     public TextMeshPro text;
-
     public bool showText = true;
     
     // Start is called before the first frame update
     void Start() {
+
+        // TODO: Set manager instance.
 
         // Add all doors to a list
         foreach (Transform child in transform) {
@@ -27,7 +26,7 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        switch (manager.doorMode) {
+        switch (manager.GetComponent<SimManager>().doorMode) {
             case DoorwayMode.OneWay:
                 int rand = Random.Range(0, 2);
                 if (rand == 0) {
@@ -82,10 +81,12 @@ public class BuildingManager : MonoBehaviour
     }
 
     public void AddShopper(GameObject shopper) {
+        // TODO: Include number of agents in a group.
         shoppers.Add(shopper);
     }
 
     public void RemoveShopper(GameObject shopper) {
+        // TODO: Include number of agents in a group.
         shoppers.Remove(shopper);
     }
 

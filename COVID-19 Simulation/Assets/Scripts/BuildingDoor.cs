@@ -78,20 +78,23 @@ public class BuildingDoor : MonoBehaviour
     
     // Called when a Shopper collides with Entrance door 'sphere'.
     private void OnTriggerEnter(Collider other) {
-        // TODO: Check for group agent entry aswell;
         // Check if current door is part of the list of destinations for each agent.
+        // * Only checks for the leader agent. Follower agents enter building when leader enters building.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        // * Check if the current destination of the agent is the current door.
-        bool targetCheck = (agent.destinations[0] == gameObject.transform);
-        // * Check if the current door is not an Exit door.
-        bool typeCheck = (doorType != DoorType.Exit);
-        // * Check if the agent is of type shopper (group or not).
-        bool groupCheck = (agent.agentType == AgentType.Shopper || agent.agentType == AgentType.GroupShopper);
-        // * Are all three conditions satisfied?
-        if (targetCheck && typeCheck && groupCheck) {
-            StartCoroutine(RecreateShopper(other.gameObject));
+        if (agent != null) {
+            // * Check if the current destination of the agent is the current door.
+            bool targetCheck = (agent.destinations[0] == gameObject.transform);
+            // * Check if the current door is not an Exit door.
+            bool typeCheck = (doorType != DoorType.Exit);
+            // * Check if the agent is of type shopper (group or not).
+            bool groupCheck = (agent.agentType == AgentType.Shopper || agent.agentType == AgentType.GroupShopper);
+            // * Are all three conditions satisfied?
+            if (targetCheck && typeCheck && groupCheck) {
+                StartCoroutine(RecreateShopper(other.gameObject));
+            }
         }
+
     }
 
     // ! Don't need OnTriggerStay for buffering due to entering checks.
@@ -112,7 +115,7 @@ public class BuildingDoor : MonoBehaviour
     // Called when a Shopper leaves the Both door 'sphere' before their buildingBufferTimer runs out.
     private void OnTriggerExit(Collider other) {
         AgentManager agent = other.GetComponent<AgentManager>();
-        if (doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
+        if (agent != null && doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
             agent.ResetBuildingBufferTime();
         }
     }
@@ -121,7 +124,6 @@ public class BuildingDoor : MonoBehaviour
     IEnumerator RecreateShopper(GameObject shopper) {
         core.AddShopper(shopper);
         shopper.gameObject.SetActive(false);
-        // TODO: Choose random time to respawn between ranges.
         int res = Random.Range(1, respawnTime);
         yield return new WaitForSeconds(res);
         shopper.transform.position = core.ReturnRandomDoor("Exit").position;

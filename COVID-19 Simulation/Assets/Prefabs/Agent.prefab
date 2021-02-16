@@ -53,6 +53,7 @@ MonoBehaviour:
     type: 3}
   agent: {fileID: 8418691987860001813}
   agentType: 0
+  follower: {fileID: 0}
   maxDestinations: 5
   destinations: []
   currentDestination: {fileID: 0}

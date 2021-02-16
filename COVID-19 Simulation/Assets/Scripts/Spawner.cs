@@ -54,12 +54,15 @@ public class Spawner : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
-        // TODO: Resolve for follower agents aswell.
+        // TODO: Fix collider with followers FollowAgentManager objects.
+
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        if (agent.currentDestination == gameObject.transform) {
+        if (agent != null && agent.currentDestination == gameObject.transform) {
             agent.Despawn();
         }
+        
+
     }
 
 }

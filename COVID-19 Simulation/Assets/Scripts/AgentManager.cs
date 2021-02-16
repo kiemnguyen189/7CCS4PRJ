@@ -20,6 +20,7 @@ public class AgentManager : MonoBehaviour
     public NavMeshAgent agent;
     public AgentType agentType;
     public Transform follower;
+    //public int maxGroupSize;
 
     // Location based variables.
     private Transform startNode;
@@ -39,10 +40,17 @@ public class AgentManager : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
 
+        // TODO: Set manager instance.
+
+        //manager = manager.GetComponent<SimManager>().gameObject;
+
         startNode = gameObject.transform;
 
         int chance = Random.Range(0, 100);
         int groupChance = Random.Range(0, 100);
+        Debug.Log("Group: " + manager.GetComponent<SimManager>().maxGroupSize);
+        Debug.Log("Mode: " + manager.GetComponent<SimManager>().doorMode);
+        int groupNum = Random.Range(1, manager.GetComponent<SimManager>().maxGroupSize);
 
         if (chance <= manager.GetComponent<SimManager>().ratioShoppers) {
             if (groupChance <= manager.GetComponent<SimManager>().ratioGroupShoppers) {
@@ -51,8 +59,9 @@ public class AgentManager : MonoBehaviour
                 color = new Color(1,0,1,1);
 
                 // TODO: Different number of followers decided randomly based on a range.
+
                 follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                follower.transform.SetParent(gameObject.transform);
+                follower.transform.parent = gameObject.transform;
 
             } else {
                 agentType = AgentType.Shopper;
@@ -66,8 +75,9 @@ public class AgentManager : MonoBehaviour
                 color = new Color(0,1,1,1);
 
                 // TODO: Different number of followers decided randomly based on a range.
+
                 follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                follower.transform.SetParent(gameObject.transform);
+                follower.transform.parent = gameObject.transform;
 
             } else {
                 agentType = AgentType.Commuter;

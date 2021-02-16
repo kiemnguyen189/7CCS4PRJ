@@ -1629,11 +1629,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 614f7dfc0d14cec45897550bc115aa64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 0}
-  tourists: []
+  manager: {fileID: 633487431973451591, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
+  shoppers: []
   doors: []
-  exits: []
-  entrances: []
   text: {fileID: 2459896892508982313}
   showText: 1
 --- !u!1 &2459896893012628792

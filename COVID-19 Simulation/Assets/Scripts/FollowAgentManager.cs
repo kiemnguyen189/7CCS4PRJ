@@ -22,19 +22,24 @@ public class FollowAgentManager : MonoBehaviour
     void Start()
     {
         leader = gameObject.transform.parent.gameObject;
-        //leaderPos = leader.transform.position;
-        //Debug.Log(leader.name);
-        //leader = GameObject.Find().GetComponent<Transform>();
-        //gameObject.transform.SetParent(leader, false);
         // TODO: Set color of child.
+        // TODO: Set tag of child.
+        if (leader.tag == "GroupShopper") {
+            color = new Color(1,0,1,0.5f);
+            gameObject.tag = "GroupShopper";
+        } else if (leader.tag == "GroupCommuter") {
+            color = new Color(0,1,1,0.5f);
+            gameObject.tag = "GroupCommuter";
+        }
+
+        rend = GetComponent<Renderer>();
+        rend.material.color = color;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Vector3 pos = leader.position;
         agent.SetDestination(leader.transform.position);
-        //agent.SetDestination(gameObject.transform.parent.transform.position);
     }
 }
