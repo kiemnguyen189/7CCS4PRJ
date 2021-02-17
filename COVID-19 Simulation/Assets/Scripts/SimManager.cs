@@ -15,11 +15,13 @@ public class SimManager : MonoBehaviour
     public Camera cam;
 
     public float ratioShoppers;
-    public float ratioCommuters;
+    public float ratioCommuters;    // ! Maybe don't need this if only using ratioShopper
     public float ratioGroupShoppers;
     public float ratioGroupCommuters;
     public DoorwayMode doorMode;
     public int maxGroupSize;
+    public float maxAgentSpeed;
+    public float radiusSize;
 
     public static int totalAgents;
     public static int totalShoppers;
@@ -100,48 +102,41 @@ public class SimManager : MonoBehaviour
     }
 
     // Increases the number of agents of the respective type as well as total
-    public void AddTotalAgents(AgentType type) {
+    public void AddTotalAgents(AgentType type, int num) {
         if (type == AgentType.Shopper) {
-            //Debug.Log("More shopper: " + totalShoppers + ", " + totalAgents);
-            totalShoppers += 1;
-            totalAgents += 1;
+            totalShoppers += num;
+            totalAgents += num;
         } else if (type == AgentType.GroupShopper) {
-            //Debug.Log("More group shoppers: " + totalGroupShoppers + ", " + totalAgents);
-            totalGroupShoppers += 1;
-            totalAgents += 1;
+            totalGroupShoppers += num;
+            totalAgents += num;
         } else if (type == AgentType.Commuter) {
-            //Debug.Log("More commuter: " + totalCommuters + ", " + totalAgents);
-            totalCommuters += 1;
-            totalAgents += 1;
+            totalCommuters += num;
+            totalAgents += num;
         } else {
-            //Debug.Log("More group commuter: " + totalGroupCommuters + ", " + totalAgents);
-            totalGroupCommuters += 1;
-            totalAgents += 1;
+            totalGroupCommuters += num;
+            totalAgents += num;
         }
+        Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
+
     }
 
     // Decreases the number of agents of the respective type as well as total
-    public void ReduceTotalAgents(AgentType type) {
+    public void ReduceTotalAgents(AgentType type, int num) {
         // Don't have a negative number of agents in the simulation.
-        if (totalAgents > 0 && totalShoppers > 0 && totalCommuters > 0) {
-            if (type == AgentType.Shopper) {
-                Debug.Log("Less shopper: " + totalShoppers + ", " + totalAgents);
-                totalShoppers -= 1;
-                totalAgents -= 1;
-            } else if (type == AgentType.GroupShopper) {
-                Debug.Log("Less group shoppers: " + totalGroupShoppers + ", " + totalAgents);
-                totalGroupShoppers -= 1;
-                totalAgents -= 1;
-            } else if (type == AgentType.Commuter) {
-                Debug.Log("Less commuter: " + totalCommuters + ", " + totalAgents);
-                totalCommuters -= 1;
-                totalAgents -= 1;
-            } else {
-                Debug.Log("Less group commuters: " + totalGroupCommuters + ", " + totalAgents);
-                totalGroupCommuters -= 1;
-                totalAgents -= 1;
-            }
+        if (type == AgentType.Shopper) {
+            totalShoppers -= num;
+            totalAgents -= num;
+        } else if (type == AgentType.GroupShopper) {
+            totalGroupShoppers -= num;
+            totalAgents -= num;
+        } else if (type == AgentType.Commuter) {
+            totalCommuters -= num;
+            totalAgents -= num;
+        } else {
+            totalGroupCommuters -= num;
+            totalAgents -= num;
         }
+        Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
         
     }
 

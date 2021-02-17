@@ -13,14 +13,16 @@ public enum AgentType {
 public class AgentManager : MonoBehaviour
 {
 
-    public GameObject manager;
+    private SimManager manager;
 
     // Agent based variables.
     public Transform followerPrefab;
     public NavMeshAgent agent;
     public AgentType agentType;
     public Transform follower;
-    //public int maxGroupSize;
+    public int groupSize;
+    public float minSpeed;
+    public float maxSpeed;
 
     // Location based variables.
     private Transform startNode;
@@ -40,66 +42,71 @@ public class AgentManager : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
 
-        // TODO: Set manager instance.
+        manager = GameObject.Find("Manager").GetComponent<SimManager>();
 
-        //manager = manager.GetComponent<SimManager>().gameObject;
-
-        startNode = gameObject.transform;
-
+        // * Spawning type of agents.
         int chance = Random.Range(0, 100);
         int groupChance = Random.Range(0, 100);
-        Debug.Log("Group: " + manager.GetComponent<SimManager>().maxGroupSize);
-        Debug.Log("Mode: " + manager.GetComponent<SimManager>().doorMode);
-        int groupNum = Random.Range(1, manager.GetComponent<SimManager>().maxGroupSize);
+        groupSize = Random.Range(2, manager.maxGroupSize);
 
-        if (chance <= manager.GetComponent<SimManager>().ratioShoppers) {
-            if (groupChance <= manager.GetComponent<SimManager>().ratioGroupShoppers) {
+        if (chance <= manager.ratioShoppers) {
+            // * Shopper agent speeds.
+            maxSpeed = manager.maxAgentSpeed * 0.5f;
+            minSpeed = maxSpeed / 2;
+            if (groupChance <= manager.ratioGroupShoppers) {
                 agentType = AgentType.GroupShopper;
                 gameObject.tag = "GroupShopper";
                 color = new Color(1,0,1,1);
-
-                // TODO: Different number of followers decided randomly based on a range.
-
-                follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                follower.transform.parent = gameObject.transform;
-
+                // Spawn followers if of type group.
+                for (int i = 0; i < groupSize-1; i++) {
+                    follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
+                    follower.transform.parent = gameObject.transform;
+                }
             } else {
                 agentType = AgentType.Shopper;
                 gameObject.tag = "Shopper";
                 color = new Color(1,0,0,1);
+                groupSize = 1;
             }
         } else {
-            if (groupChance <= manager.GetComponent<SimManager>().ratioGroupCommuters) {
+            // * Commuter agent speeds.
+            maxSpeed = manager.maxAgentSpeed;
+            minSpeed = maxSpeed / 2;
+            if (groupChance <= manager.ratioGroupCommuters) {
                 agentType = AgentType.GroupCommuter;
                 gameObject.tag = "GroupCommuter";
                 color = new Color(0,1,1,1);
-
-                // TODO: Different number of followers decided randomly based on a range.
-
-                follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                follower.transform.parent = gameObject.transform;
-
+                // Spawn followers if of type group.
+                for (int i = 0; i < groupSize-1; i++) {
+                    follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
+                    follower.transform.parent = gameObject.transform;
+                }
             } else {
                 agentType = AgentType.Commuter;
                 gameObject.tag = "Commuter";
                 color = new Color(0,1,0,1);
+                groupSize = 1;
             }
         }
-
+        agent.speed = Random.Range(minSpeed, maxSpeed);
+        agent.angularSpeed = maxSpeed*10;
+        agent.acceleration = maxSpeed*10;
 
         rend = GetComponent<Renderer>();
         rend.material.color = color;
 
+        // * Destinations of agent.
+        startNode = gameObject.transform;
         destinations = new List<Transform>();
         int numDest = Random.Range(1, maxDestinations);
         if (agentType == AgentType.Shopper || agentType == AgentType.GroupShopper) {
-            destinations = manager.GetComponent<SimManager>().SetDestinations(numDest);
+            destinations = manager.SetDestinations(numDest);
         }
-        endNode = manager.GetComponent<SimManager>().SetEndNode(startNode);
+        endNode = manager.SetEndNode(startNode);
         destinations.Add(endNode);
 
-        manager.GetComponent<SimManager>().AddTotalAgents(agentType);
-        //manager.AddTotalAgents(agentType);
+        // * SimManager metrics.
+        manager.AddTotalAgents(agentType, groupSize);
             
     }
     
@@ -107,7 +114,7 @@ public class AgentManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // // ? Temporary movement for all agents using mouse clicks
+        // ! Temporary movement for all agents using mouse clicks
         // if (Input.GetMouseButtonDown(0)) {
         //     Ray ray = manager.GetComponent<SimManager>().cam.ScreenPointToRay(Input.mousePosition);
         //     RaycastHit hit;
@@ -116,7 +123,6 @@ public class AgentManager : MonoBehaviour
         //     }
         // }
 
-        // TODO: Dynamic destination allocation for each agent.
         if (destinations.Count != 0) {
             currentDestination = destinations[0];
             agent.SetDestination(currentDestination.position);
@@ -143,8 +149,7 @@ public class AgentManager : MonoBehaviour
 
     //public 
     public void Despawn() {
-        manager.GetComponent<SimManager>().ReduceTotalAgents(agentType);
-        //manager.ReduceTotalAgents(agentType);
+        manager.ReduceTotalAgents(agentType, groupSize);
         Destroy(gameObject);
     }
 

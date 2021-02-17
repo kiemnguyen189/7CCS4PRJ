@@ -17,7 +17,8 @@ public class BuildingManager : MonoBehaviour
     // Start is called before the first frame update
     void Start() {
 
-        // TODO: Set manager instance.
+        GameObject man = GameObject.Find("Manager");
+        manager = man;
 
         // Add all doors to a list
         foreach (Transform child in transform) {
@@ -63,6 +64,7 @@ public class BuildingManager : MonoBehaviour
         
     }
 
+    //
     private void FixedUpdate() {
         if (showText) {
             StartCoroutine(UpdateText());
@@ -80,14 +82,25 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
+    // Add shopper agents into a building's list of shoppers currently inside.
     public void AddShopper(GameObject shopper) {
-        // TODO: Include number of agents in a group.
         shoppers.Add(shopper);
+        foreach (Transform child in shopper.transform) {
+            if (shopper.tag == child.tag) {
+                shoppers.Add(child.gameObject);
+            }
+            
+        }
     }
 
+    // Remove shopper agents from a building's list of shoppers currently inside.
     public void RemoveShopper(GameObject shopper) {
-        // TODO: Include number of agents in a group.
         shoppers.Remove(shopper);
+        foreach (Transform child in shopper.transform) {
+            if (shopper.tag == child.tag) {
+                shoppers.Remove(child.gameObject);
+            }
+        }
     }
 
 

@@ -6,8 +6,6 @@ using UnityEngine.AI;
 public class FollowAgentManager : MonoBehaviour
 {
 
-    public GameObject manager;
-
     public GameObject leader;
     public NavMeshAgent agent;
 
@@ -22,8 +20,6 @@ public class FollowAgentManager : MonoBehaviour
     void Start()
     {
         leader = gameObject.transform.parent.gameObject;
-        // TODO: Set color of child.
-        // TODO: Set tag of child.
         if (leader.tag == "GroupShopper") {
             color = new Color(1,0,1,0.5f);
             gameObject.tag = "GroupShopper";
@@ -31,10 +27,12 @@ public class FollowAgentManager : MonoBehaviour
             color = new Color(0,1,1,0.5f);
             gameObject.tag = "GroupCommuter";
         }
-
         rend = GetComponent<Renderer>();
         rend.material.color = color;
 
+        gameObject.GetComponent<NavMeshAgent>().speed = leader.GetComponent<AgentManager>().maxSpeed;
+        gameObject.GetComponent<NavMeshAgent>().angularSpeed = leader.GetComponent<AgentManager>().maxSpeed*10;
+        gameObject.GetComponent<NavMeshAgent>().acceleration = leader.GetComponent<AgentManager>().maxSpeed*10;
     }
 
     // Update is called once per frame

@@ -6,7 +6,6 @@ public class Spawner : MonoBehaviour
 {
 
     public Transform agentPrefab;
-    public Transform groupAgentPrefab;
     public Transform spawnPoint;
 
     public float timeBetweenWaves = 3f;
@@ -54,8 +53,6 @@ public class Spawner : MonoBehaviour
 
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
-        // TODO: Fix collider with followers FollowAgentManager objects.
-
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
         if (agent != null && agent.currentDestination == gameObject.transform) {
