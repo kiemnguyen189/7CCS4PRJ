@@ -103,7 +103,6 @@ public class BuildingManager : MonoBehaviour
         }
     }
 
-
     // Returns a random door, depending or the type parameter. Will either return Entrance/Both or Exit/Both.
     public Transform ReturnRandomDoor(string type) {
         List<BuildingDoor> temp = new List<BuildingDoor>();
@@ -115,6 +114,7 @@ public class BuildingManager : MonoBehaviour
         return temp[Random.Range(0, temp.Count)].transform;
     }
 
+    //
     IEnumerator UpdateText() {
         text.SetText("" + shoppers.Count);
         yield return new WaitForSeconds(1);

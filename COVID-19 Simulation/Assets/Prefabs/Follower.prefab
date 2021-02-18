@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6727151006491056485}
   - component: {fileID: 686963790160088592}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: SocialDistance
   m_TagString: Radius
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 6278461504925325589}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 0.01, z: 2}
+  m_LocalScale: {x: 0, y: 0.01, z: 0}
   m_Children: []
   m_Father: {fileID: 8418691987860001809}
   m_RootOrder: 0
@@ -143,9 +143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2b61f14a8c7a494c9f8d7c7c330cc7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 0}
   leader: {fileID: 8418691987860001818, guid: c8f1bac53e859c34286e2f1441642241, type: 3}
-  agent: {fileID: 8418691987860001813}
-  leaderPos: {x: 0, y: 0, z: 0}
+  navAgent: {fileID: 8418691987860001813}
+  hit: {fileID: 3567844930302017680, guid: b5d3b30d5786f0f42a9617b319609971, type: 3}
 --- !u!195 &8418691987860001813
 NavMeshAgent:
   m_ObjectHideFlags: 0

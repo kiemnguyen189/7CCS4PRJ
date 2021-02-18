@@ -37,6 +37,7 @@ public class SimManager : MonoBehaviour
     public static GameObject[] spawners;
     public static GameObject[] buildings;
     public static Transform[] temp;
+    public int contacts;
     
     
     // Start is called before the first frame update
@@ -46,11 +47,12 @@ public class SimManager : MonoBehaviour
         buildings = GameObject.FindGameObjectsWithTag("Building");
         
         ResetMetrics();
-        Debug.Log(maxGroupSize);
-        Debug.Log(doorMode);
+        //Debug.Log(maxGroupSize);
+        //Debug.Log(doorMode);
 
     }
 
+    //
     private void ResetMetrics() {
         totalAgents = 0;
         totalShoppers = 0;
@@ -116,7 +118,7 @@ public class SimManager : MonoBehaviour
             totalGroupCommuters += num;
             totalAgents += num;
         }
-        Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
+        //Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
 
     }
 
@@ -136,7 +138,7 @@ public class SimManager : MonoBehaviour
             totalGroupCommuters -= num;
             totalAgents -= num;
         }
-        Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
+        //Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
         
     }
 

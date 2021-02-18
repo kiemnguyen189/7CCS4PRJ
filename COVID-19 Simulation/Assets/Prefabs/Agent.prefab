@@ -49,14 +49,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c106a066dc59ade408c7c160634b1f96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hit: {fileID: 3567844930302017680, guid: b5d3b30d5786f0f42a9617b319609971, type: 3}
   followerPrefab: {fileID: 8418691987860001809, guid: 7fe5c64a6a4204841a8c533997de76fa,
     type: 3}
-  agent: {fileID: 8418691987860001813}
+  navAgent: {fileID: 8418691987860001813}
   agentType: 0
   follower: {fileID: 0}
   groupSize: 0
   minSpeed: 0
   maxSpeed: 0
+  radius: 0
   maxDestinations: 5
   destinations: []
   currentDestination: {fileID: 0}
@@ -172,7 +174,7 @@ GameObject:
   - component: {fileID: 260772553286527512}
   - component: {fileID: 8946477750849994917}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: SocialDistance
   m_TagString: Radius
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -187,7 +189,7 @@ Transform:
   m_GameObject: {fileID: 8710587542253548661}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 0.01, z: 2}
+  m_LocalScale: {x: 0, y: 0.01, z: 0}
   m_Children: []
   m_Father: {fileID: 8418691987860001809}
   m_RootOrder: 0
