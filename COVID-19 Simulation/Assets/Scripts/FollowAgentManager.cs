@@ -56,10 +56,17 @@ public class FollowAgentManager : MonoBehaviour
         // TODO: Interaction and Infection checks.
     }
 
-    //
+    // Collision detection code to count interactions between different agents.
+    // Agents within the same group interacting with each other do not contribute to contact counts.
+    // This is to model family and friend groups interactions with other groups.
     private void OnCollisionEnter(Collision other) {
-        bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));
-        if (environmentCheck && !(transform.IsChildOf(other.transform))) {
+        // * Check if the other object is not the map and not a spawner object.
+        bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));  
+        // * Check if other object is not the parent of this object.
+        bool parentCheck = (transform.IsChildOf(other.transform));                 
+        // * Check if siblings have the same parent.                         
+        bool siblingCheck = (transform.parent == other.transform.parent);                                   
+        if (environmentCheck && !parentCheck && !siblingCheck) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {

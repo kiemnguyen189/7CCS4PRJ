@@ -14,17 +14,20 @@ public class SimManager : MonoBehaviour
     
     public Camera cam;
     public bool simStarted = false;
+    public bool isPaused = false;
+    public float simSpeed = 1.0f;
 
     // * Initial Simulation User settings.
     public float ratioShoppers;
-    public float ratioCommuters;    // ! Maybe don't need this if only using ratioShopper
+    //public float ratioCommuters;    // ! Maybe don't need this if only using ratioShopper
     public float ratioGroups;
-    public float ratioGroupShoppers;
-    public float ratioGroupCommuters;
+    //public float ratioGroupShoppers;
+    //public float ratioGroupCommuters;
     public DoorwayMode doorMode;
     public int maxGroupSize;
     public float maxAgentSpeed;
     public float radiusSize;
+    public float infectionChance;
 
     // * Live Simulation Metrics.
     public static int totalAgents;

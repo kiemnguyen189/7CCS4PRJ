@@ -21,10 +21,10 @@ public class AgentManager : MonoBehaviour
     // * [X, 1] = Tag name.
     // * [X, 2] = Default colour value.
     public object[,] dVal = new object[,] {
-        {AgentType.Shopper, "Shopper", new Color(1,0,0,1)},
-        {AgentType.Commuter, "Commuter", new Color(0,1,0,1)},
-        {AgentType.GroupShopper, "GroupShopper", new Color(1,0,1,1)},
-        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,1,1,1)}
+        {AgentType.Shopper, "Shopper", new Color(1,0,0,1), 0.5f},
+        {AgentType.Commuter, "Commuter", new Color(0,1,0,1), 1.0f},
+        {AgentType.GroupShopper, "GroupShopper", new Color(1,0,1,1), 0.5f},
+        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,1,1,1), 1.0f}
     };
 
 
@@ -41,8 +41,12 @@ public class AgentManager : MonoBehaviour
     public float minSpeed;
     public float maxSpeed;
     public float radius;
-    public int chance;
-    public int groupChance;
+    public bool isInfected;
+
+    private int infectChance;
+    private int typeChance;
+    private int groupChance;
+    private int typeInt;
 
     // Location based variables.
     private Transform startNode;
@@ -67,53 +71,36 @@ public class AgentManager : MonoBehaviour
         // * Manager initialization.
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
 
-        // * Spawning type of agents.
-        chance = Random.Range(0, 100);
+        // * Agent spawning initialization.
+        infectChance = Random.Range(0, 100);
+        typeChance = Random.Range(0, 100);
         groupChance = Random.Range(0, 100);
-        groupSize = Random.Range(2, manager.maxGroupSize);
-        if (chance < manager.ratioShoppers) {
-            // * Shopper agent speeds.
-            maxSpeed = manager.maxAgentSpeed * 0.5f;
-            minSpeed = maxSpeed / 2;
-            if (groupChance < manager.ratioGroupShoppers) {
-                // TODO: vvv Can be condensed.
-                agentType = (AgentType)dVal[2, 0];
-                gameObject.tag = (string)dVal[2, 1];
-                color = (Color)dVal[2, 2];
-                for (int i = 0; i < groupSize-1; i++) {
-                    follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                    follower.transform.parent = gameObject.transform;
-                }
-                // TODO: ^^^ Can be condensed.
-            } else {
-                agentType = (AgentType)dVal[0, 0];
-                gameObject.tag = (string)dVal[0, 1];
-                color = (Color)dVal[0, 2];
-                groupSize = 1;
-            }
-        } else {
-            // * Commuter agent speeds.
-            maxSpeed = manager.maxAgentSpeed;
-            minSpeed = maxSpeed / 2;
-            if (groupChance < manager.ratioGroupCommuters) {
-                // TODO: vvv Can be condensed.
-                agentType = (AgentType)dVal[3, 0];
-                gameObject.tag = (string)dVal[3, 1];
-                color = (Color)dVal[3, 2];
-                for (int i = 0; i < groupSize-1; i++) {
-                    follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                    follower.transform.parent = gameObject.transform;
-                }
-                // TODO: ^^^ Can be condensed.
-            } else {
-                agentType = (AgentType)dVal[1, 0];
-                gameObject.tag = (string)dVal[1, 1];
-                color = (Color)dVal[1, 2];
-                groupSize = 1;
+        List<int> types = new List<int>() {0, 1, 2, 3};
+        if (infectChance < manager.infectionChance) { isInfected = true; }
+        if (!(groupChance < manager.ratioGroups)) { 
+            types.RemoveRange(2, 2); // Single = [0, 1]
+            groupSize = 1;
+        } else { 
+            types.RemoveRange(0, 2); // Groups = [2, 3]
+            groupSize = Random.Range(2, manager.maxGroupSize);
+        } 
+        if (typeChance < manager.ratioShoppers) { typeInt = types[0]; } 
+        else { typeInt = types[1]; }
+        
+        agentType = (AgentType)dVal[typeInt, 0];
+        gameObject.tag = (string)dVal[typeInt, 1];
+        color = (Color)dVal[typeInt, 2];
+        maxSpeed = manager.maxAgentSpeed * (float)dVal[typeInt, 3];
+        minSpeed = maxSpeed / 2;
+
+        if (groupSize > 1) {
+            for (int i = 0; i < groupSize-1; i++) {
+                follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
+                follower.transform.parent = gameObject.transform;
             }
         }
 
-        // * Agent dimensions.
+        // * Agent movement stats.
         navAgent.speed = Random.Range(minSpeed, maxSpeed);
         navAgent.angularSpeed = maxSpeed*10;
         navAgent.acceleration = maxSpeed*10;
@@ -155,6 +142,8 @@ public class AgentManager : MonoBehaviour
         //         agent.SetDestination(hit.point);
         //     }
         // }
+
+        // TODO: Add pausing, speedup/slowdown mechanism.
 
         if (destinations.Count != 0) {
             currentDestination = destinations[0];
@@ -211,7 +200,7 @@ public class AgentManager : MonoBehaviour
         Vector3 tempPoint = contact.point;
         tempPoint.y = -10;   // * Keep the same elevation for contact points.
         Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);
-        Debug.Log(tempPoint);
+        //Debug.Log(tempPoint);
         manager.AddContactNum();
         manager.AddContactLocation(tempPoint);
     }
