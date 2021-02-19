@@ -5,36 +5,46 @@ using UnityEngine;
 public class Spawner : MonoBehaviour
 {
 
+    public SimManager manager;
+
     public Transform agentPrefab;
     public Transform spawnPoint;
 
     public float timeBetweenWaves = 3f;
     private float countdown = 2f;
 
+    //public bool simStarted = false;
 
     private int waveIndex = 0;
 
     
     void Start() {
-        SpawnEnemy();
+        // TODO: Only start spawning if start button is pressed.
+        //SpawnEnemy();
+        manager = GameObject.Find("Manager").GetComponent<SimManager>();
     }
     
     
     // Update is called once per frame
     void Update()
     {
-        if (countdown <= 0f)
-        {
-            StartCoroutine(SpawnWave());
-            countdown = timeBetweenWaves;
-        }
+        if (manager.simStarted) {
 
-        countdown -= Time.deltaTime;
+            if (countdown <= 0f)
+            {
+                StartCoroutine(SpawnWave());
+                countdown = timeBetweenWaves;
+            }
+            countdown -= Time.deltaTime;
+        }
+        
 
     }
 
     IEnumerator SpawnWave()
     {
+        // TODO: Spawning rate based on initial user inputs.
+        // TODO: I.e. maximum number of agents, spawning based on peak times, etc.
         waveIndex++;
 
         for (int i = 0; i < waveIndex; i++)

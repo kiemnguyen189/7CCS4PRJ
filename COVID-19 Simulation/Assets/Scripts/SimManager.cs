@@ -13,9 +13,12 @@ public class SimManager : MonoBehaviour
 {
     
     public Camera cam;
+    public bool simStarted = false;
 
+    // * Initial Simulation User settings.
     public float ratioShoppers;
     public float ratioCommuters;    // ! Maybe don't need this if only using ratioShopper
+    public float ratioGroups;
     public float ratioGroupShoppers;
     public float ratioGroupCommuters;
     public DoorwayMode doorMode;
@@ -23,6 +26,7 @@ public class SimManager : MonoBehaviour
     public float maxAgentSpeed;
     public float radiusSize;
 
+    // * Live Simulation Metrics.
     public static int totalAgents;
     public static int totalShoppers;
     public static int totalCommuters;
@@ -36,7 +40,7 @@ public class SimManager : MonoBehaviour
 
     public static GameObject[] spawners;
     public static GameObject[] buildings;
-    public static Transform[] temp;
+    public List<Vector3> contactLocations;
     public int contacts;
     
     
@@ -45,10 +49,9 @@ public class SimManager : MonoBehaviour
     {
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
+        contactLocations = new List<Vector3>();
         
         ResetMetrics();
-        //Debug.Log(maxGroupSize);
-        //Debug.Log(doorMode);
 
     }
 
@@ -105,41 +108,34 @@ public class SimManager : MonoBehaviour
 
     // Increases the number of agents of the respective type as well as total
     public void AddTotalAgents(AgentType type, int num) {
-        if (type == AgentType.Shopper) {
-            totalShoppers += num;
-            totalAgents += num;
-        } else if (type == AgentType.GroupShopper) {
-            totalGroupShoppers += num;
-            totalAgents += num;
-        } else if (type == AgentType.Commuter) {
-            totalCommuters += num;
-            totalAgents += num;
-        } else {
-            totalGroupCommuters += num;
-            totalAgents += num;
+        switch (type) {
+            case AgentType.Shopper: totalShoppers += num; break;
+            case AgentType.Commuter: totalCommuters += num; break;
+            case AgentType.GroupShopper: totalGroupShoppers += num; break;
+            case AgentType.GroupCommuter: totalGroupCommuters += num; break;
         }
+        totalAgents += num;
         //Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
-
     }
 
     // Decreases the number of agents of the respective type as well as total
     public void ReduceTotalAgents(AgentType type, int num) {
-        // Don't have a negative number of agents in the simulation.
-        if (type == AgentType.Shopper) {
-            totalShoppers -= num;
-            totalAgents -= num;
-        } else if (type == AgentType.GroupShopper) {
-            totalGroupShoppers -= num;
-            totalAgents -= num;
-        } else if (type == AgentType.Commuter) {
-            totalCommuters -= num;
-            totalAgents -= num;
-        } else {
-            totalGroupCommuters -= num;
-            totalAgents -= num;
+        switch (type) {
+            case AgentType.Shopper: totalShoppers -= num; break;
+            case AgentType.Commuter: totalCommuters -= num; break;
+            case AgentType.GroupShopper: totalGroupShoppers -= num; break;
+            case AgentType.GroupCommuter: totalGroupCommuters -= num; break;
         }
+        totalAgents -= num;
         //Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
-        
+    }
+
+    public void AddContactNum() {
+        contacts += 1;
+    }
+
+    public void AddContactLocation(Vector3 location) {
+        contactLocations.Add(location);
     }
 
     // Updates the total numbers to Susceptible and Infectious agents.

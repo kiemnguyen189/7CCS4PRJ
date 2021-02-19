@@ -59,9 +59,12 @@ MonoBehaviour:
   minSpeed: 0
   maxSpeed: 0
   radius: 0
+  chance: 0
+  groupChance: 0
   maxDestinations: 5
   destinations: []
   currentDestination: {fileID: 0}
+  rend: {fileID: 0}
 --- !u!195 &8418691987860001813
 NavMeshAgent:
   m_ObjectHideFlags: 0

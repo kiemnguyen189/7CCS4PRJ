@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+
+// * Enumeration values for the 4 unique agent types.
 public enum AgentType {
     Shopper,
     Commuter,
@@ -10,8 +12,21 @@ public enum AgentType {
     GroupCommuter
 }
 
+// * General manager class for every main agent (not including follower agents).
 public class AgentManager : MonoBehaviour
 {
+    // * These are the default values unique to each agent type.
+    // * [0, 1, 2, 3] = agent types equivalent to enum values.
+    // * [X, 0] = Enum name.
+    // * [X, 1] = Tag name.
+    // * [X, 2] = Default colour value.
+    public object[,] dVal = new object[,] {
+        {AgentType.Shopper, "Shopper", new Color(1,0,0,1)},
+        {AgentType.Commuter, "Commuter", new Color(0,1,0,1)},
+        {AgentType.GroupShopper, "GroupShopper", new Color(1,0,1,1)},
+        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,1,1,1)}
+    };
+
 
     private SimManager manager;
 
@@ -62,18 +77,18 @@ public class AgentManager : MonoBehaviour
             minSpeed = maxSpeed / 2;
             if (groupChance < manager.ratioGroupShoppers) {
                 // TODO: vvv Can be condensed.
-                agentType = AgentType.GroupShopper;
-                gameObject.tag = "GroupShopper";
-                color = new Color(1,0,1,1);
+                agentType = (AgentType)dVal[2, 0];
+                gameObject.tag = (string)dVal[2, 1];
+                color = (Color)dVal[2, 2];
                 for (int i = 0; i < groupSize-1; i++) {
                     follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
                     follower.transform.parent = gameObject.transform;
                 }
                 // TODO: ^^^ Can be condensed.
             } else {
-                agentType = AgentType.Shopper;
-                gameObject.tag = "Shopper";
-                color = new Color(1,0,0,1);
+                agentType = (AgentType)dVal[0, 0];
+                gameObject.tag = (string)dVal[0, 1];
+                color = (Color)dVal[0, 2];
                 groupSize = 1;
             }
         } else {
@@ -82,27 +97,32 @@ public class AgentManager : MonoBehaviour
             minSpeed = maxSpeed / 2;
             if (groupChance < manager.ratioGroupCommuters) {
                 // TODO: vvv Can be condensed.
-                agentType = AgentType.GroupCommuter;
-                gameObject.tag = "GroupCommuter";
-                color = new Color(0,1,1,1);
+                agentType = (AgentType)dVal[3, 0];
+                gameObject.tag = (string)dVal[3, 1];
+                color = (Color)dVal[3, 2];
                 for (int i = 0; i < groupSize-1; i++) {
                     follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
                     follower.transform.parent = gameObject.transform;
                 }
                 // TODO: ^^^ Can be condensed.
             } else {
-                agentType = AgentType.Commuter;
-                gameObject.tag = "Commuter";
-                color = new Color(0,1,0,1);
+                agentType = (AgentType)dVal[1, 0];
+                gameObject.tag = (string)dVal[1, 1];
+                color = (Color)dVal[1, 2];
                 groupSize = 1;
             }
         }
+
+        // * Agent dimensions.
         navAgent.speed = Random.Range(minSpeed, maxSpeed);
         navAgent.angularSpeed = maxSpeed*10;
         navAgent.acceleration = maxSpeed*10;
 
-        rend = GetComponent<Renderer>();
-        rend.material.color = color;
+        // * Radius initialization.
+        radius = manager.radiusSize;
+        Vector3 scaleChange = new Vector3(radius, 0, radius);
+        gameObject.transform.GetChild(0).localScale += scaleChange;
+        navAgent.radius = manager.radiusSize / 2;
 
         // * Destinations of agent.
         startNode = gameObject.transform;
@@ -114,13 +134,12 @@ public class AgentManager : MonoBehaviour
         endNode = manager.SetEndNode(startNode);
         destinations.Add(endNode);
 
-        // * Radius initialization.
-        radius = manager.radiusSize;
-        Vector3 scaleChange = new Vector3(radius, 0, radius);
-        gameObject.transform.GetChild(0).localScale += scaleChange;
-
         // * SimManager metrics.
         manager.AddTotalAgents(agentType, groupSize);
+
+        // * Rendering initialization.
+        rend = GetComponent<Renderer>();
+        rend.material.color = color;
             
     }
     
@@ -191,9 +210,10 @@ public class AgentManager : MonoBehaviour
         ContactPoint contact = other.contacts[0];
         Vector3 tempPoint = contact.point;
         tempPoint.y = -10;   // * Keep the same elevation for contact points.
-        Instantiate(hit, tempPoint, Quaternion.identity);
+        Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);
         Debug.Log(tempPoint);
-        manager.contacts += 1;
+        manager.AddContactNum();
+        manager.AddContactLocation(tempPoint);
     }
 
     //
