@@ -12,6 +12,8 @@ public class FollowAgentManager : MonoBehaviour
     public AgentManager leadManager;
     public NavMeshAgent navAgent;
 
+    public bool isInfected;
+
     public Transform hit;
 
     public Renderer rend;
@@ -35,6 +37,11 @@ public class FollowAgentManager : MonoBehaviour
             color = new Color(0,1,1,0.5f);
             gameObject.tag = "GroupCommuter";
         }
+
+        gameObject.tag = leadManager.tag;
+        color = leadManager.color;
+        color.a = 0.5f;
+
         rend = GetComponent<Renderer>();
         rend.material.color = color;
 
@@ -60,13 +67,14 @@ public class FollowAgentManager : MonoBehaviour
     // Agents within the same group interacting with each other do not contribute to contact counts.
     // This is to model family and friend groups interactions with other groups.
     private void OnCollisionEnter(Collision other) {
+        // TODO: infection only counts.
         // * Check if the other object is not the map and not a spawner object.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));  
         // * Check if other object is not the parent of this object.
         bool parentCheck = (transform.IsChildOf(other.transform));                 
         // * Check if siblings have the same parent.                         
         bool siblingCheck = (transform.parent == other.transform.parent);                                   
-        if (environmentCheck && !parentCheck && !siblingCheck) {
+        if (environmentCheck && !parentCheck && !siblingCheck && isInfected) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {

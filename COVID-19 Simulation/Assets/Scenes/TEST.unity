@@ -2932,7 +2932,7 @@ PrefabInstance:
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
       propertyPath: ratioShoppers
-      value: 0
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
@@ -2962,12 +2962,17 @@ PrefabInstance:
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
       propertyPath: radiusSize
-      value: 1
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
       propertyPath: ratioGroups
-      value: 100
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
+        type: 3}
+      propertyPath: infectionChance
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 633487431973451591, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}

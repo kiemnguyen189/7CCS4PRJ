@@ -20,11 +20,13 @@ public class AgentManager : MonoBehaviour
     // * [X, 0] = Enum name.
     // * [X, 1] = Tag name.
     // * [X, 2] = Default colour value.
+    // * [X, 3] = Infected colour value.
+    // * [X, 4] = Agent movement speed multiplier.
     public object[,] dVal = new object[,] {
-        {AgentType.Shopper, "Shopper", new Color(1,0,0,1), 0.5f},
-        {AgentType.Commuter, "Commuter", new Color(0,1,0,1), 1.0f},
-        {AgentType.GroupShopper, "GroupShopper", new Color(1,0,1,1), 0.5f},
-        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,1,1,1), 1.0f}
+        {AgentType.Shopper, "Shopper", new Color(0,1,1,1), new Color(1,0,1,1), 0.5f},
+        {AgentType.Commuter, "Commuter", new Color(0,1,0,1), new Color(1,1,0,1), 1.0f},
+        {AgentType.GroupShopper, "GroupShopper", new Color(0,0,1,1), new Color(0.5f,0,1,1), 0.5f},
+        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,0.5f,0,1), new Color(1,0,0,1), 1.0f}
     };
 
 
@@ -61,7 +63,7 @@ public class AgentManager : MonoBehaviour
 
     // Rendering variables.
     public Renderer rend;
-    private Color color;
+    public Color color;
 
     // TODO: Maybe make a data structure to store varying agent parameters e.g. colour, speed, chances etc.
 
@@ -89,8 +91,11 @@ public class AgentManager : MonoBehaviour
         
         agentType = (AgentType)dVal[typeInt, 0];
         gameObject.tag = (string)dVal[typeInt, 1];
-        color = (Color)dVal[typeInt, 2];
-        maxSpeed = manager.maxAgentSpeed * (float)dVal[typeInt, 3];
+        if (!isInfected) { color = (Color)dVal[typeInt, 2]; } 
+        else { color = (Color)dVal[typeInt, 3]; }
+        
+
+        maxSpeed = manager.maxAgentSpeed * (float)dVal[typeInt, 4];
         minSpeed = maxSpeed / 2;
 
         if (groupSize > 1) {
@@ -174,14 +179,16 @@ public class AgentManager : MonoBehaviour
     //
     private void OnCollisionEnter(Collision other) {
         // * Do not collide with non agents and within-group agents.
+        // TODO: infection only counts.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));
-        if (environmentCheck && !(other.transform.IsChildOf(transform))) {
+        if (environmentCheck && !(other.transform.IsChildOf(transform)) && isInfected) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other);
                 rend.material.color = new Color(0, 0, 0, 1);
                 other.gameObject.GetComponent<AgentManager>().rend.material.color = new Color(0, 0, 0, 1);
+                
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other);
                 rend.material.color = new Color(0, 0, 0, 0.5f);
@@ -203,6 +210,11 @@ public class AgentManager : MonoBehaviour
         //Debug.Log(tempPoint);
         manager.AddContactNum();
         manager.AddContactLocation(tempPoint);
+    }
+
+    //
+    public void SetInfection(Collision other) {
+        other.gameObject.GetComponent<AgentManager>().isInfected = true;
     }
 
     //

@@ -44,7 +44,8 @@ public class SimManager : MonoBehaviour
     public static GameObject[] spawners;
     public static GameObject[] buildings;
     public List<Vector3> contactLocations;
-    public int contacts;
+    public int totalContacts;
+    public int infectiousContacts;
     
     
     // Start is called before the first frame update
@@ -134,7 +135,7 @@ public class SimManager : MonoBehaviour
     }
 
     public void AddContactNum() {
-        contacts += 1;
+        totalContacts += 1;
     }
 
     public void AddContactLocation(Vector3 location) {
