@@ -12,38 +12,44 @@ public enum DoorwayMode {
 public class SimManager : MonoBehaviour
 {
     
+    [Header("Prefabs")]
     public Camera cam;
+
+    [Header("Settings")]
     public bool simStarted = false;
     public bool isPaused = false;
     public float simSpeed = 1.0f;
 
     // * Initial Simulation User settings.
+    [Header("Agent Parameters")]
     public float ratioShoppers;
-    //public float ratioCommuters;    // ! Maybe don't need this if only using ratioShopper
     public float ratioGroups;
-    //public float ratioGroupShoppers;
-    //public float ratioGroupCommuters;
-    public DoorwayMode doorMode;
-    public int maxGroupSize;
-    public float maxAgentSpeed;
-    public float radiusSize;
+    public float ratioInfected;
     public float infectionChance;
+    public int maxGroupSize;
+    public float radiusSize;
+    public float maxAgentSpeed;
+
+    [Header("Environment Parameters")]
+    public DoorwayMode doorMode;
 
     // * Live Simulation Metrics.
-    public static int totalAgents;
-    public static int totalShoppers;
-    public static int totalCommuters;
-    public static int totalGroupShoppers;
-    public static int totalGroupCommuters;
+    [Header("Simulation Metrics")]
+    public int totalAgents;
+    public int totalShoppers;
+    public int totalCommuters;
+    public int totalGroupShoppers;
+    public int totalGroupCommuters;
 
-    private int totalSusceptible;
-    private int totalInfected;
-    private int totalGroupSusceptible;
-    private int totalGroupInfected;
+    public int totalSusceptible;
+    public int totalInfected;
+    public int totalGroupSusceptible;
+    public int totalGroupInfected;
 
     public static GameObject[] spawners;
     public static GameObject[] buildings;
     public List<Vector3> contactLocations;
+    public List<Vector3> infectionLocations;
     public int totalContacts;
     public int infectiousContacts;
     
@@ -55,17 +61,9 @@ public class SimManager : MonoBehaviour
         buildings = GameObject.FindGameObjectsWithTag("Building");
         contactLocations = new List<Vector3>();
         
-        ResetMetrics();
+        //ResetMetrics();
 
     }
-
-    //
-    private void ResetMetrics() {
-        totalAgents = 0;
-        totalShoppers = 0;
-        totalCommuters = 0;
-    }
-
 
     // Update is called once per frame
     void Update()
@@ -74,6 +72,73 @@ public class SimManager : MonoBehaviour
         // totalShoppers = totalShoppers;
         // totalCommuters = totalCommuters;
     }
+    
+    //
+    private void ResetMetrics() {
+        totalAgents = 0;
+        totalShoppers = 0;
+        totalCommuters = 0;
+    }
+
+    // Returns and Sets whether or not the Simulation has started or not.
+    public bool GetSimStarted() { return simStarted; }
+    public void SetSimStarted(bool state) { simStarted = state; }
+
+    // Returns and Sets whether or not the Simulation is paused or not.
+    public bool GetIsPaused() { return isPaused; }
+    public void SetIsPaused(bool state) { isPaused = state; }
+
+    // Returns and Sets the current Speed of the Simulation.
+    public float GetSimSpeed() { return simSpeed; }
+    public void SetSimSpeed(float speed) { simSpeed = speed; }
+
+    // Returns and Sets the ratio of Shopper agents to include in the simulation, from 0% to 100%.
+    public float GetRatioShoppers() { return ratioShoppers; }
+    public void SetRatioShoppers(float ratio) { ratioShoppers = ratio; }
+
+    // Returns and Sets the ratio of Group agents to include in the simulation, from 0% to 100%.
+    public float GetRatioGroups() { return ratioGroups; }
+    public void SetRatioGroups(float ratio) { ratioGroups = ratio; }
+
+    // Returns and Sets the ratio of Infected agents to include in the simulation, from 0% to 100%.
+    public float GetRatioInfected() { return ratioInfected; }
+    public void SetRatioInfected(float ratio) { ratioInfected = ratio; }
+
+    // Returns and Sets the Infection chance of agent spawning & interaction infections in the simulation, from 0% to 100%.
+    public float GetInfectionChance() { return infectionChance; }
+    public void SetInfectionChance(float ratio) { infectionChance = ratio; }
+
+    // Returns and Sets the Maximum group size of Group agents in the simulation.
+    public int GetMaxGroupSize() { return maxGroupSize; }
+    public void SetMaxGroupSize(int size) { maxGroupSize = size; }
+
+    // Returns and Sets the Radius (Social Distance) of agents in the simulation.
+    public float GetRadiusSize() { return radiusSize; }
+    public void SetRadiusSize(float size) { radiusSize = size; }
+
+    // Returns and Sets the Maximum Movement Speed of agents in the simulation.
+    public float GetMaxAgentSpeed() { return maxAgentSpeed; }
+    public void SetMaxAgentSpeed(float speed) { maxAgentSpeed = speed; }
+
+    // Returns and Sets the Modes of Entrances and Exits of Buildings in the simulation.
+    public DoorwayMode GetDoorMode() { return doorMode; }
+    public void SetDoorMode(DoorwayMode mode) { doorMode = mode; }
+
+    // Iterates the number of Total Contacts by 1.
+    public int GetTotalContactsNum() { return totalContacts; }
+    public void AddTotalContactNum() { totalContacts += 1; }
+
+    // Iterates the number of Infectious Contacts by 1.
+    public int GetInfectiousContactNum() { return infectiousContacts; }
+    public void AddInfectiousContactNum() { infectiousContacts += 1; }
+
+    // Returns and Adds a location of Contact to the list of Total Contacts.
+    public List<Vector3> GetContactLocations() { return contactLocations; }
+    public void AddContactLocations(Vector3 location) { contactLocations.Add(location); }
+
+    // Returns and Adds a location of Infection to the list of Infectious Contacts.
+    public List<Vector3> GetInfectionLocations() { return infectionLocations; }
+    public void AddInfectionLocations(Vector3 location) { infectionLocations.Add(location); }
 
 
     // Returns the Transform of the EndNode unique from the StartNode passed in.
@@ -89,7 +154,6 @@ public class SimManager : MonoBehaviour
         return tempEnds[rand].transform;
     }
 
-
     // Returns a list of building locations that the agent can visit
     // 
     public List<Transform> SetDestinations(int numDest) {
@@ -103,9 +167,7 @@ public class SimManager : MonoBehaviour
                 BuildingManager building = tempBuildings[rand].GetComponent<BuildingManager>();
                 tempBuildings.Remove(tempBuildings[rand]);
                 ret.Add(building.ReturnRandomDoor("Entrance"));
-            } else {
-                break;
-            }
+            } else { break; }
         }
         return ret;
     }
@@ -119,7 +181,7 @@ public class SimManager : MonoBehaviour
             case AgentType.GroupCommuter: totalGroupCommuters += num; break;
         }
         totalAgents += num;
-        //Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
+        // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
     }
 
     // Decreases the number of agents of the respective type as well as total
@@ -131,20 +193,7 @@ public class SimManager : MonoBehaviour
             case AgentType.GroupCommuter: totalGroupCommuters -= num; break;
         }
         totalAgents -= num;
-        //Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
-    }
-
-    public void AddContactNum() {
-        totalContacts += 1;
-    }
-
-    public void AddContactLocation(Vector3 location) {
-        contactLocations.Add(location);
-    }
-
-    // Updates the total numbers to Susceptible and Infectious agents.
-    public void UpdateSI() {
-
+        // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
     }
 
 

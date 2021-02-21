@@ -22,40 +22,45 @@ public class AgentManager : MonoBehaviour
     // * [X, 2] = Default colour value.
     // * [X, 3] = Infected colour value.
     // * [X, 4] = Agent movement speed multiplier.
-    public object[,] dVal = new object[,] {
+    private object[,] dVal = new object[,] {
         {AgentType.Shopper, "Shopper", new Color(0,1,1,1), new Color(1,0,1,1), 0.5f},
         {AgentType.Commuter, "Commuter", new Color(0,1,0,1), new Color(1,1,0,1), 1.0f},
         {AgentType.GroupShopper, "GroupShopper", new Color(0,0,1,1), new Color(0.5f,0,1,1), 0.5f},
         {AgentType.GroupCommuter, "GroupCommuter", new Color(0,0.5f,0,1), new Color(1,0,0,1), 1.0f}
     };
 
-
+    
     private SimManager manager;
 
-    public Transform hit;
-
     // Agent based variables.
+    [Header("Prefabs")]
+    public Transform hit;
+    public Transform infectHit;
     public Transform followerPrefab;
     public NavMeshAgent navAgent;
+    private Transform follower;
+
+    [Header("Agent Variables")]
     public AgentType agentType;
-    public Transform follower;
+    public bool isInfected;
     public int groupSize;
     public float minSpeed;
     public float maxSpeed;
     public float radius;
-    public bool isInfected;
 
-    private int infectChance;
+    private int infectedChance;
     private int typeChance;
     private int groupChance;
     private int typeInt;
 
     // Location based variables.
+    [Header("Geospatial variables")]
     private Transform startNode;
     private Transform endNode;
     public int maxDestinations = 5;
-    public List<Transform> destinations;
     public Transform currentDestination;
+    public List<Transform> destinations;
+    
     
     // Building based variables.
     private static float baseBuildingBufferTime = 2;
@@ -74,19 +79,22 @@ public class AgentManager : MonoBehaviour
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
 
         // * Agent spawning initialization.
-        infectChance = Random.Range(0, 100);
+        infectedChance = Random.Range(0, 100);
         typeChance = Random.Range(0, 100);
         groupChance = Random.Range(0, 100);
         List<int> types = new List<int>() {0, 1, 2, 3};
-        if (infectChance < manager.infectionChance) { isInfected = true; }
-        if (!(groupChance < manager.ratioGroups)) { 
+        if (infectedChance < manager.GetRatioInfected()) { 
+            isInfected = true; 
+
+        }
+        if (!(groupChance < manager.GetRatioGroups())) { 
             types.RemoveRange(2, 2); // Single = [0, 1]
             groupSize = 1;
         } else { 
             types.RemoveRange(0, 2); // Groups = [2, 3]
-            groupSize = Random.Range(2, manager.maxGroupSize);
+            groupSize = Random.Range(2, manager.GetMaxGroupSize());
         } 
-        if (typeChance < manager.ratioShoppers) { typeInt = types[0]; } 
+        if (typeChance < manager.GetRatioShoppers()) { typeInt = types[0]; } 
         else { typeInt = types[1]; }
         
         agentType = (AgentType)dVal[typeInt, 0];
@@ -95,7 +103,7 @@ public class AgentManager : MonoBehaviour
         else { color = (Color)dVal[typeInt, 3]; }
         
 
-        maxSpeed = manager.maxAgentSpeed * (float)dVal[typeInt, 4];
+        maxSpeed = manager.GetMaxAgentSpeed() * (float)dVal[typeInt, 4];
         minSpeed = maxSpeed / 2;
 
         if (groupSize > 1) {
@@ -111,10 +119,10 @@ public class AgentManager : MonoBehaviour
         navAgent.acceleration = maxSpeed*10;
 
         // * Radius initialization.
-        radius = manager.radiusSize;
+        radius = manager.GetRadiusSize();
         Vector3 scaleChange = new Vector3(radius, 0, radius);
         gameObject.transform.GetChild(0).localScale += scaleChange;
-        navAgent.radius = manager.radiusSize / 2;
+        navAgent.radius = manager.GetRadiusSize() / 2;
 
         // * Destinations of agent.
         startNode = gameObject.transform;
@@ -181,18 +189,23 @@ public class AgentManager : MonoBehaviour
         // * Do not collide with non agents and within-group agents.
         // TODO: infection only counts.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));
-        if (environmentCheck && !(other.transform.IsChildOf(transform)) && isInfected) {
+        if (environmentCheck && !(other.transform.IsChildOf(transform))) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
-                TrackInteraction(other);
-                rend.material.color = new Color(0, 0, 0, 1);
-                other.gameObject.GetComponent<AgentManager>().rend.material.color = new Color(0, 0, 0, 1);
+                TrackInteraction(other, isInfected, leadScript.isInfected);
+                if (isInfected || leadScript.isInfected) {
+                    SetColor(new Color(0, 0, 0, 1));
+                    leadScript.SetColor(new Color(0, 0, 0, 1));
+                }
                 
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
-                TrackInteraction(other);
-                rend.material.color = new Color(0, 0, 0, 0.5f);
-                other.gameObject.GetComponent<FollowAgentManager>().rend.material.color = new Color(0, 0, 0, 0.5f);
+                TrackInteraction(other, isInfected, followScript.isInfected);
+                if (isInfected || followScript.isInfected) {
+                    SetColor(new Color(0, 0, 0, 0.5f));
+                    followScript.SetColor(new Color(0, 0, 0, 0.5f));
+                }   
+                
             }
 
         }
@@ -200,21 +213,37 @@ public class AgentManager : MonoBehaviour
     }
 
     // Helper method used in OnCollisionEnter to track interactions between agents.
-    public void TrackInteraction(Collision other) {
-        // TODO: Store world location of interactions.
+    public void TrackInteraction(Collision other, bool infected, bool otherInfected) {
         // TODO: Set "hit" spheres inactive until needed to be shown at the end of the simulation.
+        // TODO: only change colors of interacting agents if one is infected.
         ContactPoint contact = other.contacts[0];
         Vector3 tempPoint = contact.point;
-        tempPoint.y = -10;   // * Keep the same elevation for contact points.
-        Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);
-        //Debug.Log(tempPoint);
-        manager.AddContactNum();
-        manager.AddContactLocation(tempPoint);
+        //tempPoint.y = 10;   // * Keep the same elevation for contact points.
+        manager.AddTotalContactNum();
+        manager.AddContactLocations(tempPoint);
+        if ((infected && !otherInfected) ^ (!infected && otherInfected)) {
+            manager.AddInfectiousContactNum();
+            manager.AddInfectionLocations(tempPoint);
+            tempPoint.y = 20;
+            //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);
+        }
+        tempPoint.y = 10;
+        //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
+    }
+
+    //
+    public void TrackInfection() {
+
     }
 
     //
     public void SetInfection(Collision other) {
         other.gameObject.GetComponent<AgentManager>().isInfected = true;
+    }
+
+    //
+    public void SetColor(Color col) {
+        rend.material.color = col;
     }
 
     //

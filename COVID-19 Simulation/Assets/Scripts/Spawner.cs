@@ -13,8 +13,6 @@ public class Spawner : MonoBehaviour
     public float timeBetweenWaves = 3f;
     private float countdown = 2f;
 
-    //public bool simStarted = false;
-
     private int waveIndex = 0;
 
     
@@ -47,11 +45,14 @@ public class Spawner : MonoBehaviour
         // TODO: I.e. maximum number of agents, spawning based on peak times, etc.
         waveIndex++;
 
-        for (int i = 0; i < waveIndex; i++)
-        {
-            SpawnEnemy();
-            yield return new WaitForSeconds(0.5f);
-        }
+        SpawnEnemy();
+        yield return new WaitForSeconds(0.0f);
+
+    //     for (int i = 0; i < waveIndex; i++)
+    //     {
+    //         SpawnEnemy();
+    //         yield return new WaitForSeconds(0.5f);
+    //     }
     }
 
     public void SpawnEnemy()

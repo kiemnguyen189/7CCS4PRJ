@@ -33,11 +33,11 @@ public class GUIManager : MonoBehaviour
 
     public void PauseSimulation() {
         //float curTimeScale = manager.simSpeed;
-        if (manager.isPaused) {
-            manager.isPaused = false;
+        if (manager.GetIsPaused()) {
+            manager.SetIsPaused(false);
             Time.timeScale = manager.simSpeed;
         } else {
-            manager.isPaused = true;
+            manager.SetIsPaused(true);
             Time.timeScale = 0f;
         }
     }

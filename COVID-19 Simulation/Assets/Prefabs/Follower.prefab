@@ -143,10 +143,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2b61f14a8c7a494c9f8d7c7c330cc7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 0}
   leader: {fileID: 8418691987860001818, guid: c8f1bac53e859c34286e2f1441642241, type: 3}
+  leadManager: {fileID: 0}
   navAgent: {fileID: 8418691987860001813}
+  isInfected: 0
   hit: {fileID: 3567844930302017680, guid: b5d3b30d5786f0f42a9617b319609971, type: 3}
+  infectHit: {fileID: 3567844930302017680, guid: 3af6b956e2b4b6c45b1515bccf4bbf57,
+    type: 3}
+  rend: {fileID: 0}
 --- !u!195 &8418691987860001813
 NavMeshAgent:
   m_ObjectHideFlags: 0

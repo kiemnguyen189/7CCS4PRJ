@@ -6,7 +6,7 @@ using UnityEngine.AI;
 public class FollowAgentManager : MonoBehaviour
 {
 
-    public SimManager manager;
+    private SimManager manager;
 
     public GameObject leader;
     public AgentManager leadManager;
@@ -15,6 +15,7 @@ public class FollowAgentManager : MonoBehaviour
     public bool isInfected;
 
     public Transform hit;
+    public Transform infectHit;
 
     public Renderer rend;
     private Color color;
@@ -44,6 +45,8 @@ public class FollowAgentManager : MonoBehaviour
 
         rend = GetComponent<Renderer>();
         rend.material.color = color;
+        
+        isInfected = leadManager.isInfected;
 
         // * Radius initialization.
         float radius = leadManager.radius;
@@ -74,20 +77,31 @@ public class FollowAgentManager : MonoBehaviour
         bool parentCheck = (transform.IsChildOf(other.transform));                 
         // * Check if siblings have the same parent.                         
         bool siblingCheck = (transform.parent == other.transform.parent);                                   
-        if (environmentCheck && !parentCheck && !siblingCheck && isInfected) {
+        if (environmentCheck && !parentCheck && !siblingCheck) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
-                leadManager.TrackInteraction(other);
-                rend.material.color = new Color(1, 1, 1, 1);
-                other.gameObject.GetComponent<AgentManager>().rend.material.color = new Color(1, 1, 1, 1);
+                leadManager.TrackInteraction(other, isInfected, leadScript.isInfected);
+                if (isInfected || leadScript.isInfected) {
+                    SetColor(new Color(1, 1, 1, 1));
+                    leadScript.SetColor(new Color(1, 1, 1, 1));
+                }
+                
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
-                leadManager.TrackInteraction(other);
-                rend.material.color = new Color(1, 1, 1, 0.5f);
-                other.gameObject.GetComponent<FollowAgentManager>().rend.material.color = new Color(1, 1, 1, 0.5f);
+                leadManager.TrackInteraction(other, isInfected, followScript.isInfected);
+                if (isInfected || followScript.isInfected) {
+                    SetColor(new Color(1, 1, 1, 0.5f));
+                    followScript.SetColor(new Color(1, 1, 1, 0.5f));
+                }
+                
             }
 
         }
+    }
+
+    //
+    public void SetColor(Color col) {
+        rend.material.color = col;
     }
 
 

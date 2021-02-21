@@ -27,7 +27,7 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        switch (manager.GetComponent<SimManager>().doorMode) {
+        switch (manager.GetComponent<SimManager>().GetDoorMode()) {
             case DoorwayMode.OneWay:
                 int rand = Random.Range(0, 2);
                 if (rand == 0) {

@@ -50,21 +50,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hit: {fileID: 3567844930302017680, guid: b5d3b30d5786f0f42a9617b319609971, type: 3}
+  infectHit: {fileID: 3567844930302017680, guid: 3af6b956e2b4b6c45b1515bccf4bbf57,
+    type: 3}
   followerPrefab: {fileID: 8418691987860001809, guid: 7fe5c64a6a4204841a8c533997de76fa,
     type: 3}
   navAgent: {fileID: 8418691987860001813}
   agentType: 0
-  follower: {fileID: 0}
+  isInfected: 0
   groupSize: 0
   minSpeed: 0
   maxSpeed: 0
   radius: 0
-  chance: 0
-  groupChance: 0
   maxDestinations: 5
-  destinations: []
   currentDestination: {fileID: 0}
+  destinations: []
   rend: {fileID: 0}
+  color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!195 &8418691987860001813
 NavMeshAgent:
   m_ObjectHideFlags: 0
