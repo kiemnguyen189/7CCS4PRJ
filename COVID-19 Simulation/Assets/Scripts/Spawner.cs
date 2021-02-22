@@ -23,9 +23,23 @@ public class Spawner : MonoBehaviour
     }
     
     
-    // Update is called once per frame
-    void Update()
-    {
+    // // Update is called once per frame
+    // void Update()
+    // {
+    //     if (manager.simStarted) {
+
+    //         if (countdown <= 0f)
+    //         {
+    //             StartCoroutine(SpawnWave());
+    //             countdown = timeBetweenWaves;
+    //         }
+    //         countdown -= Time.deltaTime;
+    //     }
+        
+
+    // }
+
+    private void FixedUpdate() {
         if (manager.simStarted) {
 
             if (countdown <= 0f)
@@ -35,8 +49,6 @@ public class Spawner : MonoBehaviour
             }
             countdown -= Time.deltaTime;
         }
-        
-
     }
 
     IEnumerator SpawnWave()

@@ -46,7 +46,7 @@ public class FollowAgentManager : MonoBehaviour
         rend = GetComponent<Renderer>();
         rend.material.color = color;
         
-        isInfected = leadManager.isInfected;
+        isInfected = leadManager.GetInfection();
 
         // * Radius initialization.
         float radius = leadManager.radius;
@@ -82,27 +82,38 @@ public class FollowAgentManager : MonoBehaviour
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
                 leadManager.TrackInteraction(other, isInfected, leadScript.isInfected);
-                if (isInfected || leadScript.isInfected) {
-                    SetColor(new Color(1, 1, 1, 1));
-                    leadScript.SetColor(new Color(1, 1, 1, 1));
+                if (isInfected) { 
+                    leadScript.SetColor(color); 
+                    leadScript.SetInfection(isInfected);
+                    leadScript.UpdateInfectionProportions();
+                } else if (leadScript.isInfected) { 
+                    SetColor(leadScript.GetColor()); 
+                    SetInfection(leadScript.GetInfection());
+                    leadScript.UpdateInfectionProportions();
                 }
-                
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 leadManager.TrackInteraction(other, isInfected, followScript.isInfected);
-                if (isInfected || followScript.isInfected) {
-                    SetColor(new Color(1, 1, 1, 0.5f));
-                    followScript.SetColor(new Color(1, 1, 1, 0.5f));
-                }
-                
+                if (isInfected) { 
+                    followScript.SetColor(color); 
+                    followScript.SetInfection(isInfected);
+                    leadManager.UpdateInfectionProportions();
+                } else if (followScript.isInfected) { 
+                    SetColor(followScript.GetColor()); 
+                    SetInfection(followScript.GetInfection());
+                    leadManager.UpdateInfectionProportions();
+                }  
             }
 
         }
     }
 
     //
-    public void SetColor(Color col) {
-        rend.material.color = col;
-    }
+    public Color GetColor() { return color; }
+    public void SetColor(Color col) { rend.material.color = col;}
+
+    //
+    public bool GetInfection() { return isInfected; }
+    public void SetInfection(bool infection) { isInfected = infection; }
 
 
 }

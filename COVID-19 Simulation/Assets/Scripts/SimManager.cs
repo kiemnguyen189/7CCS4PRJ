@@ -41,10 +41,8 @@ public class SimManager : MonoBehaviour
     public int totalGroupShoppers;
     public int totalGroupCommuters;
 
-    public int totalSusceptible;
+    public int totalSusceptible;    // * Total agents - Total Infected = Total Susceptible.
     public int totalInfected;
-    public int totalGroupSusceptible;
-    public int totalGroupInfected;
 
     public static GameObject[] spawners;
     public static GameObject[] buildings;
@@ -124,13 +122,59 @@ public class SimManager : MonoBehaviour
     public DoorwayMode GetDoorMode() { return doorMode; }
     public void SetDoorMode(DoorwayMode mode) { doorMode = mode; }
 
+    // Increases the number of agents of the respective type as well as total
+    public void AddNumAgents(AgentType type, int num, int infected) {
+        Debug.Log(infected);
+        switch (type) {
+            case AgentType.Shopper: totalShoppers += num; break;
+            case AgentType.Commuter: totalCommuters += num; break;
+            case AgentType.GroupShopper: totalGroupShoppers += num; break;
+            case AgentType.GroupCommuter: totalGroupCommuters += num; break;
+        }
+
+        totalAgents += num;
+        if (infected > 0) { 
+            totalInfected += infected; 
+            totalSusceptible += (num - infected); 
+        } else if (infected == 0) { 
+            totalSusceptible += num - infected; 
+        }
+
+        // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
+    }
+
+    // Decreases the number of agents of the respective type as well as total
+    public void ReduceNumAgents(AgentType type, int num, int infected) {
+        Debug.Log(infected);
+        switch (type) {
+            case AgentType.Shopper: totalShoppers -= num; break;
+            case AgentType.Commuter: totalCommuters -= num; break;
+            case AgentType.GroupShopper: totalGroupShoppers -= num; break;
+            case AgentType.GroupCommuter: totalGroupCommuters -= num; break;
+        }
+        totalAgents -= num;
+        // TODO: Reduce based on group infected proportion, NOT total num in group.
+        if (infected > 0) { 
+            totalInfected -= infected; 
+            totalSusceptible -= (num - infected);
+        } else if (infected == 0) { 
+            totalSusceptible -= num - infected; 
+        }
+
+        // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
+    }
+
     // Iterates the number of Total Contacts by 1.
     public int GetTotalContactsNum() { return totalContacts; }
     public void AddTotalContactNum() { totalContacts += 1; }
 
     // Iterates the number of Infectious Contacts by 1.
     public int GetInfectiousContactNum() { return infectiousContacts; }
-    public void AddInfectiousContactNum() { infectiousContacts += 1; }
+    public void AddInfectiousContactNum() { 
+        infectiousContacts += 1; 
+        totalInfected += 1;
+        totalSusceptible -= 1;
+    }
 
     // Returns and Adds a location of Contact to the list of Total Contacts.
     public List<Vector3> GetContactLocations() { return contactLocations; }
@@ -172,29 +216,7 @@ public class SimManager : MonoBehaviour
         return ret;
     }
 
-    // Increases the number of agents of the respective type as well as total
-    public void AddTotalAgents(AgentType type, int num) {
-        switch (type) {
-            case AgentType.Shopper: totalShoppers += num; break;
-            case AgentType.Commuter: totalCommuters += num; break;
-            case AgentType.GroupShopper: totalGroupShoppers += num; break;
-            case AgentType.GroupCommuter: totalGroupCommuters += num; break;
-        }
-        totalAgents += num;
-        // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
-    }
-
-    // Decreases the number of agents of the respective type as well as total
-    public void ReduceTotalAgents(AgentType type, int num) {
-        switch (type) {
-            case AgentType.Shopper: totalShoppers -= num; break;
-            case AgentType.Commuter: totalCommuters -= num; break;
-            case AgentType.GroupShopper: totalGroupShoppers -= num; break;
-            case AgentType.GroupCommuter: totalGroupCommuters -= num; break;
-        }
-        totalAgents -= num;
-        // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
-    }
+    
 
 
 }

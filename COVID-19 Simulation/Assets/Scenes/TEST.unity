@@ -2927,7 +2927,7 @@ PrefabInstance:
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
       propertyPath: maxGroupSize
-      value: 5
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
@@ -3605,6 +3605,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_NormalizedViewPortRect.y
       value: -0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6752185705461577800, guid: e14b3356620df6644a8830ad92efa6dd,
+        type: 3}
+      propertyPath: far clip plane
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 6752185705461577801, guid: e14b3356620df6644a8830ad92efa6dd,
         type: 3}

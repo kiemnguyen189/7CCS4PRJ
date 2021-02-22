@@ -44,6 +44,7 @@ public class AgentManager : MonoBehaviour
     public AgentType agentType;
     public bool isInfected;
     public int groupSize;
+    public int groupInfected;
     public float minSpeed;
     public float maxSpeed;
     public float radius;
@@ -83,10 +84,6 @@ public class AgentManager : MonoBehaviour
         typeChance = Random.Range(0, 100);
         groupChance = Random.Range(0, 100);
         List<int> types = new List<int>() {0, 1, 2, 3};
-        if (infectedChance < manager.GetRatioInfected()) { 
-            isInfected = true; 
-
-        }
         if (!(groupChance < manager.GetRatioGroups())) { 
             types.RemoveRange(2, 2); // Single = [0, 1]
             groupSize = 1;
@@ -96,13 +93,16 @@ public class AgentManager : MonoBehaviour
         } 
         if (typeChance < manager.GetRatioShoppers()) { typeInt = types[0]; } 
         else { typeInt = types[1]; }
+        groupInfected = 0;
+        if (infectedChance < manager.GetRatioInfected()) { 
+            isInfected = true; 
+            groupInfected = groupSize;
+        }
         
         agentType = (AgentType)dVal[typeInt, 0];
         gameObject.tag = (string)dVal[typeInt, 1];
         if (!isInfected) { color = (Color)dVal[typeInt, 2]; } 
         else { color = (Color)dVal[typeInt, 3]; }
-        
-
         maxSpeed = manager.GetMaxAgentSpeed() * (float)dVal[typeInt, 4];
         minSpeed = maxSpeed / 2;
 
@@ -113,7 +113,7 @@ public class AgentManager : MonoBehaviour
             }
         }
 
-        // * Agent movement stats.
+        // * NavMeshAgent movement stats.
         navAgent.speed = Random.Range(minSpeed, maxSpeed);
         navAgent.angularSpeed = maxSpeed*10;
         navAgent.acceleration = maxSpeed*10;
@@ -135,7 +135,9 @@ public class AgentManager : MonoBehaviour
         destinations.Add(endNode);
 
         // * SimManager metrics.
-        manager.AddTotalAgents(agentType, groupSize);
+        manager.AddNumAgents(agentType, groupSize, groupInfected);
+        // TODO: Change the metrics based on agent type, group size, infected or not, etc.
+
 
         // * Rendering initialization.
         rend = GetComponent<Renderer>();
@@ -167,6 +169,22 @@ public class AgentManager : MonoBehaviour
 
     }
 
+    //
+    public Color GetColor() { return color; }
+    public void SetColor(Color col) { rend.material.color = col; }
+
+    //
+    public bool GetInfection() { return isInfected; }
+    public void SetInfection(bool infection) { isInfected = infection; }
+
+    // TODO: Fix wrong infection numbers.
+    public void UpdateInfectionProportions() {
+        if (groupInfected != groupSize) {
+            groupInfected += 1;
+        }
+        
+    }
+
     // Updates the list of destinations each agent has.
     public void UpdateDestinations() {
         destinations.RemoveAt(0);
@@ -194,17 +212,26 @@ public class AgentManager : MonoBehaviour
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other, isInfected, leadScript.isInfected);
-                if (isInfected || leadScript.isInfected) {
-                    SetColor(new Color(0, 0, 0, 1));
-                    leadScript.SetColor(new Color(0, 0, 0, 1));
+                if (isInfected) { 
+                    leadScript.SetColor(color); 
+                    leadScript.SetInfection(isInfected);
+                    leadScript.UpdateInfectionProportions();    // TODO: Fix wrong infection numbers.
+                } else if (leadScript.GetInfection()) { 
+                    SetColor(leadScript.GetColor()); 
+                    SetInfection(leadScript.GetInfection());
+                    leadScript.UpdateInfectionProportions();    // TODO: Fix wrong infection numbers.
                 }
-                
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other, isInfected, followScript.isInfected);
-                if (isInfected || followScript.isInfected) {
-                    SetColor(new Color(0, 0, 0, 0.5f));
-                    followScript.SetColor(new Color(0, 0, 0, 0.5f));
-                }   
+                if (isInfected) { 
+                    followScript.SetColor(color); 
+                    followScript.SetInfection(isInfected);
+                    UpdateInfectionProportions();   // TODO: Fix wrong infection numbers.
+                } else if (followScript.GetInfection()) { 
+                    SetColor(followScript.GetColor()); 
+                    SetInfection(followScript.GetInfection());
+                    UpdateInfectionProportions();   // TODO: Fix wrong infection numbers.
+                }  
                 
             }
 
@@ -231,24 +258,13 @@ public class AgentManager : MonoBehaviour
         //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
     }
 
-    //
-    public void TrackInfection() {
 
-    }
-
-    //
-    public void SetInfection(Collision other) {
-        other.gameObject.GetComponent<AgentManager>().isInfected = true;
-    }
-
-    //
-    public void SetColor(Color col) {
-        rend.material.color = col;
-    }
+    
 
     //
     public void Despawn() {
-        manager.ReduceTotalAgents(agentType, groupSize);
+        manager.ReduceNumAgents(agentType, groupSize, groupInfected);
+
         Destroy(gameObject);
     }
 
