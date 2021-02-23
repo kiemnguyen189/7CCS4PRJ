@@ -58,6 +58,7 @@ MonoBehaviour:
   agentType: 0
   isInfected: 0
   groupSize: 0
+  groupInfected: 0
   minSpeed: 0
   maxSpeed: 0
   radius: 0
@@ -87,7 +88,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 1
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
+  m_ObstacleAvoidanceType: 1
 --- !u!54 &8418691987860001811
 Rigidbody:
   m_ObjectHideFlags: 0

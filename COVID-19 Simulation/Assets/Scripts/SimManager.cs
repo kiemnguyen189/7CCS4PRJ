@@ -13,43 +13,43 @@ public class SimManager : MonoBehaviour
 {
     
     [Header("Prefabs")]
-    public Camera cam;
+    public Camera cam;                          // Scene Camera Object
 
     [Header("Settings")]
-    public bool simStarted = false;
-    public bool isPaused = false;
-    public float simSpeed = 1.0f;
+    public bool simStarted = false;             // Whether the simulation has been started or not.
+    public bool isPaused = false;               // Whether or not the simulation is currently paused.
+    public float simSpeed = 1.0f;               // The current "playback speed" of the simulation, Min = 1/8x, Max = 8x.
 
     // * Initial Simulation User settings.
     [Header("Agent Parameters")]
-    public float ratioShoppers;
-    public float ratioGroups;
-    public float ratioInfected;
-    public float infectionChance;
-    public int maxGroupSize;
-    public float radiusSize;
-    public float maxAgentSpeed;
+    public float ratioShoppers;                 // The spawning ratio of Shopper agents. 100 = Only shoppers, 0 = Only Commuters.
+    public float ratioGroups;                   // The spawning ratio of Group agents. 100 = Only groups, 0 = Only singles.
+    public float ratioInfected;                 // The spawning ratio of Infected agents. 100 = Only infected, 0 = Infection free.
+    public float infectionChance;               // The chance of an infected agent infecting another agent upon contact.
+    public int maxGroupSize;                    // The maximum spawning group size of agents.
+    public float radiusSize;                    // The Social Distancing radius of each agent. 
+    public float maxAgentSpeed;                 // The maximum movement speed of the NavMeshAgents.
 
     [Header("Environment Parameters")]
-    public DoorwayMode doorMode;
+    public DoorwayMode doorMode;                // The types of Entrances / Exits for each building. Types: [OneWay, TwoWay, Mixed].
 
     // * Live Simulation Metrics.
     [Header("Simulation Metrics")]
-    public int totalAgents;
-    public int totalShoppers;
-    public int totalCommuters;
-    public int totalGroupShoppers;
-    public int totalGroupCommuters;
+    public int totalAgents;                     // The Total number of agents currently in the simulation run.
+    public int totalShoppers;                   // The Total number of Shopper agents currently in the simulation run.
+    public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
+    public int totalGroupShoppers;              // The Total number of Group Shopper agents currently in the simulation run.
+    public int totalGroupCommuters;             // The Total number of Group Commuters agents currently in the simulation run.
 
-    public int totalSusceptible;    // * Total agents - Total Infected = Total Susceptible.
-    public int totalInfected;
+    public int totalSusceptible;                // The Total number of Susceptible (Non-Infected) agents currently in the simulation run.
+    public int totalInfected;                   // The Total number of Infected agents currently in the simulation run.
 
-    public static GameObject[] spawners;
-    public static GameObject[] buildings;
-    public List<Vector3> contactLocations;
-    public List<Vector3> infectionLocations;
-    public int totalContacts;
-    public int infectiousContacts;
+    public static GameObject[] spawners;        // A list of all agent spawners in the environment.
+    public static GameObject[] buildings;       // A list of all buildings in the environment.
+    public List<Vector3> contactLocations;      // A list of all agent contact/interaction locations in the environment.
+    public List<Vector3> infectionLocations;    // A list of all infected agent contact and transfers in the environment.
+    public int totalContacts;                   // The Total number of contacts in the simulation run.
+    public int infectiousContacts;              // The Total number of infectious contacts in the simulation run.
     
     
     // Start is called before the first frame update
@@ -77,6 +77,9 @@ public class SimManager : MonoBehaviour
         totalShoppers = 0;
         totalCommuters = 0;
     }
+
+    // * Getter and Setter methods for all simulation parameters and metrics.
+    // -----------------------------------------------------------------------------------------------------------------------------
 
     // Returns and Sets whether or not the Simulation has started or not.
     public bool GetSimStarted() { return simStarted; }
@@ -122,16 +125,39 @@ public class SimManager : MonoBehaviour
     public DoorwayMode GetDoorMode() { return doorMode; }
     public void SetDoorMode(DoorwayMode mode) { doorMode = mode; }
 
+    // Returns the Total number of agents currently in the simulation.
+    public int GetTotalAgents() { return totalAgents; }
+
+    // Returns the Total number of Shopper agents currently in the simulation.
+    public int GetTotalShoppers() { return totalShoppers; }
+
+    // Returns the Total number of Commuter agents currently in the simulation.
+    public int GetTotalCommuters() { return totalCommuters; }
+
+    // Returns the Total number of Group Shopper agents currently in the simulation.
+    public int GetTotalGroupShoppers() { return totalGroupShoppers; }
+
+    // Returns the Total number of Group Commuter agents currently in the simulation.
+    public int GetTotalGroupCommuters() { return totalGroupCommuters; }
+
+    // Returns the Total number of Susceptible (Non-Infected) agents currently in the simulation.
+    public int GetTotalSusceptible() { return totalSusceptible; }
+
+    // Returns the Total number of Infected agents currently in the simulation.
+    public int GetTotalInfected() { return totalInfected; }
+
+    // -----------------------------------------------------------------------------------------------------------------------------
+
+
     // Increases the number of agents of the respective type as well as total
     public void AddNumAgents(AgentType type, int num, int infected) {
-        Debug.Log(infected);
+        //Debug.Log(infected);
         switch (type) {
             case AgentType.Shopper: totalShoppers += num; break;
             case AgentType.Commuter: totalCommuters += num; break;
             case AgentType.GroupShopper: totalGroupShoppers += num; break;
             case AgentType.GroupCommuter: totalGroupCommuters += num; break;
         }
-
         totalAgents += num;
         if (infected > 0) { 
             totalInfected += infected; 
@@ -145,7 +171,7 @@ public class SimManager : MonoBehaviour
 
     // Decreases the number of agents of the respective type as well as total
     public void ReduceNumAgents(AgentType type, int num, int infected) {
-        Debug.Log(infected);
+        //Debug.Log(infected);
         switch (type) {
             case AgentType.Shopper: totalShoppers -= num; break;
             case AgentType.Commuter: totalCommuters -= num; break;
@@ -153,7 +179,6 @@ public class SimManager : MonoBehaviour
             case AgentType.GroupCommuter: totalGroupCommuters -= num; break;
         }
         totalAgents -= num;
-        // TODO: Reduce based on group infected proportion, NOT total num in group.
         if (infected > 0) { 
             totalInfected -= infected; 
             totalSusceptible -= (num - infected);

@@ -76,8 +76,9 @@ public class FollowAgentManager : MonoBehaviour
         // * Check if other object is not the parent of this object.
         bool parentCheck = (transform.IsChildOf(other.transform));                 
         // * Check if siblings have the same parent.                         
-        bool siblingCheck = (transform.parent == other.transform.parent);                                   
-        if (environmentCheck && !parentCheck && !siblingCheck) {
+        bool siblingCheck = (transform.parent == other.transform.parent);     
+        if (environmentCheck && !parentCheck && !siblingCheck) {                          
+        //if (environmentCheck) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
@@ -85,22 +86,18 @@ public class FollowAgentManager : MonoBehaviour
                 if (isInfected) { 
                     leadScript.SetColor(color); 
                     leadScript.SetInfection(isInfected);
-                    leadScript.UpdateInfectionProportions();
                 } else if (leadScript.isInfected) { 
                     SetColor(leadScript.GetColor()); 
                     SetInfection(leadScript.GetInfection());
-                    leadScript.UpdateInfectionProportions();
                 }
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 leadManager.TrackInteraction(other, isInfected, followScript.isInfected);
                 if (isInfected) { 
                     followScript.SetColor(color); 
                     followScript.SetInfection(isInfected);
-                    leadManager.UpdateInfectionProportions();
                 } else if (followScript.isInfected) { 
                     SetColor(followScript.GetColor()); 
                     SetInfection(followScript.GetInfection());
-                    leadManager.UpdateInfectionProportions();
                 }  
             }
 

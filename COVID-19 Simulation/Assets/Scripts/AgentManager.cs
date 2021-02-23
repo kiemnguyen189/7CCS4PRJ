@@ -177,14 +177,6 @@ public class AgentManager : MonoBehaviour
     public bool GetInfection() { return isInfected; }
     public void SetInfection(bool infection) { isInfected = infection; }
 
-    // TODO: Fix wrong infection numbers.
-    public void UpdateInfectionProportions() {
-        if (groupInfected != groupSize) {
-            groupInfected += 1;
-        }
-        
-    }
-
     // Updates the list of destinations each agent has.
     public void UpdateDestinations() {
         destinations.RemoveAt(0);
@@ -202,12 +194,16 @@ public class AgentManager : MonoBehaviour
         return buildingBufferTimer;
     }
 
-    //
+    // Detects interactions between agents through collisions.
+    // Ensures that only one of the two interacting agents calls the TrackInteraction method.
+    // This removes redundant duplicate calls which can affect performance and accuracy of metrics.
     private void OnCollisionEnter(Collision other) {
         // * Do not collide with non agents and within-group agents.
         // TODO: infection only counts.
+        // TODO: Infect within group as well.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));
         if (environmentCheck && !(other.transform.IsChildOf(transform))) {
+        //if (environmentCheck) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
@@ -215,22 +211,18 @@ public class AgentManager : MonoBehaviour
                 if (isInfected) { 
                     leadScript.SetColor(color); 
                     leadScript.SetInfection(isInfected);
-                    leadScript.UpdateInfectionProportions();    // TODO: Fix wrong infection numbers.
                 } else if (leadScript.GetInfection()) { 
                     SetColor(leadScript.GetColor()); 
                     SetInfection(leadScript.GetInfection());
-                    leadScript.UpdateInfectionProportions();    // TODO: Fix wrong infection numbers.
                 }
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other, isInfected, followScript.isInfected);
                 if (isInfected) { 
                     followScript.SetColor(color); 
                     followScript.SetInfection(isInfected);
-                    UpdateInfectionProportions();   // TODO: Fix wrong infection numbers.
                 } else if (followScript.GetInfection()) { 
                     SetColor(followScript.GetColor()); 
                     SetInfection(followScript.GetInfection());
-                    UpdateInfectionProportions();   // TODO: Fix wrong infection numbers.
                 }  
                 
             }
@@ -245,17 +237,18 @@ public class AgentManager : MonoBehaviour
         // TODO: only change colors of interacting agents if one is infected.
         ContactPoint contact = other.contacts[0];
         Vector3 tempPoint = contact.point;
-        //tempPoint.y = 10;   // * Keep the same elevation for contact points.
+        tempPoint.y = 10;   // * Keep the same elevation for contact points.
         manager.AddTotalContactNum();
         manager.AddContactLocations(tempPoint);
+        Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
         if ((infected && !otherInfected) ^ (!infected && otherInfected)) {
+            tempPoint.y = 20;
             manager.AddInfectiousContactNum();
             manager.AddInfectionLocations(tempPoint);
-            tempPoint.y = 20;
+            
             //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);
         }
-        tempPoint.y = 10;
-        //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
+        
     }
 
 
@@ -263,8 +256,13 @@ public class AgentManager : MonoBehaviour
 
     //
     public void Despawn() {
+        // Recount infection exit infection numbers.
+        groupInfected = 0;
+        if (isInfected) { groupInfected += 1; }
+        for (int i = 1; i < transform.childCount; i++) {
+            if (transform.GetChild(i).GetComponent<FollowAgentManager>().GetInfection()) { groupInfected += 1; }
+        }
         manager.ReduceNumAgents(agentType, groupSize, groupInfected);
-
         Destroy(gameObject);
     }
 
