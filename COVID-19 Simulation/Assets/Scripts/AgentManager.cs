@@ -15,20 +15,6 @@ public enum AgentType {
 // * General manager class for every main agent (not including follower agents).
 public class AgentManager : MonoBehaviour
 {
-    // * These are the default values unique to each agent type.
-    // * [0, 1, 2, 3] = agent types equivalent to enum values.
-    // * [X, 0] = Enum name.
-    // * [X, 1] = Tag name.
-    // * [X, 2] = Default colour value.
-    // * [X, 3] = Infected colour value.
-    // * [X, 4] = Agent movement speed multiplier.
-    private object[,] dVal = new object[,] {
-        {AgentType.Shopper, "Shopper", new Color(0,1,1,1), new Color(1,0,1,1), 0.5f},
-        {AgentType.Commuter, "Commuter", new Color(0,1,0,1), new Color(1,1,0,1), 1.0f},
-        {AgentType.GroupShopper, "GroupShopper", new Color(0,0,1,1), new Color(0.5f,0,1,1), 0.5f},
-        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,0.5f,0,1), new Color(1,0,0,1), 1.0f}
-    };
-
     
     private SimManager manager;
 
@@ -42,6 +28,7 @@ public class AgentManager : MonoBehaviour
 
     [Header("Agent Variables")]
     public AgentType agentType;
+    public static int typeInt;
     public bool isInfected;
     public int groupSize;
     public int groupInfected;
@@ -52,7 +39,6 @@ public class AgentManager : MonoBehaviour
     private int infectedChance;
     private int typeChance;
     private int groupChance;
-    private int typeInt;
 
     // Location based variables.
     [Header("Geospatial variables")]
@@ -70,8 +56,6 @@ public class AgentManager : MonoBehaviour
     // Rendering variables.
     public Renderer rend;
     public Color color;
-
-    // TODO: Maybe make a data structure to store varying agent parameters e.g. colour, speed, chances etc.
 
     // Start is called before the first frame update
     void Start() {
@@ -99,11 +83,11 @@ public class AgentManager : MonoBehaviour
             groupInfected = groupSize;
         }
         
-        agentType = (AgentType)dVal[typeInt, 0];
-        gameObject.tag = (string)dVal[typeInt, 1];
-        if (!isInfected) { color = (Color)dVal[typeInt, 2]; } 
-        else { color = (Color)dVal[typeInt, 3]; }
-        maxSpeed = manager.GetMaxAgentSpeed() * (float)dVal[typeInt, 4];
+        agentType = (AgentType)manager.GetAgentBlueprint()[typeInt, 0];
+        gameObject.tag = (string)manager.GetAgentBlueprint()[typeInt, 1];
+        if (!isInfected) { color = (Color)manager.GetAgentBlueprint()[typeInt, 2]; } 
+        else { color = (Color)manager.GetAgentBlueprint()[typeInt, 3]; }
+        maxSpeed = manager.GetMaxAgentSpeed() * (float)manager.GetAgentBlueprint()[typeInt, 4];
         minSpeed = maxSpeed / 2;
 
         if (groupSize > 1) {
@@ -136,13 +120,29 @@ public class AgentManager : MonoBehaviour
 
         // * SimManager metrics.
         manager.AddNumAgents(agentType, groupSize, groupInfected);
-        // TODO: Change the metrics based on agent type, group size, infected or not, etc.
 
 
         // * Rendering initialization.
         rend = GetComponent<Renderer>();
         rend.material.color = color;
             
+    }
+
+    private void FixedUpdate() {
+        
+        if (destinations.Count != 0) {
+            currentDestination = destinations[0];
+            navAgent.SetDestination(currentDestination.position);
+        }   
+
+        if (!isInfected) {
+            color = (Color)manager.GetAgentBlueprint()[typeInt, 2];
+            rend.material.color = color;
+        } else {
+            color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
+            rend.material.color = color;
+        }
+
     }
     
     
@@ -158,31 +158,23 @@ public class AgentManager : MonoBehaviour
         //     }
         // }
 
-        // TODO: Add pausing, speedup/slowdown mechanism.
-
-        if (destinations.Count != 0) {
-            currentDestination = destinations[0];
-            navAgent.SetDestination(currentDestination.position);
-        }   
-        
-        // TODO: Interaction and Infection checks.
-
     }
 
-    //
+    // Returns an integer corresponding to one of four agent types.
+    public int GetTypeInt() { return typeInt; }
+
+    // Returns and sets the colour of an agent.
     public Color GetColor() { return color; }
     public void SetColor(Color col) { rend.material.color = col; }
 
-    //
+    // Returns and sets the infection status of an agent.
     public bool GetInfection() { return isInfected; }
     public void SetInfection(bool infection) { isInfected = infection; }
 
     // Updates the list of destinations each agent has.
-    public void UpdateDestinations() {
-        destinations.RemoveAt(0);
-    }
+    public void UpdateDestinations() { destinations.RemoveAt(0); }
 
-    //
+    // 
     public float UpdateBuildingBufferTime() {
         buildingBufferTimer -= Time.deltaTime;
         return buildingBufferTimer;
@@ -199,32 +191,19 @@ public class AgentManager : MonoBehaviour
     // This removes redundant duplicate calls which can affect performance and accuracy of metrics.
     private void OnCollisionEnter(Collision other) {
         // * Do not collide with non agents and within-group agents.
-        // TODO: infection only counts.
-        // TODO: Infect within group as well.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));
-        if (environmentCheck && !(other.transform.IsChildOf(transform))) {
-        //if (environmentCheck) {
+        //if (environmentCheck && !(other.transform.IsChildOf(transform))) {
+        if (environmentCheck) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other, isInfected, leadScript.isInfected);
-                if (isInfected) { 
-                    leadScript.SetColor(color); 
-                    leadScript.SetInfection(isInfected);
-                } else if (leadScript.GetInfection()) { 
-                    SetColor(leadScript.GetColor()); 
-                    SetInfection(leadScript.GetInfection());
-                }
+                if (isInfected) { leadScript.SetInfection(isInfected); } 
+                else if (leadScript.GetInfection()) { SetInfection(leadScript.GetInfection()); }
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 TrackInteraction(other, isInfected, followScript.isInfected);
-                if (isInfected) { 
-                    followScript.SetColor(color); 
-                    followScript.SetInfection(isInfected);
-                } else if (followScript.GetInfection()) { 
-                    SetColor(followScript.GetColor()); 
-                    SetInfection(followScript.GetInfection());
-                }  
-                
+                if (isInfected) { followScript.SetInfection(isInfected); } 
+                else if (followScript.GetInfection()) { SetInfection(followScript.GetInfection()); }  
             }
 
         }
@@ -240,17 +219,16 @@ public class AgentManager : MonoBehaviour
         tempPoint.y = 10;   // * Keep the same elevation for contact points.
         manager.AddTotalContactNum();
         manager.AddContactLocations(tempPoint);
-        Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
+        //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
         if ((infected && !otherInfected) ^ (!infected && otherInfected)) {
             tempPoint.y = 20;
             manager.AddInfectiousContactNum();
             manager.AddInfectionLocations(tempPoint);
             
-            //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);
+            Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);
         }
         
     }
-
 
     
 

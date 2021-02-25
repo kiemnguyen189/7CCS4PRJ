@@ -11,6 +11,20 @@ public enum DoorwayMode {
 
 public class SimManager : MonoBehaviour
 {
+
+    // * These are the default values unique to each agent type.
+    // * [0, 1, 2, 3] = agent types equivalent to enum values.
+    // * [X, 0] = Enum name.
+    // * [X, 1] = Tag name.
+    // * [X, 2] = Default colour value.
+    // * [X, 3] = Infected colour value.
+    // * [X, 4] = Agent movement speed multiplier.
+    private static object[,] agentBlueprint = new object[,] {
+        {AgentType.Shopper, "Shopper", new Color(0,1,1,1), new Color(1,0,1,1), 0.5f},
+        {AgentType.Commuter, "Commuter", new Color(0,1,0,1), new Color(1,1,0,1), 1.0f},
+        {AgentType.GroupShopper, "GroupShopper", new Color(0,0,1,1), new Color(0.5f,0,1,1), 0.5f},
+        {AgentType.GroupCommuter, "GroupCommuter", new Color(0,0.5f,0,1), new Color(1,0,0,1), 1.0f}
+    };
     
     [Header("Prefabs")]
     public Camera cam;                          // Scene Camera Object
@@ -80,6 +94,8 @@ public class SimManager : MonoBehaviour
 
     // * Getter and Setter methods for all simulation parameters and metrics.
     // -----------------------------------------------------------------------------------------------------------------------------
+
+    public object[,] GetAgentBlueprint() { return agentBlueprint; }
 
     // Returns and Sets whether or not the Simulation has started or not.
     public bool GetSimStarted() { return simStarted; }

@@ -11,6 +11,8 @@ public class FollowAgentManager : MonoBehaviour
     public GameObject leader;
     public AgentManager leadManager;
     public NavMeshAgent navAgent;
+    public AgentType agentType;
+    private int typeInt;
 
     public bool isInfected;
 
@@ -47,6 +49,7 @@ public class FollowAgentManager : MonoBehaviour
         rend.material.color = color;
         
         isInfected = leadManager.GetInfection();
+        typeInt = leadManager.GetTypeInt();
 
         // * Radius initialization.
         float radius = leadManager.radius;
@@ -59,12 +62,28 @@ public class FollowAgentManager : MonoBehaviour
         navAgent.acceleration = leadManager.maxSpeed*10;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    private void FixedUpdate() {
+
         navAgent.SetDestination(leader.transform.position);
-        // TODO: Interaction and Infection checks.
+
+        if (!isInfected) {
+            color = (Color)manager.GetAgentBlueprint()[typeInt, 2];
+            rend.material.color = color;
+        } else {
+            color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
+            rend.material.color = color;
+        }
     }
+
+    
+    //
+    public Color GetColor() { return color; }
+    public void SetColor(Color col) { rend.material.color = col;}
+
+    //
+    public bool GetInfection() { return isInfected; }
+    public void SetInfection(bool infection) { isInfected = infection; }
+
 
     // Collision detection code to count interactions between different agents.
     // Agents within the same group interacting with each other do not contribute to contact counts.
@@ -77,40 +96,23 @@ public class FollowAgentManager : MonoBehaviour
         bool parentCheck = (transform.IsChildOf(other.transform));                 
         // * Check if siblings have the same parent.                         
         bool siblingCheck = (transform.parent == other.transform.parent);     
-        if (environmentCheck && !parentCheck && !siblingCheck) {                          
-        //if (environmentCheck) {
+        //if (environmentCheck && !parentCheck && !siblingCheck) {                          
+        if (environmentCheck) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
                 leadManager.TrackInteraction(other, isInfected, leadScript.isInfected);
-                if (isInfected) { 
-                    leadScript.SetColor(color); 
-                    leadScript.SetInfection(isInfected);
-                } else if (leadScript.isInfected) { 
-                    SetColor(leadScript.GetColor()); 
-                    SetInfection(leadScript.GetInfection());
-                }
+                if (isInfected) { leadScript.SetInfection(isInfected); } 
+                else if (leadScript.isInfected) { SetInfection(leadScript.GetInfection()); }
             } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
                 leadManager.TrackInteraction(other, isInfected, followScript.isInfected);
-                if (isInfected) { 
-                    followScript.SetColor(color); 
-                    followScript.SetInfection(isInfected);
-                } else if (followScript.isInfected) { 
-                    SetColor(followScript.GetColor()); 
-                    SetInfection(followScript.GetInfection());
-                }  
+                if (isInfected) { followScript.SetInfection(isInfected); } 
+                else if (followScript.isInfected) { SetInfection(followScript.GetInfection()); }  
             }
 
         }
     }
 
-    //
-    public Color GetColor() { return color; }
-    public void SetColor(Color col) { rend.material.color = col;}
-
-    //
-    public bool GetInfection() { return isInfected; }
-    public void SetInfection(bool infection) { isInfected = infection; }
 
 
 }
