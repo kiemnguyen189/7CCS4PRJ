@@ -28,7 +28,7 @@ public class AgentManager : MonoBehaviour
 
     [Header("Agent Variables")]
     public AgentType agentType;
-    public static int typeInt;
+    public int typeInt;
     public bool isInfected;
     public int groupSize;
     public int groupInfected;
@@ -90,17 +90,16 @@ public class AgentManager : MonoBehaviour
         maxSpeed = manager.GetMaxAgentSpeed() * (float)manager.GetAgentBlueprint()[typeInt, 4];
         minSpeed = maxSpeed / 2;
 
+        // * Spawning of followers if agent is either GroupShopper or GroupCommuter.
         if (groupSize > 1) {
-            for (int i = 0; i < groupSize-1; i++) {
-                follower = Instantiate(followerPrefab, gameObject.transform.position, gameObject.transform.rotation);
-                follower.transform.parent = gameObject.transform;
-            }
+            StartCoroutine(SpawnFollowers());
         }
 
         // * NavMeshAgent movement stats.
         navAgent.speed = Random.Range(minSpeed, maxSpeed);
         navAgent.angularSpeed = maxSpeed*10;
         navAgent.acceleration = maxSpeed*10;
+        NavMesh.avoidancePredictionTime = 0.5f;
 
         // * Radius initialization.
         radius = manager.GetRadiusSize();
@@ -157,6 +156,22 @@ public class AgentManager : MonoBehaviour
         //         agent.SetDestination(hit.point);
         //     }
         // }
+
+    }
+
+
+    //
+    IEnumerator SpawnFollowers() {
+
+        float spawnDelay = 0.5f;
+        for (int i = 0; i < groupSize-1; i++) {
+            // TODO: Edit spawn position so it doesn't spawn inside the parent and bug out.
+            Vector3 spawnPos = gameObject.transform.position;
+            spawnPos.x += 2;
+            follower = Instantiate(followerPrefab, spawnPos, gameObject.transform.rotation);
+            follower.transform.parent = gameObject.transform;
+            yield return new WaitForSeconds(spawnDelay);
+        }
 
     }
 

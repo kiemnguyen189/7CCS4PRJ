@@ -2,13 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class GUIManager : MonoBehaviour
 {
 
     public SimManager manager;
 
+    // * Sim Settings
     public Button startButton;
+
+    // * Parameters
+
+
+    // * Metrics
+    public TextMeshProUGUI totalAgentsGUI;
+    public TextMeshProUGUI totalShoppersGUI;
+    public TextMeshProUGUI totalCommutersGUI;
+    public TextMeshProUGUI totalGroupShoppersGUI;
+    public TextMeshProUGUI totalGroupCommutersGUI;
+
+    public TextMeshProUGUI totalSusceptibleGUI;
+    public TextMeshProUGUI totalInfectedGUI;
+
+    public TextMeshProUGUI totalContactsGUI;
+    public TextMeshProUGUI infectiousContactsGUI;
 
     // Start is called before the first frame update
     void Start()
@@ -21,9 +39,19 @@ public class GUIManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+        totalAgentsGUI.text = "" + manager.GetTotalAgents();
+        totalShoppersGUI.text = "" + manager.GetTotalShoppers();
+        totalCommutersGUI.text = "" + manager.GetTotalCommuters();
+        totalGroupShoppersGUI.text = "" + manager.GetTotalGroupShoppers();
+        totalGroupCommutersGUI.text = "" + manager.GetTotalGroupCommuters();
+
+        totalSusceptibleGUI.text = "" + manager.GetTotalSusceptible();
+        totalInfectedGUI.text = "" + manager.GetTotalInfected();
+
+        totalContactsGUI.text = "" + manager.GetTotalContactsNum();
+        infectiousContactsGUI.text = "" + manager.GetInfectiousContactNum();
     }
 
     public void StartSimulation() {

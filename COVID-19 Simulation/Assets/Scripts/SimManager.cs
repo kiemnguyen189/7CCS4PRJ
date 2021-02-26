@@ -49,6 +49,8 @@ public class SimManager : MonoBehaviour
 
     // * Live Simulation Metrics.
     [Header("Simulation Metrics")]
+    public float simTime;
+
     public int totalAgents;                     // The Total number of agents currently in the simulation run.
     public int totalShoppers;                   // The Total number of Shopper agents currently in the simulation run.
     public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
@@ -96,6 +98,9 @@ public class SimManager : MonoBehaviour
     // -----------------------------------------------------------------------------------------------------------------------------
 
     public object[,] GetAgentBlueprint() { return agentBlueprint; }
+
+    //
+    public float GetSimTime() { return simTime; }
 
     // Returns and Sets whether or not the Simulation has started or not.
     public bool GetSimStarted() { return simStarted; }

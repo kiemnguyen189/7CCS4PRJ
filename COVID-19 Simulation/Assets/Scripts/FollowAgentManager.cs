@@ -60,6 +60,7 @@ public class FollowAgentManager : MonoBehaviour
         navAgent.speed = leadManager.maxSpeed;
         navAgent.angularSpeed = leadManager.maxSpeed*10;
         navAgent.acceleration = leadManager.maxSpeed*10;
+        NavMesh.avoidancePredictionTime = 0.5f;
     }
 
     private void FixedUpdate() {
