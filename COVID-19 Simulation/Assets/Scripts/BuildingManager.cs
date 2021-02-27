@@ -6,19 +6,19 @@ using TMPro;
 public class BuildingManager : MonoBehaviour
 {
 
-    public GameObject manager;
+    public SimManager manager;
 
     public List<GameObject> shoppers = new List<GameObject>();
     public List<BuildingDoor> doors = new List<BuildingDoor>();
 
     public TextMeshPro text;
-    public bool showText = true;
+    public bool showOccupancy = true;
+    public bool showDoors = true;
     
     // Start is called before the first frame update
     void Start() {
 
-        GameObject man = GameObject.Find("Manager");
-        manager = man;
+        manager = GameObject.Find("Manager").GetComponent<SimManager>();
 
         // Add all doors to a list
         foreach (Transform child in transform) {
@@ -27,7 +27,41 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-        switch (manager.GetComponent<SimManager>().GetDoorMode()) {
+        
+        
+    }
+
+    //
+    private void FixedUpdate() {
+
+        showOccupancy = manager.GetShowBuildingNum();
+        showDoors = manager.GetShowBuildingDoors();
+
+        if (showOccupancy) {
+            StartCoroutine(UpdateText());
+            text.gameObject.SetActive(true);
+        } else {
+            text.gameObject.SetActive(false);
+        }
+
+        // TODO: Maybe don't need to be in FixedUpdate.
+        if (showDoors) {
+            foreach (BuildingDoor door in doors) {
+                door.LabelToggle(true);
+                door.ColorToggle(true);
+            }
+        } else {
+            foreach (BuildingDoor door in doors) {
+                door.LabelToggle(false);
+                door.ColorToggle(false);
+            }
+        }
+
+    }
+
+    public void SetDoorMode() {
+        // TODO: Move to set doormodes in a method, not on Start.
+        switch (manager.GetDoorMode()) {
             case DoorwayMode.OneWay:
                 int rand = Random.Range(0, 2);
                 if (rand == 0) {
@@ -61,25 +95,13 @@ public class BuildingManager : MonoBehaviour
         foreach (BuildingDoor door in doors) {
             door.UpdateFormat();
         }       
-        
     }
 
     //
-    private void FixedUpdate() {
-        if (showText) {
-            StartCoroutine(UpdateText());
-            text.gameObject.SetActive(true);
-            foreach (BuildingDoor door in doors) {
-                door.TextToggle(true);
-                door.ColorToggle(true);
-            }
-        } else {
-            text.gameObject.SetActive(false);
-            foreach (BuildingDoor door in doors) {
-                door.TextToggle(false);
-                door.ColorToggle(false);
-            }
-        }
+    public void ResetBuilding() {
+        foreach (BuildingDoor door in doors) {
+            door.ResetFormat();
+        }   
     }
 
     // Add shopper agents into a building's list of shoppers currently inside.

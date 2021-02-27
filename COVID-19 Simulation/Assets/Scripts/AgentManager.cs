@@ -24,7 +24,7 @@ public class AgentManager : MonoBehaviour
     public Transform infectHit;
     public Transform followerPrefab;
     public NavMeshAgent navAgent;
-    private Transform follower;
+    //private Transform follower;
 
     [Header("Agent Variables")]
     public AgentType agentType;
@@ -36,6 +36,7 @@ public class AgentManager : MonoBehaviour
     public float maxSpeed;
     public float radius;
 
+    // Spawning chances.
     private int infectedChance;
     private int typeChance;
     private int groupChance;
@@ -75,7 +76,7 @@ public class AgentManager : MonoBehaviour
             types.RemoveRange(0, 2); // Groups = [2, 3]
             groupSize = Random.Range(2, manager.GetMaxGroupSize());
         } 
-        if (typeChance < manager.GetRatioShoppers()) { typeInt = types[0]; } 
+        if (typeChance < manager.GetRatioTypes()) { typeInt = types[0]; } 
         else { typeInt = types[1]; }
         groupInfected = 0;
         if (infectedChance < manager.GetRatioInfected()) { 
@@ -129,17 +130,24 @@ public class AgentManager : MonoBehaviour
 
     private void FixedUpdate() {
         
+        // Destination controller.
         if (destinations.Count != 0) {
             currentDestination = destinations[0];
             navAgent.SetDestination(currentDestination.position);
         }   
 
+        // Colour controller.
         if (!isInfected) {
             color = (Color)manager.GetAgentBlueprint()[typeInt, 2];
             rend.material.color = color;
         } else {
             color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
             rend.material.color = color;
+        }
+
+        // Instance controller.
+        if (!manager.simStarted) {
+            Destroy(gameObject);
         }
 
     }
@@ -160,7 +168,7 @@ public class AgentManager : MonoBehaviour
     }
 
 
-    //
+    // Spawn in follower agents if the agent is a Grouped type.
     IEnumerator SpawnFollowers() {
 
         float spawnDelay = 0.5f;
@@ -168,7 +176,7 @@ public class AgentManager : MonoBehaviour
             // TODO: Edit spawn position so it doesn't spawn inside the parent and bug out.
             Vector3 spawnPos = gameObject.transform.position;
             spawnPos.x += 2;
-            follower = Instantiate(followerPrefab, spawnPos, gameObject.transform.rotation);
+            Transform follower = Instantiate(followerPrefab, spawnPos, gameObject.transform.rotation);
             follower.transform.parent = gameObject.transform;
             yield return new WaitForSeconds(spawnDelay);
         }
@@ -177,6 +185,12 @@ public class AgentManager : MonoBehaviour
 
     // Returns an integer corresponding to one of four agent types.
     public int GetTypeInt() { return typeInt; }
+
+    // Returns the maximum movement speed of the agent.
+    public float GetMaxSpeed() { return maxSpeed; }
+
+    // Returns the Object Avoidance Radius (Social Distancing Radius) of the agent.
+    public float GetRadius() { return radius; }
 
     // Returns and sets the colour of an agent.
     public Color GetColor() { return color; }
@@ -189,13 +203,13 @@ public class AgentManager : MonoBehaviour
     // Updates the list of destinations each agent has.
     public void UpdateDestinations() { destinations.RemoveAt(0); }
 
-    // 
+    // Updates the buffer time of an agent, used to decide how long an agent should stay in a building.
     public float UpdateBuildingBufferTime() {
         buildingBufferTimer -= Time.deltaTime;
         return buildingBufferTimer;
     }
 
-    //
+    // Resets the building buffer time of an agent.
     public float ResetBuildingBufferTime() {
         buildingBufferTimer = baseBuildingBufferTime;
         return buildingBufferTimer;
@@ -247,7 +261,7 @@ public class AgentManager : MonoBehaviour
 
     
 
-    //
+    // Despawn the agent.
     public void Despawn() {
         // Recount infection exit infection numbers.
         groupInfected = 0;

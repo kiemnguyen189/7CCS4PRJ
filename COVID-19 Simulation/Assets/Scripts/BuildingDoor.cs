@@ -18,56 +18,54 @@ public class BuildingDoor : MonoBehaviour
     public TextMeshPro text;
     public DoorType doorType;
     
-    private Renderer rend;
-    private Color color;
-    private int respawnTime = 10;
+    public Renderer rend;
+    public Color color;
+    public int respawnTime = 10;
 
 
-    public void UpdateFormat() {
+    private void Start() {
         rend = GetComponent<Renderer>();
+    }
+
+    // Reformats the visual representation of a door.
+    public void UpdateFormat() {
         var textRot = transform.rotation.eulerAngles;
 
         switch (doorType) {
-            case DoorType.Entrance: 
-                gameObject.tag = "Entrance";
-                color = new Color(0,1,0,0.5f);
-                text.faceColor = new Color(0,1,0,1);
-                textRot.z = 0;
-                text.transform.Rotate(0,0,0);
-                break;
-            case DoorType.Exit:
-                gameObject.tag = "Exit";
-                color = new Color(1,0,0,0.5f);
-                text.faceColor = new Color(1,0,0,1);
-                textRot.y = 180;
-                text.transform.Rotate(0,0,180);
-                break;
-            case DoorType.Both: 
-                gameObject.tag = "Both";
-                color = new Color(0,0,1,0.5f);
-                text.faceColor = new Color(0,0,1,1);
-                text.SetText("=");
-                break;
-            case DoorType.None:
-                gameObject.tag = "None";
-                color = new Color(0,0,0,0.5f);
-                text.faceColor = new Color(0,0,0,1);
-                text.SetText("x");
-                break;
+            case DoorType.Entrance: SetDoorType("Entrance", new Color(0,1,0,0.5f), new Color(0,1,0,1), ">"); break;
+            case DoorType.Exit:     SetDoorType("Exit",     new Color(1,0,0,0.5f), new Color(1,0,0,1), "<"); break;
+            case DoorType.Both:     SetDoorType("Both",     new Color(0,0,1,0.5f), new Color(0,0,1,1), "="); break;
+            case DoorType.None:     SetDoorType("None",     new Color(0,0,0,0.5f), new Color(0,0,0,1), "x"); break;
         }
         rend.material.color = color;
     }
 
-    public void TextToggle(bool b) {
-        if (b) { text.gameObject.SetActive(true);
-        } else { text.gameObject.SetActive(false);
-        }
+    // Sets the formats of a door depending on the chosen door type.
+    public void SetDoorType(string tag, Color doorCol, Color textCol, string symbol) {
+        gameObject.tag = tag;
+        color = doorCol;
+        text.faceColor = textCol;
+        text.SetText(symbol);
     }
 
+    // Resets the format of a door to the default.
+    public void ResetFormat() {
+        gameObject.tag = "Untagged";
+        rend.material.color = new Color(1,1,1,0.5f);
+        text.faceColor = new Color(0,0,0,1);
+        text.SetText("o");
+    }
+
+    // Toggles the visibility of the directional symbol above a door.
+    public void LabelToggle(bool b) {
+        if (b) { text.gameObject.SetActive(true); } 
+        else { text.gameObject.SetActive(false); }
+    }
+
+    // Toggles the visibility of the collider sphere of a door.
     public void ColorToggle(bool b) {
-        if (b) { rend.enabled = true;
-        } else { rend.enabled = false;
-        }
+        if (b) { rend.enabled = true; } 
+        else { rend.enabled = false; }
     }
     
     // Called when a Shopper collides with Entrance door 'sphere'.

@@ -42,7 +42,7 @@ public class FollowAgentManager : MonoBehaviour
         }
 
         gameObject.tag = leadManager.tag;
-        color = leadManager.color;
+        color = leadManager.GetColor();
         color.a = 0.5f;
 
         rend = GetComponent<Renderer>();
@@ -52,14 +52,14 @@ public class FollowAgentManager : MonoBehaviour
         typeInt = leadManager.GetTypeInt();
 
         // * Radius initialization.
-        float radius = leadManager.radius;
+        float radius = leadManager.GetRadius();
         Vector3 scaleChange = new Vector3(radius, 0, radius);
         gameObject.transform.GetChild(0).localScale += scaleChange;
 
         // * Speed initialization.
-        navAgent.speed = leadManager.maxSpeed;
-        navAgent.angularSpeed = leadManager.maxSpeed*10;
-        navAgent.acceleration = leadManager.maxSpeed*10;
+        navAgent.speed = leadManager.GetMaxSpeed();
+        navAgent.angularSpeed = leadManager.GetMaxSpeed()*10;
+        navAgent.acceleration = leadManager.GetMaxSpeed()*10;
         NavMesh.avoidancePredictionTime = 0.5f;
     }
 
