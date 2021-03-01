@@ -276,7 +276,7 @@ public class AgentManager : MonoBehaviour
             if (transform.GetChild(i).GetComponent<FollowAgentManager>().GetInfection()) { groupInfected += 1; }
         }
         manager.ReduceNumAgents(agentType, groupSize, groupInfected);
-        Debug.Log(timeAlive);
+        //Debug.Log(timeAlive);
         Destroy(gameObject);
     }
 

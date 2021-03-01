@@ -15,9 +15,11 @@ public class GUIManager : MonoBehaviour
     public Button pauseButton;
     public Button startButton;
     public Button speedUpButton;
+    public TextMeshProUGUI speedText;
+    public TMP_Dropdown simLength;
     public TextMeshProUGUI dayText;
     public TextMeshProUGUI timeText;
-    public Slider progressBar;
+    public Button quitButton;
     
     // * Parameters
     [Header("Parameters")]
@@ -35,15 +37,15 @@ public class GUIManager : MonoBehaviour
     public TMP_Dropdown socialDistanceRadius;
     public TMP_Dropdown buildingEntranceMode;
 
-    public Toggle capacityToggle;
-    public Toggle doorToggle;
-
+    
     // * Metrics
     [Header("Simulation Metrics Text")]
     public TextMeshProUGUI totalAgentsGUI;
     public TextMeshProUGUI totalShoppersGUI;
-    public TextMeshProUGUI totalCommutersGUI;
+    public TextMeshProUGUI totalSingleShoppersGUI;
     public TextMeshProUGUI totalGroupShoppersGUI;
+    public TextMeshProUGUI totalCommutersGUI;
+    public TextMeshProUGUI totalSingleCommutersGUI;
     public TextMeshProUGUI totalGroupCommutersGUI;
 
     public TextMeshProUGUI totalSusceptibleGUI;
@@ -51,6 +53,11 @@ public class GUIManager : MonoBehaviour
 
     public TextMeshProUGUI totalContactsGUI;
     public TextMeshProUGUI infectiousContactsGUI;
+
+    [Header("Bottom Bar")]
+    public Toggle capacityToggle;
+    public Toggle doorToggle;
+    public Slider progressBar;
 
     // Start is called before the first frame update
     void Start()
@@ -68,14 +75,19 @@ public class GUIManager : MonoBehaviour
         timeText.text = ((int)Mathf.Floor(dayTime/60)).ToString("D2") + ":" + ((int)dayTime%60).ToString("D2") + ":00";
         dayText.text = ((int)Mathf.Ceil(manager.GetSimTime()/1440)).ToString("D2");
 
+        float maxDuration = manager.GetSimDuration();
+        progressBar.value = (manager.GetSimTime() / manager.GetSimDuration()) * 100;
+
     }
 
     void FixedUpdate()
     {
         totalAgentsGUI.text = "" + manager.GetTotalAgents();
         totalShoppersGUI.text = "" + manager.GetTotalShoppers();
-        totalCommutersGUI.text = "" + manager.GetTotalCommuters();
+        totalSingleShoppersGUI.text = "" + manager.GetTotalSingleShoppers();
         totalGroupShoppersGUI.text = "" + manager.GetTotalGroupShoppers();
+        totalCommutersGUI.text = "" + manager.GetTotalCommuters();
+        totalSingleCommutersGUI.text = "" + manager.GetTotalSingleCommuters();
         totalGroupCommutersGUI.text = "" + manager.GetTotalGroupCommuters();
 
         totalSusceptibleGUI.text = "" + manager.GetTotalSusceptible();
@@ -99,6 +111,7 @@ public class GUIManager : MonoBehaviour
             startButton.GetComponent<Image>().color = new Color(1,0,0,1);
 
         } else {
+            if (manager.isPaused) { PauseSimulation(); }
             manager.simStarted = false;
             manager.ResetMetrics();
             manager.ResetTime();
@@ -124,19 +137,34 @@ public class GUIManager : MonoBehaviour
         }
     }
 
-    // Speed Up the simulation.
-    public void SpeedUp() {
-        if (Time.timeScale < 8.0f) {
-            Time.timeScale = Time.timeScale * 2.0f;
-            manager.simSpeed *= 2.0f;
-        }
-    }
-
     // Slow Down the simulation.
     public void SlowDown() {
         if (Time.timeScale > 0.125f) {
             Time.timeScale = Time.timeScale / 2.0f;
             manager.simSpeed /= 2.0f;
+            speedText.text = manager.simSpeed + "x";
+        }
+    }
+
+    // Speed Up the simulation.
+    public void SpeedUp() {
+        if (Time.timeScale < 8.0f) {
+            Time.timeScale = Time.timeScale * 2.0f;
+            manager.simSpeed *= 2.0f;
+            speedText.text = manager.simSpeed + "x";
+        }
+    }
+
+    // Sets the run duration of the simulation.
+    public void SetRunLength() { 
+        switch (simLength.value) {
+            case 0: manager.SetSimDuration(1f); break;
+            case 1: manager.SetSimDuration(2f); break;
+            case 2: manager.SetSimDuration(3f); break;
+            case 3: manager.SetSimDuration(4f); break;
+            case 4: manager.SetSimDuration(5f); break;
+            case 5: manager.SetSimDuration(6f); break;
+            case 6: manager.SetSimDuration(7f); break;
         }
     }
 
@@ -209,6 +237,11 @@ public class GUIManager : MonoBehaviour
             manager.SetShowBuildingDoors(true);
             doorToggle.GetComponentInChildren<Image>().color = new Color(0,1,0,1);
         }
+    }
+
+    // Quits the program.
+    public void Quit() {
+        Application.Quit();
     }
 
 }

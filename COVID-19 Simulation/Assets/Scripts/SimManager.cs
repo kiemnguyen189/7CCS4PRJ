@@ -38,6 +38,7 @@ public class SimManager : MonoBehaviour
     public bool simStarted = false;             // Whether the simulation has been started or not.
     public bool isPaused = false;               // Whether or not the simulation is currently paused.
     public float simSpeed = 1.0f;               // The current "playback speed" of the simulation, Min = 1/8x, Max = 8x.
+    public float simDuration = 1440f;              // The duration of the simulation in raw time. 1440 seconds in real time, equating to 1 day in sim time.
     public bool showBuildingNum = true;
     public bool showBuildingDoors = true;
 
@@ -58,8 +59,10 @@ public class SimManager : MonoBehaviour
     [Header("Simulation Metrics")]
     public int totalAgents;                     // The Total number of agents currently in the simulation run.
     public int totalShoppers;                   // The Total number of Shopper agents currently in the simulation run.
-    public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
+    public int totalSingleShoppers;             // TODO:
     public int totalGroupShoppers;              // The Total number of Group Shopper agents currently in the simulation run.
+    public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
+    public int totalSingleCommuters;            // TODO:
     public int totalGroupCommuters;             // The Total number of Group Commuters agents currently in the simulation run.
 
     public int totalSusceptible;                // The Total number of Susceptible (Non-Infected) agents currently in the simulation run.
@@ -92,6 +95,15 @@ public class SimManager : MonoBehaviour
         // Current time in the simulation.
         if (simStarted && !isPaused) {
             simTime += Time.deltaTime;
+        } 
+        // If simulation reached sim length.
+        // TODO: Record metrics and display results when simfinished.
+        if (simTime > simDuration) {
+            // TODO: RecordMetrics();
+            simStarted = false;
+            isPaused = false;
+            ResetMetrics();
+            ResetTime();
         }
         
     }
@@ -106,8 +118,10 @@ public class SimManager : MonoBehaviour
 
         totalAgents = 0;
         totalShoppers = 0;
-        totalCommuters = 0;
+        totalSingleShoppers = 0;
         totalGroupShoppers = 0;
+        totalCommuters = 0;
+        totalSingleCommuters = 0;
         totalGroupCommuters = 0;
 
         totalSusceptible = 0;
@@ -134,10 +148,12 @@ public class SimManager : MonoBehaviour
     public bool GetShowBuildingDoors() { return showBuildingDoors; }
     public void SetShowBuildingDoors(bool mode) { showBuildingDoors = mode; }
 
+    // Returns and Sets the run duration of the simulation.
+    public float GetSimDuration() { return simDuration; }
+    public void SetSimDuration(float duration) { simDuration = duration*1440; }
+
     // Returns the and converts the current time in the simulation.
-    public float GetSimTime() {
-        return simTime; 
-    }
+    public float GetSimTime() { return simTime; }
 
     // Returns and Sets whether or not the Simulation has started or not.
     public bool GetSimStarted() { return simStarted; }
@@ -188,19 +204,20 @@ public class SimManager : MonoBehaviour
 
     // Returns the Total number of Shopper agents currently in the simulation.
     public int GetTotalShoppers() { return totalShoppers; }
-
-    // Returns the Total number of Commuter agents currently in the simulation.
-    public int GetTotalCommuters() { return totalCommuters; }
-
+    // Returns the Total number of Group Shopper agents currently in the simulation.
+    public int GetTotalSingleShoppers() { return totalSingleShoppers; }
     // Returns the Total number of Group Shopper agents currently in the simulation.
     public int GetTotalGroupShoppers() { return totalGroupShoppers; }
 
+    // Returns the Total number of Commuter agents currently in the simulation.
+    public int GetTotalCommuters() { return totalCommuters; }
+    // Returns the Total number of Group Commuter agents currently in the simulation.
+    public int GetTotalSingleCommuters() { return totalSingleCommuters; }
     // Returns the Total number of Group Commuter agents currently in the simulation.
     public int GetTotalGroupCommuters() { return totalGroupCommuters; }
 
     // Returns the Total number of Susceptible (Non-Infected) agents currently in the simulation.
     public int GetTotalSusceptible() { return totalSusceptible; }
-
     // Returns the Total number of Infected agents currently in the simulation.
     public int GetTotalInfected() { return totalInfected; }
 
@@ -215,12 +232,11 @@ public class SimManager : MonoBehaviour
 
     // Increases the number of agents of the respective type as well as total
     public void AddNumAgents(AgentType type, int num, int infected) {
-        //Debug.Log(infected);
         switch (type) {
-            case AgentType.Shopper: totalShoppers += num; break;
-            case AgentType.Commuter: totalCommuters += num; break;
-            case AgentType.GroupShopper: totalGroupShoppers += num; break;
-            case AgentType.GroupCommuter: totalGroupCommuters += num; break;
+            case AgentType.Shopper: totalSingleShoppers += num; totalShoppers += num; break;
+            case AgentType.GroupShopper: totalGroupShoppers += num; totalShoppers += num; break;
+            case AgentType.Commuter: totalSingleCommuters += num; totalCommuters += num; break;
+            case AgentType.GroupCommuter: totalGroupCommuters += num; totalCommuters += num; break;
         }
         totalAgents += num;
         if (infected > 0) { 
@@ -235,12 +251,11 @@ public class SimManager : MonoBehaviour
 
     // Decreases the number of agents of the respective type as well as total
     public void ReduceNumAgents(AgentType type, int num, int infected) {
-        //Debug.Log(infected);
         switch (type) {
-            case AgentType.Shopper: totalShoppers -= num; break;
-            case AgentType.Commuter: totalCommuters -= num; break;
-            case AgentType.GroupShopper: totalGroupShoppers -= num; break;
-            case AgentType.GroupCommuter: totalGroupCommuters -= num; break;
+            case AgentType.Shopper: totalSingleShoppers -= num; totalShoppers -= num; break;
+            case AgentType.GroupShopper: totalGroupShoppers -= num; totalShoppers -= num; break;
+            case AgentType.Commuter: totalSingleCommuters -= num; totalCommuters -= num; break;
+            case AgentType.GroupCommuter: totalGroupCommuters -= num; totalCommuters -= num;  break;
         }
         totalAgents -= num;
         if (infected > 0) { 
