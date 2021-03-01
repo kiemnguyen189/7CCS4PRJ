@@ -15,33 +15,28 @@ public class GUIManager : MonoBehaviour
     public Button pauseButton;
     public Button startButton;
     public Button speedUpButton;
+    public TextMeshProUGUI dayText;
+    public TextMeshProUGUI timeText;
+    public Slider progressBar;
     
     // * Parameters
     [Header("Parameters")]
     public Slider ratioTypesSlider;
     public TextMeshProUGUI ratioTypesText;
-
     public Slider ratioGroupsSlider;
     public TextMeshProUGUI ratioGroupsText;
-
     public Slider ratioInfectedSlider;
     public TextMeshProUGUI ratioInfectedText;
-
     public Slider infectionChanceSlider;
     public TextMeshProUGUI infectionChanceText;
-
     public Slider maxGroupSizeSlider;
     public TextMeshProUGUI maxGroupSizeText;
 
     public TMP_Dropdown socialDistanceRadius;
-
     public TMP_Dropdown buildingEntranceMode;
 
     public Toggle capacityToggle;
-    
     public Toggle doorToggle;
-
-
 
     // * Metrics
     [Header("Simulation Metrics Text")]
@@ -67,6 +62,14 @@ public class GUIManager : MonoBehaviour
     }
 
     // Update is called once per frame
+    private void Update() {
+
+        float dayTime = manager.GetSimTime()%1440;
+        timeText.text = ((int)Mathf.Floor(dayTime/60)).ToString("D2") + ":" + ((int)dayTime%60).ToString("D2") + ":00";
+        dayText.text = ((int)Mathf.Ceil(manager.GetSimTime()/1440)).ToString("D2");
+
+    }
+
     void FixedUpdate()
     {
         totalAgentsGUI.text = "" + manager.GetTotalAgents();
@@ -84,7 +87,8 @@ public class GUIManager : MonoBehaviour
 
     }
 
-    public void StartSimulation() {
+    // Start/Stop the simulation.
+    public void StartStopSimulation() {
 
         if (!manager.simStarted) {
             manager.simStarted = true;
@@ -95,9 +99,9 @@ public class GUIManager : MonoBehaviour
             startButton.GetComponent<Image>().color = new Color(1,0,0,1);
 
         } else {
-            // TODO: Stop and reset simulation.
             manager.simStarted = false;
             manager.ResetMetrics();
+            manager.ResetTime();
             foreach (GameObject building in manager.GetBuildings()) {
                 building.GetComponent<BuildingManager>().ResetBuilding();
             }
@@ -106,9 +110,9 @@ public class GUIManager : MonoBehaviour
 
         }
     }
-
+    
+    // Pause the simulation.
     public void PauseSimulation() {
-        //float curTimeScale = manager.simSpeed;
         if (manager.GetIsPaused()) {
             manager.SetIsPaused(false);
             Time.timeScale = manager.simSpeed;
@@ -120,6 +124,7 @@ public class GUIManager : MonoBehaviour
         }
     }
 
+    // Speed Up the simulation.
     public void SpeedUp() {
         if (Time.timeScale < 8.0f) {
             Time.timeScale = Time.timeScale * 2.0f;
@@ -127,6 +132,7 @@ public class GUIManager : MonoBehaviour
         }
     }
 
+    // Slow Down the simulation.
     public void SlowDown() {
         if (Time.timeScale > 0.125f) {
             Time.timeScale = Time.timeScale / 2.0f;
@@ -186,10 +192,10 @@ public class GUIManager : MonoBehaviour
     public void ToggleBuildingCapacity() {
         if (manager.GetShowBuildingNum()) {
             manager.SetShowBuildingNum(false);
-
+            capacityToggle.GetComponentInChildren<Image>().color = new Color(1,0,0,1);
         } else {
             manager.SetShowBuildingNum(true);
-
+            capacityToggle.GetComponentInChildren<Image>().color = new Color(0,1,0,1);
         }
         
     }
@@ -198,10 +204,10 @@ public class GUIManager : MonoBehaviour
     public void ToggleDoorVisibility() {
         if (manager.GetShowBuildingDoors()) {
             manager.SetShowBuildingDoors(false);
-            
+            doorToggle.GetComponentInChildren<Image>().color = new Color(1,0,0,1);
         } else {
             manager.SetShowBuildingDoors(true);
-
+            doorToggle.GetComponentInChildren<Image>().color = new Color(0,1,0,1);
         }
     }
 

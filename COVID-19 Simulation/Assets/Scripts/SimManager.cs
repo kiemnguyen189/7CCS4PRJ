@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
+using Random=UnityEngine.Random;
 using UnityEngine;
 
 
@@ -32,6 +34,7 @@ public class SimManager : MonoBehaviour
     public Camera cam;                          // Scene Camera Object
 
     [Header("Settings")]
+    public float simTime;
     public bool simStarted = false;             // Whether the simulation has been started or not.
     public bool isPaused = false;               // Whether or not the simulation is currently paused.
     public float simSpeed = 1.0f;               // The current "playback speed" of the simulation, Min = 1/8x, Max = 8x.
@@ -53,8 +56,6 @@ public class SimManager : MonoBehaviour
 
     // * Live Simulation Metrics.
     [Header("Simulation Metrics")]
-    public float simTime;
-
     public int totalAgents;                     // The Total number of agents currently in the simulation run.
     public int totalShoppers;                   // The Total number of Shopper agents currently in the simulation run.
     public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
@@ -85,16 +86,19 @@ public class SimManager : MonoBehaviour
 
     }
 
-    // Update is called once per frame
+    // Update is called once per frame.
     void Update()
     {
-        // totalAgents = totalAgents;
-        // totalShoppers = totalShoppers;
-        // totalCommuters = totalCommuters;
+        // Current time in the simulation.
+        if (simStarted && !isPaused) {
+            simTime += Time.deltaTime;
+        }
+        
     }
 
-    private void FixedUpdate() {
-        
+    // Resets the Date and Time of the simulation.
+    public void ResetTime() {
+        simTime = 0;
     }
     
     //
@@ -130,8 +134,10 @@ public class SimManager : MonoBehaviour
     public bool GetShowBuildingDoors() { return showBuildingDoors; }
     public void SetShowBuildingDoors(bool mode) { showBuildingDoors = mode; }
 
-    // Returns the current time in the simulation.
-    public float GetSimTime() { return simTime; }
+    // Returns the and converts the current time in the simulation.
+    public float GetSimTime() {
+        return simTime; 
+    }
 
     // Returns and Sets whether or not the Simulation has started or not.
     public bool GetSimStarted() { return simStarted; }

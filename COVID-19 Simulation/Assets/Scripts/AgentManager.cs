@@ -35,6 +35,8 @@ public class AgentManager : MonoBehaviour
     public float minSpeed;
     public float maxSpeed;
     public float radius;
+    
+    public float timeAlive;
 
     // Spawning chances.
     private int infectedChance;
@@ -60,6 +62,8 @@ public class AgentManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Start() {
+
+        timeAlive = 0;
 
         // * Manager initialization.
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
@@ -164,6 +168,8 @@ public class AgentManager : MonoBehaviour
         //         agent.SetDestination(hit.point);
         //     }
         // }
+
+        timeAlive += Time.deltaTime;
 
     }
 
@@ -270,6 +276,7 @@ public class AgentManager : MonoBehaviour
             if (transform.GetChild(i).GetComponent<FollowAgentManager>().GetInfection()) { groupInfected += 1; }
         }
         manager.ReduceNumAgents(agentType, groupSize, groupInfected);
+        Debug.Log(timeAlive);
         Destroy(gameObject);
     }
 
