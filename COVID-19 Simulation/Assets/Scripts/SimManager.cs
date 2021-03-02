@@ -54,6 +54,7 @@ public class SimManager : MonoBehaviour
 
     [Header("Environment Parameters")]
     public DoorwayMode doorMode;                // The types of Entrances / Exits for each building. Types: [OneWay, TwoWay, Mixed].
+    public bool isPedestrianised;
 
     // * Live Simulation Metrics.
     [Header("Simulation Metrics")]
@@ -86,7 +87,7 @@ public class SimManager : MonoBehaviour
         buildings = GameObject.FindGameObjectsWithTag("Building");
         contactLocations = new List<Vector3>();
 
-
+        
     }
 
     // Update is called once per frame.
@@ -100,12 +101,21 @@ public class SimManager : MonoBehaviour
         // TODO: Record metrics and display results when simfinished.
         if (simTime > simDuration) {
             // TODO: RecordMetrics();
-            simStarted = false;
-            isPaused = false;
-            ResetMetrics();
-            ResetTime();
+            guiManager.StartStopSimulation();
         }
         
+    }
+
+    //
+    public void StartSim() {
+        simStarted = true;
+    }
+
+    //
+    public void StopSim() {
+        simStarted = false;
+        ResetMetrics();
+        ResetTime();
     }
 
     // Resets the Date and Time of the simulation.
@@ -199,6 +209,12 @@ public class SimManager : MonoBehaviour
     public DoorwayMode GetDoorMode() { return doorMode; }
     public void SetDoorMode(DoorwayMode mode) { doorMode = mode; }
 
+    //  Returns and Sets whether or not the environment should be pedestrianised.
+    public bool GetIsPedestrianised() { return isPedestrianised; }
+    public void SetIsPedestrianised(bool mode) { isPedestrianised = mode; }
+
+    // ! --------------------------------------------------------------------------------------------------------------
+
     // Returns the Total number of agents currently in the simulation.
     public int GetTotalAgents() { return totalAgents; }
 
@@ -239,12 +255,8 @@ public class SimManager : MonoBehaviour
             case AgentType.GroupCommuter: totalGroupCommuters += num; totalCommuters += num; break;
         }
         totalAgents += num;
-        if (infected > 0) { 
-            totalInfected += infected; 
-            totalSusceptible += (num - infected); 
-        } else if (infected == 0) { 
-            totalSusceptible += num - infected; 
-        }
+        totalInfected += infected; 
+        totalSusceptible += (num - infected); 
 
         // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
     }
@@ -258,12 +270,8 @@ public class SimManager : MonoBehaviour
             case AgentType.GroupCommuter: totalGroupCommuters -= num; totalCommuters -= num;  break;
         }
         totalAgents -= num;
-        if (infected > 0) { 
-            totalInfected -= infected; 
-            totalSusceptible -= (num - infected);
-        } else if (infected == 0) { 
-            totalSusceptible -= num - infected; 
-        }
+        totalInfected -= infected; 
+        totalSusceptible -= (num - infected);
 
         // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
     }

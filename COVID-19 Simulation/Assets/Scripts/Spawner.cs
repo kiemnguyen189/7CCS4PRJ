@@ -57,7 +57,7 @@ public class Spawner : MonoBehaviour
         // TODO: I.e. maximum number of agents, spawning based on peak times, etc.
         waveIndex++;
 
-        SpawnEnemy();
+        SpawnAgent();
         yield return new WaitForSeconds(0.0f);
 
     //     for (int i = 0; i < waveIndex; i++)
@@ -67,7 +67,7 @@ public class Spawner : MonoBehaviour
     //     }
     }
 
-    public void SpawnEnemy()
+    public void SpawnAgent()
     {
         Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
         
@@ -78,7 +78,7 @@ public class Spawner : MonoBehaviour
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
-        if (agent != null && agent.currentDestination == gameObject.transform) {
+        if (agent != null && agent.GetCurrentDestination() == gameObject.transform) {
             agent.Despawn();
         }
         

@@ -119,6 +119,7 @@ public class AgentManager : MonoBehaviour
         if (agentType == AgentType.Shopper || agentType == AgentType.GroupShopper) {
             destinations = manager.SetDestinations(numDest);
         }
+        // Chooses an End node that is NOT the same as the Start node (param).
         endNode = manager.SetEndNode(startNode);
         destinations.Add(endNode);
 
@@ -206,6 +207,9 @@ public class AgentManager : MonoBehaviour
     public bool GetInfection() { return isInfected; }
     public void SetInfection(bool infection) { isInfected = infection; }
 
+    // Returns the current destination of the agent.
+    public Transform GetCurrentDestination() { return currentDestination; }
+
     // Updates the list of destinations each agent has.
     public void UpdateDestinations() { destinations.RemoveAt(0); }
 
@@ -252,7 +256,7 @@ public class AgentManager : MonoBehaviour
         ContactPoint contact = other.contacts[0];
         Vector3 tempPoint = contact.point;
         tempPoint.y = 10;   // * Keep the same elevation for contact points.
-        manager.AddTotalContactNum();
+        manager.AddTotalContactNum();   // ! Object ref not set to instance of object.
         manager.AddContactLocations(tempPoint);
         //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
         if ((infected && !otherInfected) ^ (!infected && otherInfected)) {

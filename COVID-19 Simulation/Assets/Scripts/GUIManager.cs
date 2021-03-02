@@ -36,6 +36,7 @@ public class GUIManager : MonoBehaviour
 
     public TMP_Dropdown socialDistanceRadius;
     public TMP_Dropdown buildingEntranceMode;
+    public TMP_Dropdown pedestrianisedMode;
 
     
     // * Metrics
@@ -103,7 +104,7 @@ public class GUIManager : MonoBehaviour
     public void StartStopSimulation() {
 
         if (!manager.simStarted) {
-            manager.simStarted = true;
+            manager.StartSim();
             foreach (GameObject building in manager.GetBuildings()) {
                 building.GetComponent<BuildingManager>().SetDoorMode();
             }
@@ -112,9 +113,7 @@ public class GUIManager : MonoBehaviour
 
         } else {
             if (manager.isPaused) { PauseSimulation(); }
-            manager.simStarted = false;
-            manager.ResetMetrics();
-            manager.ResetTime();
+            manager.StopSim();
             foreach (GameObject building in manager.GetBuildings()) {
                 building.GetComponent<BuildingManager>().ResetBuilding();
             }
@@ -198,7 +197,7 @@ public class GUIManager : MonoBehaviour
         manager.SetMaxGroupSize((int)maxGroupSizeSlider.value);
     }
 
-    // Matches the shown text value of Max Group Sizes to the Slider value.
+    // Sets the social distancing radius depending on user input.
     public void SetSocialDistanceRadius() { 
         switch (socialDistanceRadius.value) {
             case 0: manager.SetRadiusSize(0.5f); break;
@@ -207,12 +206,20 @@ public class GUIManager : MonoBehaviour
         }
     }
 
-    // Matches the shown text value of Max Group Sizes to the Slider value.
+    // Sets the building entrance mode depending on user input.
     public void SetBuildingEntranceMode() { 
         switch (buildingEntranceMode.value) {
             case 0: manager.SetDoorMode(DoorwayMode.OneWay); break;
             case 1: manager.SetDoorMode(DoorwayMode.TwoWay); break;
             case 2: manager.SetDoorMode(DoorwayMode.Mixed); break;
+        }
+    }
+
+    // Sets whether or not the environment should be pedestrianised depending on user input.
+    public void SetPedestianised() { 
+        switch (pedestrianisedMode.value) {
+            case 0: manager.SetIsPedestrianised(false); break;
+            case 1: manager.SetIsPedestrianised(true); break;
         }
     }
 
