@@ -15,6 +15,7 @@ public class SimManager : MonoBehaviour
 {
 
     public GUIManager guiManager;
+    public DataManager dataManager;
 
     // * These are the default values unique to each agent type.
     // * [0, 1, 2, 3] = agent types equivalent to enum values.
@@ -37,14 +38,20 @@ public class SimManager : MonoBehaviour
         7000, 10000, 12000, 12000, 14000, 14000,    // 12:00 to 17:00
         12000, 10000, 6000, 4000, 2000, 1000        // 18:00 to 23:00
     };
+
+    public static GameObject[] spawners;        // A list of all agent spawners in the environment.
+    public static GameObject[] buildings;       // A list of all buildings in the environment.
     
     [Header("Prefabs")]
     public Camera cam;                          // Scene Camera Object
 
     [Header("Settings")]
     public float simTime;
+    public float countdown = 60f;
     public bool simStarted = false;             // Whether the simulation has been started or not.
+    public bool simFinished = false;            // Whether or not the simulation has finished its run.
     public bool isPaused = false;               // Whether or not the simulation is currently paused.
+    public bool recorded = false;
     public float simSpeed = 1.0f;               // The current "playback speed" of the simulation, Min = 1/8x, Max = 8x.
     public float simDuration = 1440f;              // The duration of the simulation in raw time. 1440 seconds in real time, equating to 1 day in sim time.
     public bool showBuildingNum = true;
@@ -76,9 +83,7 @@ public class SimManager : MonoBehaviour
 
     public int totalSusceptible;                // The Total number of Susceptible (Non-Infected) agents currently in the simulation run.
     public int totalInfected;                   // The Total number of Infected agents currently in the simulation run.
-
-    public static GameObject[] spawners;        // A list of all agent spawners in the environment.
-    public static GameObject[] buildings;       // A list of all buildings in the environment.
+    
     public List<Vector3> contactLocations;      // A list of all agent contact/interaction locations in the environment.
     public List<Vector3> infectionLocations;    // A list of all infected agent contact and transfers in the environment.
     public int totalContacts;                   // The Total number of contacts in the simulation run.
@@ -90,6 +95,7 @@ public class SimManager : MonoBehaviour
     {
 
         guiManager = GameObject.Find("Manager").GetComponent<GUIManager>();
+        dataManager = GameObject.Find("Manager").GetComponent<DataManager>();
 
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
@@ -104,22 +110,40 @@ public class SimManager : MonoBehaviour
         // Current time in the simulation.
         if (simStarted && !isPaused) {
             simTime += Time.deltaTime;
+            countdown -= Time.deltaTime;
         } 
         // If simulation reached sim length.
         // TODO: Record metrics and display results when simfinished.
         if (simTime > simDuration) {
             // TODO: RecordMetrics();
+            simFinished = true;
+            // Show metrics when finished.
             guiManager.StartStopSimulation();
         }
 
         // TODO: Record stats every hour.
-        // if (simTime % 60f == 0) { record(); }
+        if (simStarted && countdown <= 0f) { 
+            countdown = 60f;
+            RecordData(); 
+            
+        }
         
+    }
+
+    // Intermediate method to update data structures in DataManager.
+    public void RecordData() {
+
+
+        dataManager.UpdateHourlyPop(totalAgents);
+        dataManager.UpdateCumulativePop(totalAgents);
+
+
     }
 
     //
     public void StartSim() {
         simStarted = true;
+        simFinished = false;
     }
 
     //
@@ -127,6 +151,7 @@ public class SimManager : MonoBehaviour
         simStarted = false;
         ResetMetrics();
         ResetTime();
+        dataManager.ResetData();
     }
 
     // Resets the Date and Time of the simulation.

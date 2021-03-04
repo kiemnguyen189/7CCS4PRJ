@@ -9,7 +9,8 @@ public class GUIManager : MonoBehaviour
 
     public SimManager manager;
 
-    public Image playOverlay;
+    public Sprite playSprite;
+    public Sprite pauseSprite;
     public Image pauseOverlay;
 
     // * Sim Settings
@@ -68,11 +69,6 @@ public class GUIManager : MonoBehaviour
     {
 
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
-        //playOverlay.color = new Color(1,1,1,0);
-        foreach (Transform img in playOverlay.transform) {
-            img.GetComponent<Image>().color = new Color(1,1,1,0);
-        }
-        //pauseOverlay.color = new Color(1,1,1,0);
         foreach (Transform img in pauseOverlay.transform) {
             img.GetComponent<Image>().color = new Color(1,1,1,0);
         }
@@ -85,7 +81,6 @@ public class GUIManager : MonoBehaviour
         timeText.text = ((int)Mathf.Floor(dayTime/60)).ToString("D2") + ":" + ((int)dayTime%60).ToString("D2") + ":00";
         dayText.text = ((int)Mathf.Ceil(manager.GetSimTime()/1440)).ToString("D2");
 
-        float maxDuration = manager.GetSimDuration();
         progressBar.value = (manager.GetSimTime() / manager.GetSimDuration()) * 100;
 
     }
@@ -111,31 +106,30 @@ public class GUIManager : MonoBehaviour
 
     // Show the pause overlay on top of the visualizer.
     public void ShowPause(Image img) {
+        // Change sprite to pause.
+        img.transform.GetChild(0).GetComponent<Image>().sprite = pauseSprite;
+        // Show pause overlay.
         foreach (Transform subImg in img.transform) {
             subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,0.5f);
         }
     }
 
     // Show and fade the play overlay on topm of the visualizer.
-    IEnumerator ShowPlay(Image play, Image pause) {
-        // Set the pause overlay alpha to 0.
-        foreach (Transform subImg in pause.transform) {
-            subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,0f);
-        }
-        // Show the play overlay.
-        foreach (Transform subImg in play.transform) {
-            subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,0.2f);
-        }
+    IEnumerator ShowPlay(Image img) {
+        // Change sprite play.
+        img.transform.GetChild(0).GetComponent<Image>().sprite = playSprite;
         // Fade the play overlay to transparent.
         for (float i = 0.5f; i >= 0; i -= Time.deltaTime) {
-            foreach (Transform subImg in play.transform) {
-                subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,i);
+            // Robustness from spamming.
+            if (!manager.GetIsPaused()) {
+                foreach (Transform subImg in img.transform) {
+                    subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,i);
+                }
+                yield return null;
             }
-            yield return null;
+            
         }
     }
-
-    
 
     // Start/Stop the simulation.
     public void StartStopSimulation() {
@@ -166,7 +160,7 @@ public class GUIManager : MonoBehaviour
             manager.SetIsPaused(false);
             Time.timeScale = manager.simSpeed;
             pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
-            StartCoroutine(ShowPlay(playOverlay, pauseOverlay));
+            StartCoroutine(ShowPlay(pauseOverlay));
         } else {
             manager.SetIsPaused(true);
             Time.timeScale = 0f;

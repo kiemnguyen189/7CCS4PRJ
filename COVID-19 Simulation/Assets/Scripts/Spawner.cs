@@ -55,7 +55,12 @@ public class Spawner : MonoBehaviour
     //
     public void SpawnAgent()
     {
-        Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
+        // TODO: MavMesh.SamplePosition.
+        //NavMeshHit hit;
+        //if (NavMesh.SamplePosition(spawnPoint.position, out hit, 2, 1)) {
+            Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
+        //}
+        
         
     }
 
