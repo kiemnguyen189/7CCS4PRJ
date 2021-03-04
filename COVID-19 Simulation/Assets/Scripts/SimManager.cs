@@ -29,6 +29,14 @@ public class SimManager : MonoBehaviour
         {AgentType.GroupShopper, "GroupShopper", new Color(0,0,1,1), new Color(0.5f,0,1,1), 0.5f},
         {AgentType.GroupCommuter, "GroupCommuter", new Color(0,0.5f,0,1), new Color(1,0,0,1), 1.0f}
     };
+
+    // An array of 24 integers, each representing the amount of total pedestrian flow per hour in a day.
+    private static int[] flowTimings = new int[] {
+        200, 150, 100, 50, 200, 500,                // 00:00 to 05:00
+        700, 1000, 2000, 2500, 4000, 5000,          // 06:00 to 11:00
+        7000, 10000, 12000, 12000, 14000, 14000,    // 12:00 to 17:00
+        12000, 10000, 6000, 4000, 2000, 1000        // 18:00 to 23:00
+    };
     
     [Header("Prefabs")]
     public Camera cam;                          // Scene Camera Object
@@ -85,8 +93,8 @@ public class SimManager : MonoBehaviour
 
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
-        contactLocations = new List<Vector3>();
 
+        contactLocations = new List<Vector3>();
         
     }
 
@@ -103,6 +111,9 @@ public class SimManager : MonoBehaviour
             // TODO: RecordMetrics();
             guiManager.StartStopSimulation();
         }
+
+        // TODO: Record stats every hour.
+        // if (simTime % 60f == 0) { record(); }
         
     }
 
@@ -148,7 +159,11 @@ public class SimManager : MonoBehaviour
     // * Getter and Setter methods for all simulation parameters and metrics.
     // -----------------------------------------------------------------------------------------------------------------------------
 
+    // Returns the blueprints for creating each agent.
     public object[,] GetAgentBlueprint() { return agentBlueprint; }
+
+    // Returns the hourly pedestrian flow timings in a day.
+    public int[] GetFlowTimings() { return flowTimings; }
 
     // Returns whether or not to show building capacity.
     public bool GetShowBuildingNum() { return showBuildingNum; }
@@ -287,6 +302,9 @@ public class SimManager : MonoBehaviour
         totalInfected += 1;
         totalSusceptible -= 1;
     }
+
+    //
+    public int GetNumSpawners() { return spawners.Length; }
 
     // Returns and Adds a location of Contact to the list of Total Contacts.
     public List<Vector3> GetContactLocations() { return contactLocations; }

@@ -10,70 +10,61 @@ public class Spawner : MonoBehaviour
     public Transform agentPrefab;
     public Transform spawnPoint;
 
+    public bool isDense = false;            // Whether or not a spawner is located in a high traffic areaa (r.g. main roads/stations).
+
     public float timeBetweenWaves = 3f;
     private float countdown = 2f;
 
-    private int waveIndex = 0;
-
-    
+    //
     void Start() {
-        // TODO: Only start spawning if start button is pressed.
-        //SpawnEnemy();
+
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
+
+
     }
-    
-    
-    // // Update is called once per frame
-    // void Update()
-    // {
-    //     if (manager.simStarted) {
 
-    //         if (countdown <= 0f)
-    //         {
-    //             StartCoroutine(SpawnWave());
-    //             countdown = timeBetweenWaves;
-    //         }
-    //         countdown -= Time.deltaTime;
-    //     }
-        
+    //
+    private void Update() {
 
-    // }
-
-    private void FixedUpdate() {
         if (manager.simStarted) {
+
+            // TODO: Spawn rates dependant on simTime.
+
+            // Get the current total hourly pedestrian flow based on the current simulation time.
+            // The %24 is used for durations above a day (1440), so indexes stay within 0-23.
+            int hourlyFlow = manager.GetFlowTimings()[ConvertSimTime(manager.GetSimTime()) % 24];
+            // ! Change to GetNumSpawners when all spawners placed.
+            int agentsPerSpawner = (int)Mathf.Floor(hourlyFlow / manager.GetNumSpawners());
+            //int agentsPerSpawner = (int)Mathf.Floor(hourlyFlow / 30);
+            timeBetweenWaves = 60f / agentsPerSpawner;
+            // TODO: Record current stats every hour in sim time.
+            
 
             if (countdown <= 0f)
             {
-                StartCoroutine(SpawnWave());
+                SpawnAgent();
                 countdown = timeBetweenWaves;
+                Debug.Log("HourlyFlow: " + hourlyFlow + " agentsPerSpawner: " + agentsPerSpawner + " timeBetweenWaves: " + timeBetweenWaves);
             }
             countdown -= Time.deltaTime;
+
+            
         }
     }
 
-    IEnumerator SpawnWave()
-    {
-        // TODO: Spawning rate based on initial user inputs.
-        // TODO: I.e. maximum number of agents, spawning based on peak times, etc.
-        waveIndex++;
-
-        SpawnAgent();
-        yield return new WaitForSeconds(0.0f);
-
-    //     for (int i = 0; i < waveIndex; i++)
-    //     {
-    //         SpawnEnemy();
-    //         yield return new WaitForSeconds(0.5f);
-    //     }
-    }
-
+    //
     public void SpawnAgent()
     {
         Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
         
     }
 
+    // Converts the raw simulation time into the relevant hourly index in flowTimings.
+    public int ConvertSimTime(float time) {
+        return (int)Mathf.Floor((manager.GetFlowTimings().Length / 1440f) * Mathf.Floor(manager.GetSimTime()));
+    }
 
+    //
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();

@@ -9,6 +9,9 @@ public class GUIManager : MonoBehaviour
 
     public SimManager manager;
 
+    public Image playOverlay;
+    public Image pauseOverlay;
+
     // * Sim Settings
     [Header("Top Bar")]
     public Button slowDownButton;
@@ -65,8 +68,14 @@ public class GUIManager : MonoBehaviour
     {
 
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
-
-
+        //playOverlay.color = new Color(1,1,1,0);
+        foreach (Transform img in playOverlay.transform) {
+            img.GetComponent<Image>().color = new Color(1,1,1,0);
+        }
+        //pauseOverlay.color = new Color(1,1,1,0);
+        foreach (Transform img in pauseOverlay.transform) {
+            img.GetComponent<Image>().color = new Color(1,1,1,0);
+        }
     }
 
     // Update is called once per frame
@@ -100,6 +109,34 @@ public class GUIManager : MonoBehaviour
 
     }
 
+    // Show the pause overlay on top of the visualizer.
+    public void ShowPause(Image img) {
+        foreach (Transform subImg in img.transform) {
+            subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,0.5f);
+        }
+    }
+
+    // Show and fade the play overlay on topm of the visualizer.
+    IEnumerator ShowPlay(Image play, Image pause) {
+        // Set the pause overlay alpha to 0.
+        foreach (Transform subImg in pause.transform) {
+            subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,0f);
+        }
+        // Show the play overlay.
+        foreach (Transform subImg in play.transform) {
+            subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,0.2f);
+        }
+        // Fade the play overlay to transparent.
+        for (float i = 0.5f; i >= 0; i -= Time.deltaTime) {
+            foreach (Transform subImg in play.transform) {
+                subImg.GetComponent<Image>().color = new Color(0.2f,0.2f,0.2f,i);
+            }
+            yield return null;
+        }
+    }
+
+    
+
     // Start/Stop the simulation.
     public void StartStopSimulation() {
 
@@ -109,7 +146,7 @@ public class GUIManager : MonoBehaviour
                 building.GetComponent<BuildingManager>().SetDoorMode();
             }
             startButton.GetComponentInChildren<TextMeshProUGUI>().text = "Stop";
-            startButton.GetComponent<Image>().color = new Color(1,0,0,1);
+            startButton.GetComponent<Image>().color = new Color(1,0,0,1);   // Set to RED
 
         } else {
             if (manager.isPaused) { PauseSimulation(); }
@@ -118,7 +155,7 @@ public class GUIManager : MonoBehaviour
                 building.GetComponent<BuildingManager>().ResetBuilding();
             }
             startButton.GetComponentInChildren<TextMeshProUGUI>().text = "Start";
-            startButton.GetComponent<Image>().color = new Color(0,1,0,1);
+            startButton.GetComponent<Image>().color = new Color(0,1,0,1);   // Set to GREEN
 
         }
     }
@@ -129,10 +166,12 @@ public class GUIManager : MonoBehaviour
             manager.SetIsPaused(false);
             Time.timeScale = manager.simSpeed;
             pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
+            StartCoroutine(ShowPlay(playOverlay, pauseOverlay));
         } else {
             manager.SetIsPaused(true);
             Time.timeScale = 0f;
             pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play";
+            ShowPause(pauseOverlay);
         }
     }
 
