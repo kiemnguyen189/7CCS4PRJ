@@ -99,6 +99,7 @@ public class BuildingManager : MonoBehaviour
 
     //
     public void ResetBuilding() {
+        shoppers.Clear();
         foreach (BuildingDoor door in doors) {
             door.ResetFormat();
         }   

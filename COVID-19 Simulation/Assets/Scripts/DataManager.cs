@@ -35,7 +35,6 @@ public class DataManager : MonoBehaviour
 
     // Updates the number of hourly populations.
     public void UpdateHourlyPop(int num) {
-        Debug.Log("Hourly: " + num);
         hourlyPop.Add(num);
     }
 
@@ -44,10 +43,8 @@ public class DataManager : MonoBehaviour
         // Get latest hourly population number.
         if (cumulativePop.Count == 0) {
             cumulativePop.Add(num);
-            Debug.Log("Cumulative: " + num);
         } else {
             int newNum = num + cumulativePop[cumulativePop.Count-1];
-            Debug.Log("Cumulative: " + newNum);
             // Append total of latest and current population numbers.
             cumulativePop.Add(newNum);
         }

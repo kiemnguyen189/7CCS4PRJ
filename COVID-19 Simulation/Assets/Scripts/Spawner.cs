@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Spawner : MonoBehaviour
 {
@@ -44,7 +45,7 @@ public class Spawner : MonoBehaviour
             {
                 SpawnAgent();
                 countdown = timeBetweenWaves;
-                Debug.Log("HourlyFlow: " + hourlyFlow + " agentsPerSpawner: " + agentsPerSpawner + " timeBetweenWaves: " + timeBetweenWaves);
+                //Debug.Log("HourlyFlow: " + hourlyFlow + " agentsPerSpawner: " + agentsPerSpawner + " timeBetweenWaves: " + timeBetweenWaves);
             }
             countdown -= Time.deltaTime;
 
@@ -56,10 +57,10 @@ public class Spawner : MonoBehaviour
     public void SpawnAgent()
     {
         // TODO: MavMesh.SamplePosition.
-        //NavMeshHit hit;
-        //if (NavMesh.SamplePosition(spawnPoint.position, out hit, 2, 1)) {
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(spawnPoint.position, out hit, 2, 1)) {
             Instantiate(agentPrefab, spawnPoint.position, spawnPoint.rotation);
-        //}
+        }
         
         
     }

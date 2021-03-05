@@ -178,7 +178,7 @@ public class AgentManager : MonoBehaviour
     // Spawn in follower agents if the agent is a Grouped type.
     IEnumerator SpawnFollowers() {
 
-        float spawnDelay = 0.1f;
+        float spawnDelay = 0.0f;
         for (int i = 0; i < groupSize-1; i++) {
             // TODO: Edit spawn position so it doesn't spawn inside the parent and bug out.
             Vector3 spawnPos = gameObject.transform.position;
@@ -202,6 +202,10 @@ public class AgentManager : MonoBehaviour
     // Returns and sets the colour of an agent.
     public Color GetColor() { return color; }
     public void SetColor(Color col) { rend.material.color = col; }
+
+    public void SetGroupInfection() {
+        groupInfected += 1;
+    }
 
     // Returns and sets the infection status of an agent.
     public bool GetInfection() { return isInfected; }
@@ -253,20 +257,38 @@ public class AgentManager : MonoBehaviour
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
         // If interacting with another lead agent.
-        if (lead != null && lead.GetInstanceID() > GetInstanceID()) {
+        if (lead != null && (lead.GetInstanceID() > GetInstanceID())) {
             TrackInteraction(other, isInfected, lead.GetInfection(), successful);
-            // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect other agent.
-            if (isInfected && !lead.GetInfection() && successful) { lead.SetInfection(isInfected); } // This agent infects OTHER lead agent.
-            // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS agent.
-            else if (lead.GetInfection() && !isInfected && successful) { SetInfection(lead.GetInfection()); } // OTHER lead agent infects this agent. 
+            Debug.Log("LL: " + isInfected + " " + lead.GetInfection());
+            // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
+            if (isInfected & !lead.GetInfection() & successful) { 
+
+                lead.SetInfection(true); 
+
+            }
+            // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
+            else if (lead.GetInfection() & !isInfected & successful) { 
+
+                SetInfection(true); 
+
+            }
         } 
         // Else interacting with another follower agent.
-        else if (follow != null && follow.GetInstanceID() > GetInstanceID()) {
+        else if (follow != null && (follow.GetInstanceID() > GetInstanceID())) {
             TrackInteraction(other, isInfected, follow.GetInfection(), successful);
-            // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect other agent.
-            if (isInfected && !follow.GetInfection() && successful) { follow.SetInfection(isInfected); } // This agent infects OTHER follow agent.
-            // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS agent.
-            else if (follow.GetInfection() && !isInfected && successful) { SetInfection(follow.GetInfection()); } // OTHER follow agent infects this agent. 
+            Debug.Log("LF: " + isInfected + " " + follow.GetInfection());
+            // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
+            if (isInfected & !follow.GetInfection() & successful) { 
+
+                follow.SetInfection(true); 
+
+            }
+            // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
+            else if (follow.GetInfection() & !isInfected & successful) { 
+
+                SetInfection(true); 
+
+            }
         }
     }
 
@@ -279,16 +301,22 @@ public class AgentManager : MonoBehaviour
         manager.AddTotalContactNum();   // ! Object ref not set to instance of object.
         manager.AddContactLocations(tempPoint);
         //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
-        if ((infected && !otherInfected) ^ (!infected && otherInfected) && successful) {
+        if (((infected & !otherInfected) ^ (!infected & otherInfected)) & successful) {
             tempPoint.y = 20;
-            manager.AddInfectiousContactNum();
+            manager.AddInfectiousContactNum();  // ! Wrong counts. Calls when not actually infected.
             manager.AddInfectionLocations(tempPoint);
             
-            Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);
+            //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
         }
         
     }
 
+    // If the agent is currently inside a building and the sim ahd been stopped, destroy.
+    public void OnDisable() {
+        if (!manager.simStarted) {
+            Destroy(gameObject);
+        }
+    }
     
 
     // Despawn the agent.

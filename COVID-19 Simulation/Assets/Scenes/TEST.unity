@@ -23822,6 +23822,11 @@ PrefabInstance:
       propertyPath: guiManager
       value: 
       objectReference: {fileID: 291446593}
+    - target: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd,
+        type: 3}
+      propertyPath: dataManager
+      value: 
+      objectReference: {fileID: 291446592}
     - target: {fileID: 633487431973451591, guid: a4c989a1ae652fa4aa9e657568490fcd,
         type: 3}
       propertyPath: m_Name

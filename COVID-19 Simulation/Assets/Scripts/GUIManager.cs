@@ -119,7 +119,7 @@ public class GUIManager : MonoBehaviour
         // Change sprite play.
         img.transform.GetChild(0).GetComponent<Image>().sprite = playSprite;
         // Fade the play overlay to transparent.
-        for (float i = 0.5f; i >= 0; i -= Time.deltaTime) {
+        for (float i = 0.5f; i >= 0; i -= Time.fixedDeltaTime) {
             // Robustness from spamming.
             if (!manager.GetIsPaused()) {
                 foreach (Transform subImg in img.transform) {

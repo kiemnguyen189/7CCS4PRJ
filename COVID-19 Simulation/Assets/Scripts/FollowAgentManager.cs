@@ -83,7 +83,10 @@ public class FollowAgentManager : MonoBehaviour
 
     //
     public bool GetInfection() { return isInfected; }
-    public void SetInfection(bool infection) { isInfected = infection; }
+    public void SetInfection(bool infection) { 
+        isInfected = infection; 
+        leadManager.SetGroupInfection();
+    }
 
 
     // Collision detection code to count interactions between different agents.
@@ -92,7 +95,7 @@ public class FollowAgentManager : MonoBehaviour
     private void OnCollisionEnter(Collision other) {
         // TODO: infection only counts.
         // * Check if the other object is not the map and not a spawner object.
-        bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.name != "Map"));  
+        bool environmentCheck = ((other.gameObject.tag != "Spawner") & (other.gameObject.name != "Map"));  
         // * Check if other object is not the parent of this object.
         bool parentCheck = (transform.IsChildOf(other.transform));                 
         // * Check if siblings have the same parent.                         
@@ -102,20 +105,6 @@ public class FollowAgentManager : MonoBehaviour
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             Interact(other, leadScript, followScript);
-            // if (leadScript != null && leadScript.GetInstanceID() > GetInstanceID()) {
-            //     // TODO: Implement infection chances.
-
-            //     leadManager.TrackInteraction(other, isInfected, leadScript.isInfected);
-            //     if (isInfected) { leadScript.SetInfection(isInfected); } 
-            //     else if (leadScript.isInfected) { SetInfection(leadScript.GetInfection()); }
-            // } else if (followScript != null && followScript.GetInstanceID() > GetInstanceID()) {
-            //     // TODO: Implement infection chances.
-
-            //     leadManager.TrackInteraction(other, isInfected, followScript.isInfected);
-            //     if (isInfected) { followScript.SetInfection(isInfected); } 
-            //     else if (followScript.isInfected) { SetInfection(followScript.GetInfection()); }  
-            // }
-
         }
     }
 
@@ -124,20 +113,34 @@ public class FollowAgentManager : MonoBehaviour
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
         // If interacting with another lead agent.
-        if (lead != null && lead.GetInstanceID() > GetInstanceID()) {
+        if (lead != null && (lead.GetInstanceID() > GetInstanceID())) {
             leadManager.TrackInteraction(other, isInfected, lead.GetInfection(), successful);
-            // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect other agent.
-            if (isInfected && !lead.GetInfection() && successful) { lead.SetInfection(isInfected); } // This agent infects OTHER lead agent.
-            // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS agent.
-            else if (lead.GetInfection() && !isInfected && successful) { SetInfection(lead.GetInfection()); } // OTHER lead agent infects this agent.
+            Debug.Log("FL: " + isInfected + " " + lead.GetInfection());
+            // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
+            if (isInfected & !lead.GetInfection() & successful) { 
+
+                lead.SetInfection(true); 
+            }
+            // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
+            else if (lead.GetInfection() & !isInfected & successful) { 
+
+                SetInfection(true); 
+            }
         } 
         // Else interacting with another follower agent.
-        else if (follow != null && follow.GetInstanceID() > GetInstanceID()) {
+        else if (follow != null && (follow.GetInstanceID() > GetInstanceID())) {
             leadManager.TrackInteraction(other, isInfected, follow.GetInfection(), successful);
-            // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect other agent.
-            if (isInfected && !follow.GetInfection() && successful) { follow.SetInfection(isInfected); } // This agent infects OTHER follow agent.
-            // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS agent.
-            else if (follow.GetInfection() && !isInfected && successful) { SetInfection(follow.GetInfection()); } // OTHER follow agent infects this agent.
+            Debug.Log("FF: " + isInfected + " " + follow.GetInfection());
+            // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
+            if (isInfected & !follow.GetInfection() & successful) { 
+
+                follow.SetInfection(true); 
+            }
+            // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
+            else if (follow.GetInfection() & !isInfected & successful) { 
+
+                SetInfection(true); 
+            }
         }
     }
 
