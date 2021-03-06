@@ -294,9 +294,12 @@ public class SimManager : MonoBehaviour
             case AgentType.Commuter: totalSingleCommuters += num; totalCommuters += num; break;
             case AgentType.GroupCommuter: totalGroupCommuters += num; totalCommuters += num; break;
         }
+        Debug.Log("+1 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
         totalAgents += num;
         totalInfected += infected; 
         totalSusceptible += (num - infected); 
+        Debug.Log("+2 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        
 
         // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
     }
@@ -309,9 +312,17 @@ public class SimManager : MonoBehaviour
             case AgentType.Commuter: totalSingleCommuters -= num; totalCommuters -= num; break;
             case AgentType.GroupCommuter: totalGroupCommuters -= num; totalCommuters -= num;  break;
         }
-        totalAgents -= num;
-        totalInfected -= infected; 
-        totalSusceptible -= (num - infected);
+        Debug.Log("-1 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        // ! ((totalInfected - infected) + (totalSusceptible - num) == totalAgents) && 
+        //if (!(totalInfected - infected < 0) && !(totalSusceptible - (num - infected) < 0)) {
+            totalAgents -= num;
+            totalInfected -= infected; 
+            totalSusceptible -= (num - infected);
+        //}
+        Debug.Log("-2 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        
+        
+        
 
         // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
     }
@@ -324,8 +335,38 @@ public class SimManager : MonoBehaviour
     public int GetInfectiousContactNum() { return infectiousContacts; }
     public void AddInfectiousContactNum() { 
         infectiousContacts += 1; 
-        totalInfected += 1;
-        totalSusceptible -= 1;
+        // if (!(totalSusceptible - 1 < 0)) {
+        //     Debug.Log("totalSusceptible - 1 < 0");
+        //     totalInfected += 1;
+        //     totalSusceptible -= 1;
+        // } else if (!(totalInfected - 1 < 0)) {
+        //     Debug.Log("totalInfected - 1 < 0");
+        //     totalInfected += 1;
+        //     totalSusceptible -= 1;
+        // } else if (!(totalSusceptible + 1 > totalAgents)) {
+        //     Debug.Log("totalSusceptible + 1 > totalAgents");
+        //     totalInfected += 1;
+        //     totalSusceptible -= 1;
+        // } else if (!(totalInfected + 1 > totalAgents)) {
+        //     Debug.Log("totalInfected + 1 > totalAgents");
+        //     totalInfected += 1;
+        //     totalSusceptible -= 1;
+        // }
+        // if (!(totalSusceptible - 1 < 0) && !(totalInfected - 1 < 0) && !(totalSusceptible + 1 > totalAgents) && !(totalInfected + 1 > totalAgents)) {
+        //     //Debug.Log("totalSusceptible - 1 < 0");
+        //     totalInfected += 1;
+        //     totalSusceptible -= 1;
+        // }
+        if (!(totalSusceptible - 1 < 0) && !(totalInfected + 1 > totalAgents)) {
+            //Debug.Log("totalSusceptible - 1 < 0");
+            totalInfected += 1;
+            totalSusceptible -= 1;
+        }
+        else { 
+            Debug.Log("ERROR: TotalAgents: " + totalAgents + ", TotalInfected: "  + totalInfected + ", TotalSusceptible: " + totalSusceptible);
+            guiManager.PauseSimulation(); 
+            
+        }
     }
 
     //

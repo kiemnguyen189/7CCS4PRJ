@@ -75,6 +75,7 @@ public class Spawner : MonoBehaviour
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();
         // Checks for valid Entry.
+        //if (agent != null && agent.GetCurrentDestination() == gameObject.transform) {
         if (agent != null && agent.GetCurrentDestination() == gameObject.transform) {
             agent.Despawn();
         }

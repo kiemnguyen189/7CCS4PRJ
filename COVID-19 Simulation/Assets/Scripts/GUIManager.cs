@@ -171,19 +171,21 @@ public class GUIManager : MonoBehaviour
 
     // Slow Down the simulation.
     public void SlowDown() {
-        if (Time.timeScale > 0.125f) {
-            Time.timeScale = Time.timeScale / 2.0f;
-            manager.simSpeed /= 2.0f;
-            speedText.text = manager.simSpeed + "x";
+        float speed = manager.GetSimSpeed();
+        if (speed > 0.125f) {
+            manager.SetSimSpeed(speed / 2.0f);
+            if (!manager.GetIsPaused()) { Time.timeScale = manager.GetSimSpeed(); }
+            speedText.text = manager.GetSimSpeed() + "x";
         }
     }
 
     // Speed Up the simulation.
     public void SpeedUp() {
-        if (Time.timeScale < 8.0f) {
-            Time.timeScale = Time.timeScale * 2.0f;
-            manager.simSpeed *= 2.0f;
-            speedText.text = manager.simSpeed + "x";
+        float speed = manager.GetSimSpeed();
+        if (speed < 8.0f) {
+            manager.SetSimSpeed(speed * 2.0f);
+            if (!manager.GetIsPaused()) { Time.timeScale = manager.GetSimSpeed(); }
+            speedText.text = manager.GetSimSpeed() + "x";
         }
     }
 
