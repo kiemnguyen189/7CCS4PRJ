@@ -247,7 +247,7 @@ public class AgentManager : MonoBehaviour
         // * Do not collide with non agents and within-group agents.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.tag != "Despawner") && (other.gameObject.name != "Map"));
         //if (environmentCheck && !(other.transform.IsChildOf(transform))) {
-        if (environmentCheck && (other.gameObject.GetInstanceID() > gameObject.GetInstanceID())) {
+        if (environmentCheck && (spawnBuffer <= 0) && (other.gameObject.GetInstanceID() > gameObject.GetInstanceID())) {
             // Get the agent collided with. Can either be another leader or follower.
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
@@ -262,38 +262,21 @@ public class AgentManager : MonoBehaviour
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
         // If interacting with another lead agent.
-        //if (lead != null && (lead.GetInstanceID() > GetInstanceID())) {
-        successful = true;
-        if (lead != null && (spawnBuffer <= 0)) {
+        if (lead != null) {
             TrackContact(other);
-            // // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
-            if ((isInfected && !lead.GetInfection()) && successful) { 
-                lead.SetInfection(other); 
-            }
+            // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
+            if ((isInfected && !lead.GetInfection()) && successful) { lead.SetInfection(other); }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
-            else if ((lead.GetInfection() && !isInfected) && successful) { 
-                SetInfection(other); 
-            }
-            // else {
-            //     Debug.Log("Error: " + isInfected + " " + lead.GetInfection() + " " + successful);
-            // }
-            // if ((isInfected != lead.GetInfection()) && successful) { 
-            //     if (isInfected) { lead.SetInfection(other);  }
-            //     else if (lead.GetInfection()) { SetInfection(other); }
-            // }
+            else if ((lead.GetInfection() && !isInfected) && successful) { SetInfection(other); }
         } 
         // Else interacting with another follower agent.
         //else if (follow != null && (follow.GetInstanceID() > GetInstanceID())) {
         else if (follow != null) {
             TrackContact(other);
             // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
-            if ((isInfected & !follow.GetInfection()) & successful) { 
-                follow.SetInfection(other); 
-            }
+            if ((isInfected & !follow.GetInfection()) & successful) { follow.SetInfection(other); }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
-            else if ((follow.GetInfection() & !isInfected) & successful) { 
-                SetInfection(other); 
-            }
+            else if ((follow.GetInfection() & !isInfected) & successful) { SetInfection(other); }
         }
     }
 
@@ -313,9 +296,13 @@ public class AgentManager : MonoBehaviour
         ContactPoint contact = other.contacts[0];
         Vector3 tempPoint = contact.point;
         tempPoint.y = 1;
-        // TODO: Check here if tempPoint is inside a despawner, if so dont track.
-        manager.AddInfectiousContactNum(tempPoint, currentDestination.position);  // ! Wrong counts. Calls when not actually infected.
-        manager.AddInfectionLocations(tempPoint);
+        // Check if collision point is within a despawn node. If not, count infection.
+        // This is due to the fact that there are possibilities that an infection can occur whilst an agent is being despawned.
+        // This is known to adversely affect the accuracy of the infection counts.
+        if (!currentDestination.GetComponent<Collider>().bounds.Contains(tempPoint)) {
+            manager.AddInfectiousContactNum();
+            manager.AddInfectionLocations(tempPoint);
+        }
         Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
     }
 
@@ -329,14 +316,12 @@ public class AgentManager : MonoBehaviour
 
     // Despawn the agent.
     public void Despawn() {
-        
         // Recount infection exit infection numbers.
         groupInfected = 0;
         if (isInfected) { groupInfected += 1; }
         for (int i = 1; i < transform.childCount; i++) {
             if (transform.GetChild(i).GetComponent<FollowAgentManager>().GetInfection()) { groupInfected += 1; }
         }
-        Debug.Log("Agent: " + manager.GetSimTime());
         manager.ReduceNumAgents(agentType, groupSize, groupInfected);
         Destroy(gameObject);
     }

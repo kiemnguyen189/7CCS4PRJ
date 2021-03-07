@@ -85,7 +85,8 @@ public class FollowAgentManager : MonoBehaviour
     public bool GetInfection() { return isInfected; }
     public void SetInfection(Collision other) { 
         isInfected = true; 
-        // TODO: Maybe recount similar to despawn.
+        color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
+        rend.material.color = color;
         leadManager.AddGroupInfection();
         leadManager.TrackInfection(other);
     }
