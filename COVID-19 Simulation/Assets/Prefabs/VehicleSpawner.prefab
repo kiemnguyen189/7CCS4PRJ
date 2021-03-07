@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5518816871955827835}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -257.2, y: 2, z: -5.5}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children: []
   m_Father: {fileID: 0}
@@ -49,9 +49,8 @@ MonoBehaviour:
   manager: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
   vehiclePrefab: {fileID: 2846969899103374402, guid: 69f31260fcaa94946ba06649466d2136,
     type: 3}
-  endSpawner: {fileID: 0}
-  route: {fileID: 0}
-  path: []
+  end: {fileID: 0}
+  path: {fileID: 0}
   timeBetweenWaves: 3
 --- !u!65 &8949194026583322282
 BoxCollider:

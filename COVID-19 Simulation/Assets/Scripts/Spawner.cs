@@ -70,7 +70,7 @@ public class Spawner : MonoBehaviour
         return (int)Mathf.Floor((manager.GetFlowTimings().Length / 1440f) * Mathf.Floor(manager.GetSimTime()));
     }
 
-    //
+    // TODO: offload to Despawner object.
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
         AgentManager agent = other.GetComponent<AgentManager>();

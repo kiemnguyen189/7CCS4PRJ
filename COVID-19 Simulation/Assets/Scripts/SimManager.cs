@@ -40,6 +40,7 @@ public class SimManager : MonoBehaviour
     };
 
     public static GameObject[] spawners;        // A list of all agent spawners in the environment.
+    public static GameObject[] despawners;
     public static GameObject[] buildings;       // A list of all buildings in the environment.
     
     [Header("Prefabs")]
@@ -98,6 +99,7 @@ public class SimManager : MonoBehaviour
         dataManager = GameObject.Find("Manager").GetComponent<DataManager>();
 
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
+        despawners = GameObject.FindGameObjectsWithTag("Despawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
 
         contactLocations = new List<Vector3>();
@@ -152,6 +154,17 @@ public class SimManager : MonoBehaviour
         ResetMetrics();
         ResetTime();
         dataManager.ResetData();
+    }
+
+    //
+    public void PauseSim() {
+        if (isPaused) {
+            isPaused = false;
+            Time.timeScale = simSpeed;
+        } else {
+            isPaused = true;
+            Time.timeScale = 0f;
+        }
     }
 
     // Resets the Date and Time of the simulation.
@@ -288,40 +301,47 @@ public class SimManager : MonoBehaviour
 
     // Increases the number of agents of the respective type as well as total
     public void AddNumAgents(AgentType type, int num, int infected) {
+
+        
+
         switch (type) {
             case AgentType.Shopper: totalSingleShoppers += num; totalShoppers += num; break;
             case AgentType.GroupShopper: totalGroupShoppers += num; totalShoppers += num; break;
             case AgentType.Commuter: totalSingleCommuters += num; totalCommuters += num; break;
             case AgentType.GroupCommuter: totalGroupCommuters += num; totalCommuters += num; break;
         }
-        Debug.Log("+1 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        //Debug.Log("+1 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
         totalAgents += num;
         totalInfected += infected; 
         totalSusceptible += (num - infected); 
-        Debug.Log("+2 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        //Debug.Log("+2 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
         
+        //guiManager.PauseSimulation();
 
         // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
     }
 
     // Decreases the number of agents of the respective type as well as total
     public void ReduceNumAgents(AgentType type, int num, int infected) {
+
+        
+
         switch (type) {
             case AgentType.Shopper: totalSingleShoppers -= num; totalShoppers -= num; break;
             case AgentType.GroupShopper: totalGroupShoppers -= num; totalShoppers -= num; break;
             case AgentType.Commuter: totalSingleCommuters -= num; totalCommuters -= num; break;
             case AgentType.GroupCommuter: totalGroupCommuters -= num; totalCommuters -= num;  break;
         }
-        Debug.Log("-1 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        //Debug.Log("-1 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
         // ! ((totalInfected - infected) + (totalSusceptible - num) == totalAgents) && 
         //if (!(totalInfected - infected < 0) && !(totalSusceptible - (num - infected) < 0)) {
             totalAgents -= num;
             totalInfected -= infected; 
             totalSusceptible -= (num - infected);
         //}
-        Debug.Log("-2 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
+        //Debug.Log("-2 TotalAgents: " + totalAgents + ", TotalInfected: " + totalInfected + ", TotalSusceptible: " + totalSusceptible + " | " + num + " " + infected);
         
-        
+        //guiManager.PauseSimulation();
         
 
         // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
@@ -333,7 +353,7 @@ public class SimManager : MonoBehaviour
 
     // Iterates the number of Infectious Contacts by 1.
     public int GetInfectiousContactNum() { return infectiousContacts; }
-    public void AddInfectiousContactNum() { 
+    public void AddInfectiousContactNum(Vector3 point, Vector3 dest) { 
         infectiousContacts += 1; 
         // if (!(totalSusceptible - 1 < 0)) {
         //     Debug.Log("totalSusceptible - 1 < 0");
@@ -357,16 +377,26 @@ public class SimManager : MonoBehaviour
         //     totalInfected += 1;
         //     totalSusceptible -= 1;
         // }
-        if (!(totalSusceptible - 1 < 0) && !(totalInfected + 1 > totalAgents)) {
-            //Debug.Log("totalSusceptible - 1 < 0");
+        //Debug.Log("Before: TotalAgents: " + totalAgents + ", TotalInfected: "  + totalInfected + ", TotalSusceptible: " + totalSusceptible);
+
+        // if (!(totalSusceptible - 1 < 0) && !(totalInfected + 1 > totalAgents)) {
+        //     //Debug.Log("totalSusceptible - 1 < 0");
+        //     totalInfected += 1;
+        //     totalSusceptible -= 1;
+        //     Debug.Log(agent);
+        // }
+        if (point != dest) {
             totalInfected += 1;
             totalSusceptible -= 1;
         }
         else { 
             Debug.Log("ERROR: TotalAgents: " + totalAgents + ", TotalInfected: "  + totalInfected + ", TotalSusceptible: " + totalSusceptible);
-            guiManager.PauseSimulation(); 
+            //guiManager.PauseSimulation(); 
             
         }
+        //Debug.Log("After: TotalAgents: " + totalAgents + ", TotalInfected: "  + totalInfected + ", TotalSusceptible: " + totalSusceptible);
+        Debug.Log("Sim: " + simTime);
+        guiManager.PauseSimulation();
     }
 
     //
@@ -382,16 +412,24 @@ public class SimManager : MonoBehaviour
 
 
     // Returns the Transform of the EndNode unique from the StartNode passed in.
-    public Transform SetEndNode(Transform startNode) {
-        List<GameObject> tempEnds = new List<GameObject>(spawners);
-        foreach (GameObject i in tempEnds) {
-            if (i.transform.position == startNode.position) {
-                tempEnds.Remove(i);
+    // TODO: Set end node as a random Despawner object.
+    public Transform SetEndNode(Vector3 startNode) {
+        List<GameObject> starts = new List<GameObject>(spawners);
+        List<GameObject> ends = new List<GameObject>(despawners);
+        Vector3 par = new Vector3(0,0,0);
+        foreach (GameObject i in starts) {
+            if (startNode == i.transform.position) {
+                par = i.transform.parent.transform.position;
+            }
+        }
+        foreach (GameObject j in ends) {
+            if (j.transform.parent.transform.position == par) {
+                ends.Remove(j);
                 break;
             }
         }
-        int rand = Random.Range(0, tempEnds.Count);
-        return tempEnds[rand].transform;
+        int rand = Random.Range(0, ends.Count);
+        return ends[rand].transform;
     }
 
     // Returns a list of building locations that the agent can visit

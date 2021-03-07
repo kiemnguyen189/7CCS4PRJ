@@ -83,10 +83,6 @@ public class GUIManager : MonoBehaviour
 
         progressBar.value = (manager.GetSimTime() / manager.GetSimDuration()) * 100;
 
-    }
-
-    void FixedUpdate()
-    {
         totalAgentsGUI.text = "" + manager.GetTotalAgents();
         totalShoppersGUI.text = "" + manager.GetTotalShoppers();
         totalSingleShoppersGUI.text = "" + manager.GetTotalSingleShoppers();
@@ -100,6 +96,24 @@ public class GUIManager : MonoBehaviour
 
         totalContactsGUI.text = "" + manager.GetTotalContactsNum();
         infectiousContactsGUI.text = "" + manager.GetInfectiousContactNum();
+
+    }
+
+    void FixedUpdate()
+    {
+        // totalAgentsGUI.text = "" + manager.GetTotalAgents();
+        // totalShoppersGUI.text = "" + manager.GetTotalShoppers();
+        // totalSingleShoppersGUI.text = "" + manager.GetTotalSingleShoppers();
+        // totalGroupShoppersGUI.text = "" + manager.GetTotalGroupShoppers();
+        // totalCommutersGUI.text = "" + manager.GetTotalCommuters();
+        // totalSingleCommutersGUI.text = "" + manager.GetTotalSingleCommuters();
+        // totalGroupCommutersGUI.text = "" + manager.GetTotalGroupCommuters();
+
+        // totalSusceptibleGUI.text = "" + manager.GetTotalSusceptible();
+        // totalInfectedGUI.text = "" + manager.GetTotalInfected();
+
+        // totalContactsGUI.text = "" + manager.GetTotalContactsNum();
+        // infectiousContactsGUI.text = "" + manager.GetInfectiousContactNum();
 
 
     }
@@ -156,14 +170,12 @@ public class GUIManager : MonoBehaviour
     
     // Pause the simulation.
     public void PauseSimulation() {
-        if (manager.GetIsPaused()) {
-            manager.SetIsPaused(false);
-            Time.timeScale = manager.simSpeed;
+        manager.PauseSim();
+        // Update play/pause button and overlay state.
+        if (!manager.GetIsPaused()) {
             pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
             StartCoroutine(ShowPlay(pauseOverlay));
         } else {
-            manager.SetIsPaused(true);
-            Time.timeScale = 0f;
             pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play";
             ShowPause(pauseOverlay);
         }

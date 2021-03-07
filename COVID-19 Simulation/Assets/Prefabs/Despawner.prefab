@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6143015887641360595
+--- !u!1 &2531276163160127603
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,65 +8,47 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6143015887641360599}
-  - component: {fileID: 6143015887641360594}
-  - component: {fileID: 6143015887641360596}
-  - component: {fileID: 6143015887641360597}
-  - component: {fileID: -3062934068676769008}
+  - component: {fileID: 3088716217345300340}
+  - component: {fileID: 6263431325886006805}
+  - component: {fileID: 6266779505696513565}
+  - component: {fileID: 5010946335990079086}
+  - component: {fileID: 3405774181023093649}
   m_Layer: 0
-  m_Name: Spawner
-  m_TagString: Spawner
+  m_Name: Despawner
+  m_TagString: Despawner
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6143015887641360599
+--- !u!4 &3088716217345300340
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143015887641360595}
+  m_GameObject: {fileID: 2531276163160127603}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 3, y: 1, z: 3}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6143015887641360594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143015887641360595}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14e7b96806e0a86419e00267cb4821ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  manager: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
-  agentPrefab: {fileID: 8418691987860001809, guid: c8f1bac53e859c34286e2f1441642241,
-    type: 3}
-  spawnPoint: {fileID: 6143015887641360599}
-  isDense: 0
-  timeBetweenWaves: 5
---- !u!33 &6143015887641360596
+--- !u!33 &6263431325886006805
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143015887641360595}
+  m_GameObject: {fileID: 2531276163160127603}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &6143015887641360597
+--- !u!23 &6266779505696513565
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143015887641360595}
+  m_GameObject: {fileID: 2531276163160127603}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -78,7 +60,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d20a3fcd9a446c749bd2c0b0966db570, type: 2}
+  - {fileID: 2100000, guid: 92c8a4acdaea0d24885ba617995fe486, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -99,17 +81,29 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!136 &-3062934068676769008
+--- !u!136 &5010946335990079086
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6143015887641360595}
+  m_GameObject: {fileID: 2531276163160127603}
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_Enabled: 1
   m_Radius: 0.5000001
-  m_Height: 5
+  m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &3405774181023093649
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2531276163160127603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32bbeecd19ece564da943ef937077917, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

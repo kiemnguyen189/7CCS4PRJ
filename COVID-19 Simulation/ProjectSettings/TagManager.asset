@@ -18,6 +18,7 @@ TagManager:
   - GroupCommuter
   - Manager
   - Radius
+  - Despawner
   layers:
   - Default
   - TransparentFX

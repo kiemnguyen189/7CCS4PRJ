@@ -64,6 +64,7 @@ MonoBehaviour:
   maxSpeed: 0
   radius: 0
   timeAlive: 0
+  spawnBuffer: 1
   maxDestinations: 5
   currentDestination: {fileID: 0}
   destinations: []
