@@ -116,11 +116,13 @@ public class SimManager : MonoBehaviour
         } 
         // If simulation reached sim length.
         // TODO: Record metrics and display results when simfinished.
-        if (simTime > simDuration) {
+        if (simTime > simDuration/8) {
             // TODO: RecordMetrics();
             simFinished = true;
             // Show metrics when finished.
+            //guiManager.ShowData();
             guiManager.StartStopSimulation();
+            
         }
 
         // TODO: Record stats every hour.
@@ -146,14 +148,19 @@ public class SimManager : MonoBehaviour
     public void StartSim() {
         simStarted = true;
         simFinished = false;
+        guiManager.CloseData();
     }
 
     //
     public void StopSim() {
         simStarted = false;
+        if (simFinished) {
+            guiManager.ShowData();
+        }
         ResetMetrics();
         ResetTime();
         dataManager.ResetData();
+        
     }
 
     //
@@ -333,10 +340,12 @@ public class SimManager : MonoBehaviour
 
     // Iterates the number of Infectious Contacts by 1.
     public int GetInfectiousContactNum() { return infectiousContacts; }
-    public void AddInfectiousContactNum() { 
+    public void AddInfectiousContactNum() {
         infectiousContacts += 1; 
-        totalInfected += 1;
-        totalSusceptible -= 1;
+        if (!(totalInfected + 1 > totalAgents) && !(totalSusceptible - 1 < 0)) {
+            totalInfected += 1;
+            totalSusceptible -= 1;
+        }
         //Debug.Log("After: TotalAgents: " + totalAgents + ", TotalInfected: "  + totalInfected + ", TotalSusceptible: " + totalSusceptible);
         //guiManager.PauseSimulation();
     }

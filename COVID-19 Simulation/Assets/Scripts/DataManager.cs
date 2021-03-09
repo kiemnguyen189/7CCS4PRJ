@@ -6,6 +6,7 @@ public class DataManager : MonoBehaviour
 {
     
     public SimManager manager;
+    public Transform barGraphPrefab;
 
     public List<int> hourlyPop;
     public List<int> cumulativePop;
@@ -28,17 +29,25 @@ public class DataManager : MonoBehaviour
         
     }
 
+    //
+    public void CreateGraphs() {
+        
+
+    }
+
     public void ResetData() {
         hourlyPop.Clear();
         cumulativePop.Clear();
     }
 
     // Updates the number of hourly populations.
+    public List<int> GetHourlyPop() { return hourlyPop; }
     public void UpdateHourlyPop(int num) {
         hourlyPop.Add(num);
     }
 
     // Updates the cumulative number of hourly populations.
+    public List<int> GetCumulativePop() { return cumulativePop; }
     public void UpdateCumulativePop(int num) {
         // Get latest hourly population number.
         if (cumulativePop.Count == 0) {

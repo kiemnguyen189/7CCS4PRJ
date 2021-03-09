@@ -15,6 +15,7 @@ public class FollowAgentManager : MonoBehaviour
     private int typeInt;
 
     public bool isInfected;
+    public float timeAlive;
 
     public Transform hit;
     public Transform infectHit;
@@ -33,17 +34,17 @@ public class FollowAgentManager : MonoBehaviour
         leadManager = leader.GetComponent<AgentManager>();
 
         // * Tag and Color initialization.
-        if (leader.tag == "GroupShopper") {
-            color = new Color(1,0,1,0.5f);
-            gameObject.tag = "GroupShopper";
-        } else if (leader.tag == "GroupCommuter") {
-            color = new Color(0,1,1,0.5f);
-            gameObject.tag = "GroupCommuter";
-        }
+        // if (leader.tag == "GroupShopper") {
+        //     color = new Color(1,0,1,0.5f);
+        //     gameObject.tag = "GroupShopper";
+        // } else if (leader.tag == "GroupCommuter") {
+        //     color = new Color(0,1,1,0.5f);
+        //     gameObject.tag = "GroupCommuter";
+        // }
 
         gameObject.tag = leadManager.tag;
         color = leadManager.GetColor();
-        color.a = 0.5f;
+        //color.a = 0.5f;
 
         rend = GetComponent<Renderer>();
         rend.material.color = color;
@@ -63,19 +64,18 @@ public class FollowAgentManager : MonoBehaviour
         NavMesh.avoidancePredictionTime = 0.5f;
     }
 
-    private void FixedUpdate() {
+    //
+    private void Update() {
 
-        navAgent.SetDestination(leader.transform.position);
+        timeAlive += Time.deltaTime;
 
         if (!isInfected) {
             color = (Color)manager.GetAgentBlueprint()[typeInt, 2];
             rend.material.color = color;
-        } else {
-            color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
-            rend.material.color = color;
-        }
-    }
+        } 
 
+        navAgent.SetDestination(leader.transform.position);
+    }
     
     //
     public Color GetColor() { return color; }
@@ -88,7 +88,8 @@ public class FollowAgentManager : MonoBehaviour
         color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
         rend.material.color = color;
         leadManager.AddGroupInfection();
-        leadManager.TrackInfection(other);
+        //leadManager.TrackInfection(other);
+        TrackInfection(other);
     }
 
 
@@ -104,9 +105,10 @@ public class FollowAgentManager : MonoBehaviour
         // * Check if siblings have the same parent.                         
         bool siblingCheck = (transform.parent == other.transform.parent);     
         //if (environmentCheck && !parentCheck && !siblingCheck) {                          
-        if (environmentCheck) {
+        if (environmentCheck && (timeAlive >= 0.5f) && (other.gameObject.GetInstanceID() > gameObject.GetInstanceID())) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
+            //manager.PauseSim();
             Interact(other, leadScript, followScript);
         }
     }
@@ -116,31 +118,48 @@ public class FollowAgentManager : MonoBehaviour
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
         // If interacting with another lead agent.
-        if (lead != null && (lead.GetInstanceID() > GetInstanceID())) {
+        if (lead != null) {
             leadManager.TrackContact(other);
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
-            if ((isInfected & !lead.GetInfection()) & successful) { 
-                lead.SetInfection(other); 
-            }
+            // if ((isInfected && !lead.GetInfection()) && successful) { 
+            //     Debug.Log("5");
+            //     lead.SetInfection(other); 
+            // }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
-            else if ((lead.GetInfection() & !isInfected) & successful) { 
+            if ((lead.GetInfection() && !isInfected) && successful) { 
+                Debug.Log("6");
                 SetInfection(other); 
             }
         } 
         // Else interacting with another follower agent.
-        else if (follow != null && (follow.GetInstanceID() > GetInstanceID())) {
+        else if (follow != null) {
             leadManager.TrackContact(other);
             // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
-            if ((isInfected & !follow.GetInfection()) & successful) { 
-                follow.SetInfection(other); 
-            }
+            // if ((isInfected && !follow.GetInfection()) && successful) { 
+            //     Debug.Log("7");
+            //     follow.SetInfection(other); 
+            // }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
-            else if ((follow.GetInfection() & !isInfected) & successful) { 
+            if ((follow.GetInfection() && !isInfected) && successful) { 
+                Debug.Log("8");
                 SetInfection(other); 
             }
         }
     }
 
+    //
+    public void TrackInfection(Collision other) {
+        Vector3 tempPoint = other.contacts[0].point;
+        tempPoint.y = 1;
+        // Check if collision point is within a despawn node. If not, count infection.
+        // This is due to the fact that there are possibilities that an infection can occur whilst an agent is being despawned.
+        // This is known to adversely affect the accuracy of the infection counts.
+        if (!leadManager.GetCurrentDestination().GetComponent<Collider>().bounds.Contains(tempPoint)) {
+            manager.AddInfectiousContactNum();
+            manager.AddInfectionLocations(tempPoint);
+        }
+        Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
+    }
 
 
 }

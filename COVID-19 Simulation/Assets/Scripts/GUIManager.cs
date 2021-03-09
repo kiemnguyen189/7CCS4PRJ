@@ -8,10 +8,14 @@ public class GUIManager : MonoBehaviour
 {
 
     public SimManager manager;
+    public DataManager dataManager;
 
     public Sprite playSprite;
     public Sprite pauseSprite;
     public Image pauseOverlay;
+
+    public GameObject dataOverlay;
+    public Transform barGraphPrefab;
 
     // * Sim Settings
     [Header("Top Bar")]
@@ -72,6 +76,8 @@ public class GUIManager : MonoBehaviour
         foreach (Transform img in pauseOverlay.transform) {
             img.GetComponent<Image>().color = new Color(1,1,1,0);
         }
+
+        CloseData();
     }
 
     // Update is called once per frame
@@ -99,27 +105,22 @@ public class GUIManager : MonoBehaviour
 
     }
 
-    void FixedUpdate()
-    {
-        // totalAgentsGUI.text = "" + manager.GetTotalAgents();
-        // totalShoppersGUI.text = "" + manager.GetTotalShoppers();
-        // totalSingleShoppersGUI.text = "" + manager.GetTotalSingleShoppers();
-        // totalGroupShoppersGUI.text = "" + manager.GetTotalGroupShoppers();
-        // totalCommutersGUI.text = "" + manager.GetTotalCommuters();
-        // totalSingleCommutersGUI.text = "" + manager.GetTotalSingleCommuters();
-        // totalGroupCommutersGUI.text = "" + manager.GetTotalGroupCommuters();
+    //
+    public void ShowData() {
+        dataOverlay.SetActive(true);
+        // TODO: Create data.
+        dataManager.CreateGraphs();
+    }
 
-        // totalSusceptibleGUI.text = "" + manager.GetTotalSusceptible();
-        // totalInfectedGUI.text = "" + manager.GetTotalInfected();
-
-        // totalContactsGUI.text = "" + manager.GetTotalContactsNum();
-        // infectiousContactsGUI.text = "" + manager.GetInfectiousContactNum();
-
-
+    //
+    public void CloseData() {
+        dataOverlay.SetActive(false);
+        // TODO: Reset data.
     }
 
     // Show the pause overlay on top of the visualizer.
     public void ShowPause(Image img) {
+        pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play";
         // Change sprite to pause.
         img.transform.GetChild(0).GetComponent<Image>().sprite = pauseSprite;
         // Show pause overlay.
@@ -130,6 +131,7 @@ public class GUIManager : MonoBehaviour
 
     // Show and fade the play overlay on topm of the visualizer.
     IEnumerator ShowPlay(Image img) {
+        pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
         // Change sprite play.
         img.transform.GetChild(0).GetComponent<Image>().sprite = playSprite;
         // Fade the play overlay to transparent.
@@ -173,10 +175,8 @@ public class GUIManager : MonoBehaviour
         manager.PauseSim();
         // Update play/pause button and overlay state.
         if (!manager.GetIsPaused()) {
-            pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Pause";
             StartCoroutine(ShowPlay(pauseOverlay));
         } else {
-            pauseButton.GetComponentInChildren<TextMeshProUGUI>().text = "Play";
             ShowPause(pauseOverlay);
         }
     }
