@@ -114,10 +114,19 @@ public class SimManager : MonoBehaviour
             simTime += Time.deltaTime;
             countdown -= Time.deltaTime;
         } 
+
+        // TODO: Record stats every hour.
+        if (countdown <= 0f) { 
+            countdown = 60f;
+            RecordData(); 
+            
+        }
+
         // If simulation reached sim length.
         // TODO: Record metrics and display results when simfinished.
-        if (simTime > simDuration/8) {
+        if (simTime > simDuration) {
             // TODO: RecordMetrics();
+            RecordData(); 
             simFinished = true;
             // Show metrics when finished.
             //guiManager.ShowData();
@@ -125,12 +134,7 @@ public class SimManager : MonoBehaviour
             
         }
 
-        // TODO: Record stats every hour.
-        if (simStarted && countdown <= 0f) { 
-            countdown = 60f;
-            RecordData(); 
-            
-        }
+        
         
     }
 
@@ -159,7 +163,7 @@ public class SimManager : MonoBehaviour
         }
         ResetMetrics();
         ResetTime();
-        dataManager.ResetData();
+        //dataManager.ResetData();
         
     }
 

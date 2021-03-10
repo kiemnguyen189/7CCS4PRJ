@@ -29,12 +29,6 @@ public class DataManager : MonoBehaviour
         
     }
 
-    //
-    public void CreateGraphs() {
-        
-
-    }
-
     public void ResetData() {
         hourlyPop.Clear();
         cumulativePop.Clear();

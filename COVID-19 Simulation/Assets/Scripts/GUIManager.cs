@@ -7,15 +7,19 @@ using TMPro;
 public class GUIManager : MonoBehaviour
 {
 
+    [Header("Managers")]
     public SimManager manager;
     public DataManager dataManager;
 
+    [Header("Overlay")]
     public Sprite playSprite;
     public Sprite pauseSprite;
     public Image pauseOverlay;
 
+    [Header("Results Overlay")]
     public GameObject dataOverlay;
-    public Transform barGraphPrefab;
+    public Transform hourlyPopGraph;
+    public Transform cumulativePopGraph;
 
     // * Sim Settings
     [Header("Top Bar")]
@@ -109,7 +113,32 @@ public class GUIManager : MonoBehaviour
     public void ShowData() {
         dataOverlay.SetActive(true);
         // TODO: Create data.
-        dataManager.CreateGraphs();
+
+        UpdateGraph(hourlyPopGraph, dataManager.GetHourlyPop());
+        UpdateGraph(cumulativePopGraph, dataManager.GetCumulativePop());
+
+    }
+
+    // Updates the bar graph.
+    public void UpdateGraph(Transform graph, List<int> data) {
+        // Get max value in the data.
+        float max = (float)data[0];
+        foreach (int val in data) { if (val > max) { max = val; } }
+        // Round up the max to the place value of the second digit.
+        float digits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(max))-1));
+        max = Mathf.Ceil(max/digits) * digits;
+        // Set values for bar positioning.
+        float maxHeight = 160;
+        float vOffset = 40;
+        float hOffset = 40;
+        for (int i = 0; i < data.Count; i++) {
+            float heightValue = (data[i] / max) * maxHeight;
+            graph.GetChild(i).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
+            graph.GetChild(i).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (i*10), (heightValue/2) + vOffset);
+        }
+        // Change the value of the highest tick value on the yAxis.
+        TextMeshProUGUI topVal = graph.Find("TopValue").GetComponent<TextMeshProUGUI>();
+        topVal.text = "" + max;
     }
 
     //

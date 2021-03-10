@@ -127,7 +127,7 @@ public class FollowAgentManager : MonoBehaviour
             // }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
             if ((lead.GetInfection() && !isInfected) && successful) { 
-                Debug.Log("6");
+                //Debug.Log("6");
                 SetInfection(other); 
             }
         } 
@@ -141,7 +141,7 @@ public class FollowAgentManager : MonoBehaviour
             // }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
             if ((follow.GetInfection() && !isInfected) && successful) { 
-                Debug.Log("8");
+                //Debug.Log("8");
                 SetInfection(other); 
             }
         }
