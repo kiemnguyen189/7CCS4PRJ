@@ -18,8 +18,14 @@ public class GUIManager : MonoBehaviour
 
     [Header("Results Overlay")]
     public GameObject dataOverlay;
-    public Transform hourlyPopGraph;
-    public Transform cumulativePopGraph;
+
+    public TMP_Dropdown graphType;
+    public TMP_Dropdown currentDay;
+    private bool isCumulative = false;
+    private int day = 1;
+
+    public Transform populationGraph;
+    public Transform infectionsGraph;
 
     // * Sim Settings
     [Header("Top Bar")]
@@ -81,6 +87,9 @@ public class GUIManager : MonoBehaviour
             img.GetComponent<Image>().color = new Color(1,1,1,0);
         }
 
+        // List<string> temp = new List<string>() {"temp"};
+        // simLength.AddOptions(temp);
+
         CloseData();
     }
 
@@ -112,15 +121,49 @@ public class GUIManager : MonoBehaviour
     //
     public void ShowData() {
         dataOverlay.SetActive(true);
-        // TODO: Create data.
+        // TODO: Dynamic update of contents in Day dropdown depending on selected duration.
+        currentDay.options.Clear();
+        List<string> temp = new List<string>();
+        for (int i = 1; i <= simLength.value+1; i++) {
+            temp.Add("Day "+i);
+        }
+        currentDay.AddOptions(temp);
 
-        UpdateGraph(hourlyPopGraph, dataManager.GetHourlyPop());
-        UpdateGraph(cumulativePopGraph, dataManager.GetCumulativePop());
+        UpdateAllGraphs();
+
 
     }
 
+    // Switches from hourly to cumulative population measurements.
+    public void SwitchGraphType() {
+
+        switch (graphType.value) {
+            case 0: isCumulative = false; break;
+            case 1: isCumulative = true; break;
+        }
+
+        switch (currentDay.value) {
+            case 0: day = 1; break;
+            case 1: day = 2; break;
+            case 2: day = 3; break;
+            case 3: day = 4; break;
+            case 4: day = 5; break;
+            case 5: day = 6; break;
+            case 6: day = 7; break;
+        }
+
+        UpdateAllGraphs();
+
+    }
+
+    //
+    public void UpdateAllGraphs() {
+        UpdateBarGraph(populationGraph, dataManager.GetPopulation(isCumulative, day), false);
+        UpdateBarGraph(infectionsGraph, dataManager.GetPopulation(isCumulative, day), false);
+    }
+
     // Updates the bar graph.
-    public void UpdateGraph(Transform graph, List<int> data) {
+    public void UpdateBarGraph(Transform graph, List<int> data, bool percentage) {
         // Get max value in the data.
         float max = (float)data[0];
         foreach (int val in data) { if (val > max) { max = val; } }
@@ -131,15 +174,55 @@ public class GUIManager : MonoBehaviour
         float maxHeight = 160;
         float vOffset = 40;
         float hOffset = 40;
-        for (int i = 0; i < data.Count; i++) {
-            float heightValue = (data[i] / max) * maxHeight;
-            graph.GetChild(i).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
-            graph.GetChild(i).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (i*10), (heightValue/2) + vOffset);
+        // Main bar heights.
+        for (int j = 0; j < data.Count; j++) {
+            float heightValue = (data[j] / max) * maxHeight;
+            graph.Find("MainBars").GetChild(j).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
+            graph.Find("MainBars").GetChild(j).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (j*10), (heightValue/2) + vOffset);
         }
-        // Change the value of the highest tick value on the yAxis.
-        TextMeshProUGUI topVal = graph.Find("TopValue").GetComponent<TextMeshProUGUI>();
-        topVal.text = "" + max;
+        // Change the interval values on the yAxis.
+        Transform values = graph.Find("yAxis").Find("Values");
+        for (int i = 0; i <= 10; i++) {
+            values.GetChild(i).GetComponent<TextMeshProUGUI>().text = (max - (i*(max/10))).ToString();
+        }
     }
+
+    // // Updates the bar graph.
+    // public void UpdateStackedBarGraph(Transform graph, List<List<int>> data, bool percentage) {
+    //     // Get max value in the data.
+    //     float max = (float)data[0];
+    //     foreach (int val in data) { if (val > max) { max = val; } }
+    //     // Round up the max to the place value of the second digit.
+    //     float digits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(max))-1));
+    //     max = Mathf.Ceil(max/digits) * digits;
+    //     // Set values for bar positioning.
+    //     float maxHeight = 160;
+    //     float vOffset = 40;
+    //     float hOffset = 40;
+    //     // Stacked bar heights.
+    //     for (int i = 0; i < data.Count; i++) {
+    //         float heightValue = 0f;
+    //         if (percentage) {
+    //             if (stacked) { heightValue = maxHeight; }
+    //             else { heightValue = 0f; }
+    //         } else {
+    //             if (stacked) { heightValue = 0f; }
+    //             else { heightValue = 0f; }
+    //         }
+            
+    //         graph.Find("StackedBars").GetChild(i).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
+    //         graph.Find("StackedBars").GetChild(i).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (i*10), (heightValue/2) + vOffset);
+    //     }
+    //     // Main bar heights.
+    //     for (int j = 0; j < data.Count; j++) {
+    //         float heightValue = (data[j] / max) * maxHeight;
+    //         graph.Find("MainBars").GetChild(j).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
+    //         graph.Find("MainBars").GetChild(j).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (j*10), (heightValue/2) + vOffset);
+    //     }
+    //     // Change the value of the highest tick value on the yAxis.
+    //     TextMeshProUGUI topVal = graph.Find("yAxis").Find("TopValue").GetComponent<TextMeshProUGUI>();
+    //     topVal.text = "" + max;
+    // }
 
     //
     public void CloseData() {

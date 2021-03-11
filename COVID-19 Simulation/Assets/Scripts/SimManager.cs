@@ -76,11 +76,11 @@ public class SimManager : MonoBehaviour
     [Header("Simulation Metrics")]
     public int totalAgents;                     // The Total number of agents currently in the simulation run.
     public int totalShoppers;                   // The Total number of Shopper agents currently in the simulation run.
-    public int totalSingleShoppers;             // TODO:
+    public int totalSingleShoppers;             // The Total number of Single Shopper agents currently in the simulation run.
     public int totalGroupShoppers;              // The Total number of Group Shopper agents currently in the simulation run.
     public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
-    public int totalSingleCommuters;            // TODO:
-    public int totalGroupCommuters;             // The Total number of Group Commuters agents currently in the simulation run.
+    public int totalSingleCommuters;            // The Total number of Single Commuter agents currently in the simulation run.
+    public int totalGroupCommuters;             // The Total number of Group Commuter agents currently in the simulation run.
 
     public int totalSusceptible;                // The Total number of Susceptible (Non-Infected) agents currently in the simulation run.
     public int totalInfected;                   // The Total number of Infected agents currently in the simulation run.
@@ -125,11 +125,9 @@ public class SimManager : MonoBehaviour
         // If simulation reached sim length.
         // TODO: Record metrics and display results when simfinished.
         if (simTime > simDuration) {
-            // TODO: RecordMetrics();
             RecordData(); 
             simFinished = true;
             // Show metrics when finished.
-            //guiManager.ShowData();
             guiManager.StartStopSimulation();
             
         }
@@ -141,9 +139,7 @@ public class SimManager : MonoBehaviour
     // Intermediate method to update data structures in DataManager.
     public void RecordData() {
 
-
-        dataManager.UpdateHourlyPop(totalAgents);
-        dataManager.UpdateCumulativePop(totalAgents);
+        dataManager.UpdatePopulation(totalAgents);
 
 
     }
@@ -153,6 +149,7 @@ public class SimManager : MonoBehaviour
         simStarted = true;
         simFinished = false;
         guiManager.CloseData();
+        dataManager.ResetData();
     }
 
     //
