@@ -6,18 +6,15 @@ public class DataManager : MonoBehaviour
 {
     
     public SimManager manager;
-    public Transform barGraphPrefab;
 
     public List<List<int>> population = new List<List<int>>();
     public List<int> hourlyPop = new List<int>();
     public List<int> cumulativePop = new List<int>();
 
     public List<List<int>> infectedPop = new List<List<int>>();
+    public List<int> hourlyInfected = new List<int>();
+    public List<int> cumulativeInfected = new List<int>();
 
-    
-
-    public List<int> hourlyInfected;
-    public List<int> cumulativeInfected;
     public List<List<int>> demographicPop;
     public List<int> proportionInfectedHourly;
     public List<int> proportionInfectedCumulative;
@@ -36,8 +33,15 @@ public class DataManager : MonoBehaviour
     }
 
     public void ResetData() {
+
+        population.Clear();
         hourlyPop.Clear();
         cumulativePop.Clear();
+
+        infectedPop.Clear();
+        hourlyInfected.Clear();
+        cumulativeInfected.Clear();
+
     }
 
     // Gets the list of population numbers. If isCumulative is true, return cumulative numbers, else return hourly.
@@ -65,25 +69,29 @@ public class DataManager : MonoBehaviour
         population.Add(cumulativePop);
     }
 
-    // // Updates the number of hourly populations.
-    // public List<int> GetHourlyPop() { return hourlyPop; }
-    // public void UpdateHourlyPop(int num) {
-    //     hourlyPop.Add(num);
-    // }
+    //
+    public List<int> GetInfections(bool isCumulative, int day) {
+        List<int> ret = new List<int>();
+        int listNum = 0;
+        int startIndex = ((day*24) - 24);
+        // Whether or not to return an hourly or cumulative graph.
+        if (!isCumulative) { listNum = 0;} 
+        else { listNum = 1; }
+        // Create temporary sub list out of the total population data to return.
+        for (int i = startIndex; i < startIndex+24; i++) { ret.Add(infectedPop[listNum][i]); }
+        return ret; 
+    }
 
-    // // Updates the cumulative number of hourly populations.
-    // public List<int> GetCumulativePop() { return cumulativePop; }
-    // public void UpdateCumulativePop(int num) {
-    //     // Get latest hourly population number.
-    //     if (cumulativePop.Count == 0) {
-    //         cumulativePop.Add(num);
-    //     } else {
-    //         int newNum = num + cumulativePop[cumulativePop.Count-1];
-    //         // Append total of latest and current population numbers.
-    //         cumulativePop.Add(newNum);
-    //     }
-        
-    // }
+    //
+    public void UpdateInfections(int num) {
+        // Update hourly population List.
+        cumulativeInfected.Add(num);
+        // Update cumulative population List.
+        if (hourlyInfected.Count == 0) { hourlyInfected.Add(num); }
+        else { hourlyInfected.Add(num - cumulativeInfected[cumulativeInfected.Count-2]); }
+        infectedPop.Add(hourlyInfected);
+        infectedPop.Add(cumulativeInfected);
+    }
 
     // Updates the number of hourly infected populations.
     public List<int> GetHourlyInfected() { return hourlyInfected; }

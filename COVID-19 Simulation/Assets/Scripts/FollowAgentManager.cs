@@ -121,13 +121,11 @@ public class FollowAgentManager : MonoBehaviour
         if (lead != null) {
             leadManager.TrackContact(other);
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
-            // if ((isInfected && !lead.GetInfection()) && successful) { 
-            //     Debug.Log("5");
-            //     lead.SetInfection(other); 
-            // }
+            if ((isInfected && !lead.GetInfection()) && successful) { 
+                lead.SetInfection(other); 
+            }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
-            if ((lead.GetInfection() && !isInfected) && successful) { 
-                //Debug.Log("6");
+            else if ((lead.GetInfection() && !isInfected) && successful) { 
                 SetInfection(other); 
             }
         } 
@@ -135,13 +133,11 @@ public class FollowAgentManager : MonoBehaviour
         else if (follow != null) {
             leadManager.TrackContact(other);
             // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
-            // if ((isInfected && !follow.GetInfection()) && successful) { 
-            //     Debug.Log("7");
-            //     follow.SetInfection(other); 
-            // }
+            if ((isInfected && !follow.GetInfection()) && successful) { 
+                follow.SetInfection(other); 
+            }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
-            if ((follow.GetInfection() && !isInfected) && successful) { 
-                //Debug.Log("8");
+            else if ((follow.GetInfection() && !isInfected) && successful) { 
                 SetInfection(other); 
             }
         }
@@ -158,7 +154,7 @@ public class FollowAgentManager : MonoBehaviour
             manager.AddInfectiousContactNum();
             manager.AddInfectionLocations(tempPoint);
         }
-        Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
+        //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
     }
 
 

@@ -45,6 +45,9 @@ public class SimManager : MonoBehaviour
     
     [Header("Prefabs")]
     public Camera cam;                          // Scene Camera Object
+    public Transform dots;
+    public Transform hit;
+    public Transform infectHit;
 
     [Header("Settings")]
     public float simTime;
@@ -140,7 +143,7 @@ public class SimManager : MonoBehaviour
     public void RecordData() {
 
         dataManager.UpdatePopulation(totalAgents);
-
+        dataManager.UpdateInfections(infectiousContacts);
 
     }
 
@@ -150,6 +153,7 @@ public class SimManager : MonoBehaviour
         simFinished = false;
         guiManager.CloseData();
         dataManager.ResetData();
+        RemoveInfectiousContacts();
     }
 
     //
@@ -157,6 +161,7 @@ public class SimManager : MonoBehaviour
         simStarted = false;
         if (simFinished) {
             guiManager.ShowData();
+            ShowInfectiousContacts();
         }
         ResetMetrics();
         ResetTime();
@@ -361,6 +366,21 @@ public class SimManager : MonoBehaviour
     // Returns and Adds a location of Infection to the list of Infectious Contacts.
     public List<Vector3> GetInfectionLocations() { return infectionLocations; }
     public void AddInfectionLocations(Vector3 location) { infectionLocations.Add(location); }
+
+    // Shows all of the infectious contact locations.
+    public void ShowInfectiousContacts() {
+        foreach (Vector3 dot in infectionLocations) {
+            Transform d = Instantiate(infectHit, dot, Quaternion.identity);
+            d.transform.parent = dots.transform;
+        }
+    }
+
+    //
+    public void RemoveInfectiousContacts() {
+        foreach (Transform child in dots) {
+            Destroy(child.gameObject);
+        }
+    }
 
 
     // Returns the Transform of the EndNode unique from the StartNode passed in.

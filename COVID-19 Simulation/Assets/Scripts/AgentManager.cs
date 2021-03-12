@@ -260,13 +260,11 @@ public class AgentManager : MonoBehaviour
         if (lead != null) {
             TrackContact(other);
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
-            // if ((isInfected && !lead.GetInfection()) && successful) { 
-            //     Debug.Log("1");
-            //     lead.SetInfection(other); 
-            // }
+            if ((isInfected && !lead.GetInfection()) && successful) { 
+                lead.SetInfection(other); 
+            }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
-            if ((lead.GetInfection() && !isInfected) && successful) { 
-                //Debug.Log("2");
+            else if ((lead.GetInfection() && !isInfected) && successful) { 
                 SetInfection(other); 
             }
         } 
@@ -274,13 +272,11 @@ public class AgentManager : MonoBehaviour
         else if (follow != null) {
             TrackContact(other);
             // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
-            // if ((isInfected && !follow.GetInfection()) && successful) { 
-            //     Debug.Log("3");
-            //     follow.SetInfection(other); 
-            // }
+            if ((isInfected && !follow.GetInfection()) && successful) { 
+                follow.SetInfection(other); 
+            }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
-            if ((follow.GetInfection() & !isInfected) & successful) { 
-                //Debug.Log("4");
+            else if ((follow.GetInfection() & !isInfected) & successful) { 
                 SetInfection(other); 
             }
         }
