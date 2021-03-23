@@ -118,7 +118,7 @@ public class FollowAgentManager : MonoBehaviour
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
         // Track contacts with other agents not in the same group.
-        if (!(transform.IsChildOf(other.transform))) { leadManager.TrackContact(other); }
+        //if (!(transform.IsChildOf(other.transform))) { leadManager.TrackContact(other); }
         // If interacting with another lead agent.
         if (lead != null) {
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.

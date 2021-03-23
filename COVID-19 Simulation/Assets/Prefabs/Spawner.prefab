@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 6143015887641360596}
   - component: {fileID: 6143015887641360597}
   - component: {fileID: -3062934068676769008}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Spawner
   m_TagString: Spawner
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -49,9 +49,9 @@ MonoBehaviour:
   manager: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
   agentPrefab: {fileID: 8418691987860001809, guid: c8f1bac53e859c34286e2f1441642241,
     type: 3}
-  spawnPoint: {fileID: 6143015887641360599}
   isDense: 0
   timeBetweenWaves: 5
+  countdown: 2
 --- !u!33 &6143015887641360596
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -67,7 +67,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6143015887641360595}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

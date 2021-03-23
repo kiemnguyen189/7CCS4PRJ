@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 9193245265684079768}
   - component: {fileID: 8535996552624593086}
   - component: {fileID: 1678036677480969569}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: VehicleEnd
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -49,7 +49,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4701838566473422059}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1

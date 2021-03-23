@@ -21,7 +21,7 @@ public class Spawner : MonoBehaviour
     void Start() {
 
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
-        numSpawners = manager.GetNumSpawners();
+        
 
     }
 
@@ -33,7 +33,7 @@ public class Spawner : MonoBehaviour
             // Get the current total hourly pedestrian flow based on the current simulation time.
             // The %24 is used for durations above a day (1440), so indexes stay within 0-23.
             hourlyFlow = manager.GetFlowTimings()[ConvertSimTime(manager.GetSimTime()) % 24];
-            // ! Change to GetNumSpawners when all spawners placed.
+            numSpawners = manager.GetNumSpawners();
             timeBetweenWaves = 60f / ((float)hourlyFlow / numSpawners);
 
             if (countdown <= 0f)

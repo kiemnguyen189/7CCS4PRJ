@@ -13,10 +13,10 @@ GameObject:
   - component: {fileID: 6266779505696513565}
   - component: {fileID: 5010946335990079086}
   - component: {fileID: 3405774181023093649}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Despawner
   m_TagString: Despawner
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: -5442936267250999957, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -49,7 +49,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2531276163160127603}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

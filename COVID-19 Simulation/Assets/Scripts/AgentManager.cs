@@ -135,14 +135,6 @@ public class AgentManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // ! Temporary movement for all agents using mouse clicks
-        // if (Input.GetMouseButtonDown(0)) {
-        //     Ray ray = manager.GetComponent<SimManager>().cam.ScreenPointToRay(Input.mousePosition);
-        //     RaycastHit hit;
-        //     if (Physics.Raycast(ray, out hit)) {
-        //         agent.SetDestination(hit.point);
-        //     }
-        // }
 
         // Destination controller.
         if (destinations.Count != 0) {
@@ -257,7 +249,7 @@ public class AgentManager : MonoBehaviour
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
         // Track contacts with other agents not in the same group.
-        if (!(other.transform.IsChildOf(transform))) { TrackContact(other); }
+        //if (!(other.transform.IsChildOf(transform))) { TrackContact(other); }
         // If interacting with another lead agent.
         if (lead != null) {
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.

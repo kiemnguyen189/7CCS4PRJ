@@ -28,14 +28,14 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Agent
+  - Building
+  - Ground
+  - Door
+  - Node
+  - Vehicle
+  - VNode
+  - Follower
   - 
   - 
   - 

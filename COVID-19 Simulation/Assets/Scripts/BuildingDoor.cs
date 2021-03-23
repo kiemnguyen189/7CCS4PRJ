@@ -69,6 +69,7 @@ public class BuildingDoor : MonoBehaviour
     }
     
     // Called when a Shopper collides with Entrance door 'sphere'.
+    //private void OnCollisionEnter(Collision other) {
     private void OnTriggerEnter(Collider other) {
         // Check if current door is part of the list of destinations for each agent.
         // * Only checks for the leader agent. Follower agents enter building when leader enters building.
@@ -115,6 +116,7 @@ public class BuildingDoor : MonoBehaviour
     // Disables a Shopper for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
     IEnumerator RecreateShopper(GameObject shopper) {
         core.AddShopper(shopper);
+        core.UpdateText();
         shopper.GetComponent<AgentManager>().GatherFollowers();
         shopper.gameObject.SetActive(false);
         yield return new WaitForSeconds(Random.Range(1, respawnTime));

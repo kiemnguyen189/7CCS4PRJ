@@ -27,7 +27,30 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
+        // Combine the meshes of all the component cubes that make up the shape of the building into one mesh.
+        Quaternion oldRot = transform.rotation;
+        Vector3 oldPos = transform.position;
+
+        transform.rotation = Quaternion.identity;
+        transform.position = Vector3.zero;
+
+        MeshFilter[] meshFilters = GetComponentsInChildren<MeshFilter>();
+        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
         
+        for (int i = 9; i < meshFilters.Length; i++) {
+            if (meshFilters[i].transform == transform) { continue; }
+            combine[i].mesh = meshFilters[i].sharedMesh;
+            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+            meshFilters[i].gameObject.SetActive(false);
+        }
+
+        transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
+        transform.GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine);
+
+        transform.rotation = oldRot;
+        transform.position = oldPos;
+
+        transform.gameObject.SetActive(true);
         
     }
 
@@ -38,7 +61,6 @@ public class BuildingManager : MonoBehaviour
         showDoors = manager.GetShowBuildingDoors();
 
         if (showOccupancy) {
-            StartCoroutine(UpdateText());
             text.gameObject.SetActive(true);
         } else {
             text.gameObject.SetActive(false);
@@ -97,7 +119,7 @@ public class BuildingManager : MonoBehaviour
         }       
     }
 
-    //
+    // Resets the configuration of the building (doors, labels, etc.)
     public void ResetBuilding() {
         shoppers.Clear();
         foreach (BuildingDoor door in doors) {
@@ -137,10 +159,9 @@ public class BuildingManager : MonoBehaviour
         return temp[Random.Range(0, temp.Count)].transform;
     }
 
-    //
-    IEnumerator UpdateText() {
+    // Updates the text showing how many agents are currently inside the building.
+    public void UpdateText() {
         text.SetText("" + shoppers.Count);
-        yield return new WaitForSeconds(1);
     }
 
 }
