@@ -130,20 +130,6 @@ public class AgentManager : MonoBehaviour
         rend.material.color = color;
             
     }
-
-    private void FixedUpdate() {
-        
-        // Destination controller.
-        if (destinations.Count != 0) {
-            currentDestination = destinations[0];
-            navAgent.SetDestination(currentDestination.position);
-        }   
-
-        
-
-        
-
-    }
     
     
     // Update is called once per frame
@@ -157,6 +143,12 @@ public class AgentManager : MonoBehaviour
         //         agent.SetDestination(hit.point);
         //     }
         // }
+
+        // Destination controller.
+        if (destinations.Count != 0) {
+            currentDestination = destinations[0];
+            navAgent.SetDestination(currentDestination.position);
+        }   
 
         // Colour controller.
         if (!isInfected) {
@@ -186,6 +178,15 @@ public class AgentManager : MonoBehaviour
             yield return new WaitForSeconds(spawnDelay);
         }
 
+    }
+
+    //
+    public void GatherFollowers() {
+        foreach (Transform child in transform) {
+            if (child.name != "Radius") {
+                child.position = transform.position;
+            }
+        }
     }
 
     // Returns an integer corresponding to one of four agent types.
@@ -239,14 +240,13 @@ public class AgentManager : MonoBehaviour
     private void OnCollisionEnter(Collision other) {
         //Debug.Log("TEST: " + GetInstanceID() + ", " + gameObject.name + "=" + transform.position + " " + other.gameObject.GetInstanceID() + ", " + gameObject.name + "=" + other.transform.position);
         // * Do not collide with non agents and within-group agents.
-        bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.tag != "Despawner") && (other.gameObject.name != "Map"));
+        bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.tag != "Despawner") && (other.gameObject.name != "Ground"));
         //if (environmentCheck && !(other.transform.IsChildOf(transform))) {
         if (environmentCheck && (timeAlive >= 0.5f) && (other.gameObject.GetInstanceID() > gameObject.GetInstanceID())) {
             // Get the agent collided with. Can either be another leader or follower.
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
             // Interact helper method performs the actual interaction behaviour dynamics between the two agents.
-            //manager.PauseSim();
             Interact(other, leadScript, followScript);
         }
         
@@ -256,29 +256,21 @@ public class AgentManager : MonoBehaviour
     public void Interact(Collision other, AgentManager lead, FollowAgentManager follow) {
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
+        // Track contacts with other agents not in the same group.
+        if (!(other.transform.IsChildOf(transform))) { TrackContact(other); }
         // If interacting with another lead agent.
         if (lead != null) {
-            TrackContact(other);
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
-            if ((isInfected && !lead.GetInfection()) && successful) { 
-                lead.SetInfection(other); 
-            }
+            if ((isInfected && !lead.GetInfection()) && successful) { lead.SetInfection(other); }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
-            else if ((lead.GetInfection() && !isInfected) && successful) { 
-                SetInfection(other); 
-            }
+            else if ((lead.GetInfection() && !isInfected) && successful) { SetInfection(other); }
         } 
         // Else interacting with another follower agent.
         else if (follow != null) {
-            TrackContact(other);
             // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
-            if ((isInfected && !follow.GetInfection()) && successful) { 
-                follow.SetInfection(other); 
-            }
+            if ((isInfected && !follow.GetInfection()) && successful) { follow.SetInfection(other); }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS lead agent.
-            else if ((follow.GetInfection() & !isInfected) & successful) { 
-                SetInfection(other); 
-            }
+            else if ((follow.GetInfection() & !isInfected) & successful) { SetInfection(other); }
         }
     }
 
@@ -289,7 +281,6 @@ public class AgentManager : MonoBehaviour
         tempPoint.y = 10;   // * Keep the same elevation for contact points.
         manager.AddTotalContactNum();   // ! Object ref not set to instance of object.
         manager.AddContactLocations(tempPoint);
-        //Transform dot = Instantiate(hit, tempPoint, Quaternion.identity);     // TODO: Only show contact points visually at the end of the simulation.
     }
 
     //
@@ -299,9 +290,7 @@ public class AgentManager : MonoBehaviour
         // Check if collision point is within a despawn node. If not, count infection.
         // This is due to the fact that there are possibilities that an infection can occur whilst an agent is being despawned.
         // This is known to adversely affect the accuracy of the infection counts.
-        
         // TODO: Check if iDot is within the bounds of any spawner.
-        //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
         if (!currentDestination.GetComponent<Collider>().bounds.Contains(tempPoint)) {
             manager.AddInfectiousContactNum();
             manager.AddInfectionLocations(tempPoint);

@@ -99,7 +99,7 @@ public class FollowAgentManager : MonoBehaviour
     private void OnCollisionEnter(Collision other) {
         // TODO: infection only counts.
         // * Check if the other object is not the map and not a spawner object.
-        bool environmentCheck = ((other.gameObject.tag != "Spawner") & (other.gameObject.name != "Map"));  
+        bool environmentCheck = ((other.gameObject.tag != "Spawner") & (other.gameObject.name != "Ground"));  
         // * Check if other object is not the parent of this object.
         bool parentCheck = (transform.IsChildOf(other.transform));                 
         // * Check if siblings have the same parent.                         
@@ -117,29 +117,21 @@ public class FollowAgentManager : MonoBehaviour
     public void Interact(Collision other, AgentManager lead, FollowAgentManager follow) {
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
+        // Track contacts with other agents not in the same group.
+        if (!(transform.IsChildOf(other.transform))) { leadManager.TrackContact(other); }
         // If interacting with another lead agent.
         if (lead != null) {
-            leadManager.TrackContact(other);
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
-            if ((isInfected && !lead.GetInfection()) && successful) { 
-                lead.SetInfection(other); 
-            }
+            if ((isInfected && !lead.GetInfection()) && successful) { lead.SetInfection(other); }
             // If the OTHER lead agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
-            else if ((lead.GetInfection() && !isInfected) && successful) { 
-                SetInfection(other); 
-            }
+            else if ((lead.GetInfection() && !isInfected) && successful) { SetInfection(other); }
         } 
         // Else interacting with another follower agent.
         else if (follow != null) {
-            leadManager.TrackContact(other);
             // If THIS agent is infected and the OTHER follow agent is not and within infection chance, infect OTHER follower agent.
-            if ((isInfected && !follow.GetInfection()) && successful) { 
-                follow.SetInfection(other); 
-            }
+            if ((isInfected && !follow.GetInfection()) && successful) { follow.SetInfection(other); }
             // If the OTHER follow agent is infected and THIS agent is not and within infection chance, infect THIS follower agent.
-            else if ((follow.GetInfection() && !isInfected) && successful) { 
-                SetInfection(other); 
-            }
+            else if ((follow.GetInfection() && !isInfected) && successful) { SetInfection(other); }
         }
     }
 

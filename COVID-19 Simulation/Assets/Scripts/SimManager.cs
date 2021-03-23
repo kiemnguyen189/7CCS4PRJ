@@ -144,6 +144,7 @@ public class SimManager : MonoBehaviour
 
         dataManager.UpdatePopulation(totalAgents);
         dataManager.UpdateInfections(infectiousContacts);
+        //dataManager.UpdateDemographic(totalSingleShoppers, totalGroupShoppers, totalSingleCommuters, totalGroupCommuters);
 
     }
 
@@ -335,8 +336,11 @@ public class SimManager : MonoBehaviour
             case AgentType.GroupCommuter: totalGroupCommuters -= num; totalCommuters -= num;  break;
         }
         totalAgents -= num;
-        totalInfected -= infected; 
-        totalSusceptible -= (num - infected);  
+        if ((totalInfected - infected) < 0) { totalInfected = 0; } 
+        else { totalInfected -= infected; }
+        if ((totalSusceptible - (num - infected)) < 0) { totalSusceptible = 0; }
+        else { totalSusceptible -= (num - infected); }
+        
         // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
     }
 

@@ -7,15 +7,18 @@ public class DataManager : MonoBehaviour
     
     public SimManager manager;
 
+    // List of population numbers.
+    // Outer list contains 2 elements: HourlyList and Cumulative List.
+    // Inner lists contain hourly data. Length is in multiples of 24.
     public List<List<int>> population = new List<List<int>>();
-    public List<int> hourlyPop = new List<int>();
-    public List<int> cumulativePop = new List<int>();
-
     public List<List<int>> infectedPop = new List<List<int>>();
-    public List<int> hourlyInfected = new List<int>();
-    public List<int> cumulativeInfected = new List<int>();
 
-    public List<List<int>> demographicPop;
+    // List of population demographic numbers.
+    // Outermost list contains 4 elements: SingleShopperList, GroupShopperList, SingleCommuterList and GroupCommuterList.
+    // Middle lists contains 2 elements: Hourly and Cumulative.
+    // Innermost list contains hourly data. Length is in multiples of 24.
+    public List<List<List<int>>> demographicPop = new List<List<List<int>>>();
+
     public List<int> proportionInfectedHourly;
     public List<int> proportionInfectedCumulative;
 
@@ -35,12 +38,7 @@ public class DataManager : MonoBehaviour
     public void ResetData() {
 
         population.Clear();
-        hourlyPop.Clear();
-        cumulativePop.Clear();
-
         infectedPop.Clear();
-        hourlyInfected.Clear();
-        cumulativeInfected.Clear();
 
     }
 
@@ -60,13 +58,16 @@ public class DataManager : MonoBehaviour
 
     // Updates the number of hourly and cumulative hourly populations.
     public void UpdatePopulation(int num) {
-        // Update hourly population List.
-        hourlyPop.Add(num);
-        // Update cumulative population List.
-        if ((cumulativePop.Count%24) == 0) { cumulativePop.Add(num); }
-        else { cumulativePop.Add(num + cumulativePop[cumulativePop.Count-1]); }
-        population.Add(hourlyPop);
-        population.Add(cumulativePop);
+
+        if (population.Count == 0) {
+            population.Add(new List<int>() {num} );
+            population.Add(new List<int>() {num} );
+        } else {
+            population[0].Add(num);
+            if ((population[1].Count%24) == 0) { population[1].Add(num); }
+            else { population[1].Add(num + population[1][population[1].Count-1]); }
+        }
+        
     }
 
     //
@@ -84,33 +85,66 @@ public class DataManager : MonoBehaviour
 
     //
     public void UpdateInfections(int num) {
-        // Update hourly population List.
-        cumulativeInfected.Add(num);
-        // Update cumulative population List.
-        if (hourlyInfected.Count == 0) { hourlyInfected.Add(num); }
-        else { hourlyInfected.Add(num - cumulativeInfected[cumulativeInfected.Count-2]); }
-        infectedPop.Add(hourlyInfected);
-        infectedPop.Add(cumulativeInfected);
-    }
-
-    // Updates the number of hourly infected populations.
-    public List<int> GetHourlyInfected() { return hourlyInfected; }
-    public void UpdateHourlyInfected(int num) {
-        hourlyInfected.Add(num);
-    }
-
-    // Updates the cumulative number of hourly infected populations.
-    public List<int> GetCumulativeInfected() { return cumulativeInfected; }
-    public void UpdateCumulativeInfected(int num) {
-        // Get latest hourly infected population number.
-        if (cumulativeInfected.Count == 0) {
-            cumulativeInfected.Add(num);
-        } else {
-            int newNum = num + cumulativeInfected[cumulativeInfected.Count-1];
-            // Append total of latest and current infected numbers.
-            cumulativeInfected.Add(newNum);
-        }
         
+        if (infectedPop.Count == 0) {
+            infectedPop.Add(new List<int>() {num} );
+            infectedPop.Add(new List<int>() {num} );
+        } else {
+            infectedPop[1].Add(num);
+            if (infectedPop[0].Count == 0) { infectedPop[0].Add(num); }
+            else { infectedPop[0].Add(num - infectedPop[1][infectedPop[1].Count-2]); }
+        }
     }
+
+    // //
+    // public List<List<int>> GetDemographic(bool isCumulative, int day) {
+
+    //     List<List<int>> ret = new List<List<int>>();
+    //     int listNum = 0;
+    //     int startIndex = ((day*24) - 24);
+    //     // Whether or not to return an hourly or cumulative graph.
+    //     if (!isCumulative) { listNum = 0;} 
+    //     else { listNum = 1; }
+    //     // Create temporary sub list out of the total population data to return.
+
+
+    //     for (int i = startIndex; i < startIndex+24; i++) { 
+
+    //         ret.Add(demographicPop[listNum][i]); 
+    //     }
+    //     return ret; 
+
+    // }
+
+    // //
+    // public void UpdateDemographic(int sShop, int gShop, int sComm, int gComm) {
+
+    //     List<int> data = new List<int>() {sShop, gShop, sComm, gComm};
+        
+    //     if (demographicPop.Count == 0) {
+    //         demographicPop.Add(new List<int>() {} );    // Single Shoppers
+    //         demographicPop.Add(new List<int>() {} );    // Group Shoppers
+    //         demographicPop.Add(new List<int>() {} );    // Single Commuters
+    //         demographicPop.Add(new List<int>() {} );    // Group Commuters
+    //     } else {
+
+    //         for (int i = 0; i < data.Count; i++) {
+
+    //             if (demographicPop[i].Count == 0) {
+    //                 demographicPop[i].Add(new List<int>() {data[i]} );
+    //                 demographicPop.Add(new List<int>() {data[i]} );
+    //             } else {
+    //                 demographicPop[1].Add(num);
+    //                 if (demographicPop[0].Count == 0) { demographicPop[0].Add(num); }
+    //                 else { demographicPop[0].Add(num - demographicPop[1][demographicPop[1].Count-2]); }
+    //             }
+
+    //         }
+    //     }
+
+        
+        
+        
+    // }
 
 }

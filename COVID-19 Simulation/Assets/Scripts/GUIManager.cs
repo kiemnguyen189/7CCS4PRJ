@@ -264,19 +264,61 @@ public class GUIManager : MonoBehaviour
         // Set alignment values for bar positioning.
         float maxHeight = 160;
         float vOffset = 40;
-        float hOffset = 40;
-        // Main bar heights.
+        float hOffset = 55;
+        Transform bars = graph.Find("MainBars").GetChild(0);
         for (int j = 0; j < data.Count; j++) {
             float heightValue = ((data[j]-min) / (max-min)) * maxHeight;
-            graph.Find("MainBars").GetChild(j).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
-            graph.Find("MainBars").GetChild(j).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (j*10), (heightValue/2) + vOffset);
+            bars.transform.GetChild(j).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
+            bars.transform.GetChild(j).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (j*10), (heightValue/2) + vOffset);
         }
+        
         // Change the interval values on the yAxis.
         Transform values = graph.Find("yAxis").Find("Values");
         for (int i = 0; i <= 10; i++) {
             values.GetChild(i).GetComponent<TextMeshProUGUI>().text = (max - (i*((max-min)/10))).ToString();
         }
     }
+
+    // // Updates the bar graph.
+    // public void UpdateStackedGraph(Transform graph, List<List<int>> data, bool percentage) {
+        
+    //     // Iterate through each set of bars.
+    //     for (int i = 0; i < data.Count; i++) {
+    //         // Get max and min values in the data.
+    //         float max = (float)data[i][0];
+    //         float min = (float)data[i][0];
+    //         foreach (int val in data) { 
+    //             if (val > max) { max = val; } 
+    //             else if (val < min) { min = val; }
+    //         }
+    //         // Round the max and min to the place value of the second digit.
+    //         float maxDigits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(max))-1));
+    //         float minDigits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(min))-1));
+    //         max = Mathf.Ceil(max/maxDigits) * maxDigits;
+    //         // If minimum value is only a single digit, set min to 0.
+    //         if (minDigits < 1) { min = 0;}
+    //         else { min = Mathf.Floor(min/minDigits) * minDigits; }
+    //         // Set alignment values for bar positioning.
+    //         float maxHeight = 160;
+    //         float vOffset = 40;
+    //         float hOffset = 40;
+    //         // Main bar heights.
+    //         Transform mainBars = graph.Find("MainBars");
+    //         // TODO: Create prefab of set of bars.
+    //         Transform bars = Instantiate(barGraphPrefab, mainBars);
+    //         //Transform bars = mainBars.GetChild(i);
+    //         for (int j = 0; j < data[i].Count; j++) {
+    //             float heightValue = ((data[j]-min) / (max-min)) * maxHeight;
+    //             bars.transform.GetChild(j).GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
+    //             bars.transform.GetChild(j).GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (j*10), (heightValue/2) + vOffset);
+    //         }
+    //     }
+    //     // Change the interval values on the yAxis.
+    //     Transform values = graph.Find("yAxis").Find("Values");
+    //     for (int i = 0; i <= 10; i++) {
+    //         values.GetChild(i).GetComponent<TextMeshProUGUI>().text = (max - (i*((max-min)/10))).ToString();
+    //     }
+    // }
 
     //
     public void ShowData() {
