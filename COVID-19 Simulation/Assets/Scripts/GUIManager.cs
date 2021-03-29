@@ -74,7 +74,6 @@ public class GUIManager : MonoBehaviour
     public TextMeshProUGUI totalSusceptibleGUI;
     public TextMeshProUGUI totalInfectedGUI;
 
-    public TextMeshProUGUI totalContactsGUI;
     public TextMeshProUGUI infectiousContactsGUI;
 
     [Header("Bottom Bar")]
@@ -119,7 +118,6 @@ public class GUIManager : MonoBehaviour
         totalSusceptibleGUI.text = "" + manager.GetTotalSusceptible();
         totalInfectedGUI.text = "" + manager.GetTotalInfected();
 
-        totalContactsGUI.text = "" + manager.GetTotalContactsNum();
         infectiousContactsGUI.text = "" + manager.GetInfectiousContactNum();
 
     }

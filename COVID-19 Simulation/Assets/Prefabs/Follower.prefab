@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2354200382883744591}
   - component: {fileID: 3800518663487390053}
   - component: {fileID: 6727151006491056485}
-  - component: {fileID: 686963790160088592}
   m_Layer: 15
   m_Name: SocialDistance
   m_TagString: Radius
@@ -80,20 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!136 &686963790160088592
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6278461504925325589}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &8418691987860001818
 GameObject:
   m_ObjectHideFlags: 0
@@ -149,10 +134,11 @@ MonoBehaviour:
   agentType: 0
   isInfected: 0
   timeAlive: 0
-  hit: {fileID: 3567844930302017680, guid: b5d3b30d5786f0f42a9617b319609971, type: 3}
   infectHit: {fileID: 3567844930302017680, guid: 3af6b956e2b4b6c45b1515bccf4bbf57,
     type: 3}
-  rend: {fileID: 0}
+  coll: {fileID: 8418691987860001812}
+  rend: {fileID: 8418691987860001815}
+  color: {r: 0, g: 0, b: 0, a: 0}
 --- !u!195 &8418691987860001813
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -189,8 +175,8 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 4
-  m_CollisionDetection: 3
+  m_Constraints: 84
+  m_CollisionDetection: 0
 --- !u!136 &8418691987860001812
 CapsuleCollider:
   m_ObjectHideFlags: 0

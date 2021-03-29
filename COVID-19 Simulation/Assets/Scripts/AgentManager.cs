@@ -20,7 +20,6 @@ public class AgentManager : MonoBehaviour
 
     // Agent based variables.
     [Header("Prefabs")]
-    public Transform hit;
     public Transform infectHit;
     public Transform followerPrefab;
     public NavMeshAgent navAgent;
@@ -34,19 +33,12 @@ public class AgentManager : MonoBehaviour
     public float minSpeed;
     public float maxSpeed;
     public float radius;
-    
     public float timeAlive;
-
-    // Spawning chances.
-    private int infectedChance;
-    private int typeChance;
-    private int groupChance;
 
     // Location based variables.
     [Header("Geospatial variables")]
     private Vector3 startNode;
     private Transform endNode;
-    public int maxDestinations = 5;
     public Transform currentDestination;
     public List<Transform> destinations;
     
@@ -55,7 +47,8 @@ public class AgentManager : MonoBehaviour
     private static float baseBuildingBufferTime = 2;
     private float buildingBufferTimer = baseBuildingBufferTime;
 
-    // Rendering variables.
+    // Agent Components.
+    public Collider coll;
     public Renderer rend;
     public Color color;
 
@@ -68,21 +61,18 @@ public class AgentManager : MonoBehaviour
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
 
         // * Agent spawning initialization.
-        infectedChance = Random.Range(0, 100);
-        typeChance = Random.Range(0, 100);
-        groupChance = Random.Range(0, 100);
         List<int> types = new List<int>() {0, 1, 2, 3};
-        if (!(groupChance < manager.GetRatioGroups())) { 
+        if (!(Random.Range(0, 100) < manager.GetRatioGroups())) { 
             types.RemoveRange(2, 2); // Single = [0, 1]
             groupSize = 1;
         } else { 
             types.RemoveRange(0, 2); // Groups = [2, 3]
             groupSize = Random.Range(2, manager.GetMaxGroupSize());
         } 
-        if (typeChance < manager.GetRatioTypes()) { typeInt = types[0]; } 
+        if (Random.Range(0, 100) < manager.GetRatioTypes()) { typeInt = types[0]; } 
         else { typeInt = types[1]; }
         groupInfected = 0;
-        if (infectedChance < manager.GetRatioInfected()) { 
+        if (Random.Range(0, 100) < manager.GetRatioInfected()) { 
             isInfected = true; 
             groupInfected = groupSize;
         }
@@ -109,12 +99,12 @@ public class AgentManager : MonoBehaviour
         radius = manager.GetRadiusSize();
         Vector3 scaleChange = new Vector3(radius, 0, radius);
         gameObject.transform.GetChild(0).localScale += scaleChange;
-        navAgent.radius = manager.GetRadiusSize() / 2;
+        navAgent.radius = radius / 2;
 
         // * Destinations of agent.
         startNode = gameObject.transform.position;
         destinations = new List<Transform>();
-        int numDest = Random.Range(1, maxDestinations);
+        int numDest = Random.Range(1, manager.GetMaxDestinations());
         if (agentType == AgentType.Shopper || agentType == AgentType.GroupShopper) {
             destinations = manager.SetDestinations(numDest);
         }
@@ -126,15 +116,29 @@ public class AgentManager : MonoBehaviour
         manager.AddNumAgents(agentType, groupSize, groupInfected);
 
         // * Rendering initialization.
-        rend = GetComponent<Renderer>();
+        //rend = GetComponent<Renderer>();
         rend.material.color = color;
             
     }
     
     
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
+
+        if (navAgent.pathPending) {
+            coll.enabled = false;
+            rend.enabled = false;
+            foreach (Transform child in transform) {
+                child.gameObject.SetActive(false);
+            }
+        } else if (!navAgent.pathPending) {
+            coll.enabled = true;
+            rend.enabled = true;
+            foreach (Transform child in transform) {
+                child.gameObject.SetActive(true);
+            }
+        }
 
         // Destination controller.
         if (destinations.Count != 0) {
@@ -161,14 +165,20 @@ public class AgentManager : MonoBehaviour
     IEnumerator SpawnFollowers() {
 
         float spawnDelay = 0.0f;
+        int count = 0;
         for (int i = 0; i < groupSize-1; i++) {
             // TODO: Edit spawn position so it doesn't spawn inside the parent and bug out.
             Vector3 spawnPos = gameObject.transform.position;
             spawnPos.x += 2;
-            Transform follower = Instantiate(followerPrefab, spawnPos, gameObject.transform.rotation);
-            follower.transform.parent = gameObject.transform;
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(spawnPos, out hit, 2, 1)) {
+                Transform follower = Instantiate(followerPrefab, spawnPos, gameObject.transform.rotation);
+                follower.transform.parent = gameObject.transform;
+                count += 1;
+            } else { Debug.Log("Follower Failed."); }
             yield return new WaitForSeconds(spawnDelay);
         }
+        groupSize = count;
 
     }
 
@@ -248,8 +258,6 @@ public class AgentManager : MonoBehaviour
     public void Interact(Collision other, AgentManager lead, FollowAgentManager follow) {
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
-        // Track contacts with other agents not in the same group.
-        //if (!(other.transform.IsChildOf(transform))) { TrackContact(other); }
         // If interacting with another lead agent.
         if (lead != null) {
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.
@@ -266,14 +274,6 @@ public class AgentManager : MonoBehaviour
         }
     }
 
-    // Helper method used in OnCollisionEnter to track interactions between agents.
-    public void TrackContact(Collision other) {
-        // TODO: Set "hit" spheres inactive until needed to be shown at the end of the simulation.
-        Vector3 tempPoint = other.contacts[0].point;
-        tempPoint.y = 10;   // * Keep the same elevation for contact points.
-        manager.AddTotalContactNum();   // ! Object ref not set to instance of object.
-        manager.AddContactLocations(tempPoint);
-    }
 
     //
     public void TrackInfection(Collision other) {

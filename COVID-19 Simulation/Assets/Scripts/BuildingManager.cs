@@ -35,13 +35,13 @@ public class BuildingManager : MonoBehaviour
         transform.position = Vector3.zero;
 
         MeshFilter[] meshFilters = GetComponentsInChildren<MeshFilter>();
-        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
+        CombineInstance[] combine = new CombineInstance[6];
         
-        for (int i = 9; i < meshFilters.Length; i++) {
+        for (int i = 0; i < 6; i++) {
             if (meshFilters[i].transform == transform) { continue; }
-            combine[i].mesh = meshFilters[i].sharedMesh;
-            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-            meshFilters[i].gameObject.SetActive(false);
+            combine[i].mesh = meshFilters[i+9].sharedMesh;
+            combine[i].transform = meshFilters[i+9].transform.localToWorldMatrix;
+            meshFilters[i+9].gameObject.SetActive(false);
         }
 
         transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
@@ -77,6 +77,11 @@ public class BuildingManager : MonoBehaviour
                 door.LabelToggle(false);
                 door.ColorToggle(false);
             }
+        }
+
+        if (!manager.simStarted) {
+            shoppers.Clear();
+            UpdateText();
         }
 
     }

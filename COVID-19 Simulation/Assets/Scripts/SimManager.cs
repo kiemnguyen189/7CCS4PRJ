@@ -33,10 +33,10 @@ public class SimManager : MonoBehaviour
 
     // An array of 24 integers, each representing the amount of total pedestrian flow per hour in a day.
     private static int[] flowTimings = new int[] {
-        200, 150, 100, 50, 200, 500,                // 00:00 to 05:00
-        700, 1000, 2000, 2500, 4000, 5000,          // 06:00 to 11:00
-        7000, 10000, 12000, 12000, 14000, 14000,    // 12:00 to 17:00
-        12000, 10000, 6000, 4000, 2000, 1000        // 18:00 to 23:00
+        100, 200, 300, 400, 500, 600,           // 00:00 to 05:00
+        700, 800, 900, 1000, 1100, 1200,        // 06:00 to 11:00
+        1300, 1400, 1600, 1800, 2000, 2000,     // 12:00 to 17:00
+        1600, 1200, 600, 400, 200, 100          // 18:00 to 23:00
     };
 
     public static GameObject[] spawners;        // A list of all agent spawners in the environment.
@@ -69,7 +69,10 @@ public class SimManager : MonoBehaviour
     public float infectionChance;               // The chance of an infected agent infecting another agent upon contact.
     public int maxGroupSize;                    // The maximum spawning group size of agents.
     public float radiusSize;                    // The Social Distancing radius of each agent. 
+
+    [Header("Private Params")]
     public float maxAgentSpeed;                 // The maximum movement speed of the NavMeshAgents.
+    public int maxDestinations;
 
     [Header("Environment Parameters")]
     public DoorwayMode doorMode;                // The types of Entrances / Exits for each building. Types: [OneWay, TwoWay, Mixed].
@@ -166,7 +169,6 @@ public class SimManager : MonoBehaviour
         }
         ResetMetrics();
         ResetTime();
-        //dataManager.ResetData();
         
     }
 
@@ -271,6 +273,10 @@ public class SimManager : MonoBehaviour
     // Returns and Sets the Maximum Movement Speed of agents in the simulation.
     public float GetMaxAgentSpeed() { return maxAgentSpeed; }
     public void SetMaxAgentSpeed(float speed) { maxAgentSpeed = speed; }
+
+    // Returns
+    public int GetMaxDestinations() { return maxDestinations; }
+    public void SetMaxDestinations(int value) { maxDestinations = value; }
 
     // Returns and Sets the Modes of Entrances and Exits of Buildings in the simulation.
     public DoorwayMode GetDoorMode() { return doorMode; }

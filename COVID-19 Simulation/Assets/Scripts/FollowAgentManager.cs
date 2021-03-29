@@ -17,11 +17,11 @@ public class FollowAgentManager : MonoBehaviour
     public bool isInfected;
     public float timeAlive;
 
-    public Transform hit;
     public Transform infectHit;
 
+    public Collider coll;
     public Renderer rend;
-    private Color color;
+    public Color color;
 
     // Start is called before the first frame update
     void Start()
@@ -33,20 +33,10 @@ public class FollowAgentManager : MonoBehaviour
         leader = gameObject.transform.parent.gameObject;
         leadManager = leader.GetComponent<AgentManager>();
 
-        // * Tag and Color initialization.
-        // if (leader.tag == "GroupShopper") {
-        //     color = new Color(1,0,1,0.5f);
-        //     gameObject.tag = "GroupShopper";
-        // } else if (leader.tag == "GroupCommuter") {
-        //     color = new Color(0,1,1,0.5f);
-        //     gameObject.tag = "GroupCommuter";
-        // }
-
         gameObject.tag = leadManager.tag;
         color = leadManager.GetColor();
-        //color.a = 0.5f;
 
-        rend = GetComponent<Renderer>();
+        //rend = GetComponent<Renderer>();
         rend.material.color = color;
         
         isInfected = leadManager.GetInfection();
@@ -65,10 +55,18 @@ public class FollowAgentManager : MonoBehaviour
     }
 
     //
-    private void Update() {
+    private void FixedUpdate() {
 
         timeAlive += Time.deltaTime;
 
+        if (navAgent.pathPending && leadManager.navAgent.pathPending) {
+            coll.enabled = false;
+            rend.enabled = false;
+        } else if (!navAgent.pathPending && !leadManager.navAgent.pathPending) {
+            coll.enabled = true;
+            rend.enabled = true;
+        }
+        
         if (!isInfected) {
             color = (Color)manager.GetAgentBlueprint()[typeInt, 2];
             rend.material.color = color;
@@ -117,8 +115,6 @@ public class FollowAgentManager : MonoBehaviour
     public void Interact(Collision other, AgentManager lead, FollowAgentManager follow) {
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
-        // Track contacts with other agents not in the same group.
-        //if (!(transform.IsChildOf(other.transform))) { leadManager.TrackContact(other); }
         // If interacting with another lead agent.
         if (lead != null) {
             // If THIS agent is infected and the OTHER lead agent is not and within infection chance, infect OTHER lead agent.

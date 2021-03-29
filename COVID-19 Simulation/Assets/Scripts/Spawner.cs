@@ -15,6 +15,7 @@ public class Spawner : MonoBehaviour
     public float timeBetweenWaves;
     private int hourlyFlow;
     private int numSpawners;
+    private int agentsLeft;
     public float countdown = 2f;
 
     //
@@ -26,7 +27,7 @@ public class Spawner : MonoBehaviour
     }
 
     //
-    private void Update() {
+    private void FixedUpdate() {
 
         if (manager.simStarted) {
 
@@ -34,16 +35,21 @@ public class Spawner : MonoBehaviour
             // The %24 is used for durations above a day (1440), so indexes stay within 0-23.
             hourlyFlow = manager.GetFlowTimings()[ConvertSimTime(manager.GetSimTime()) % 24];
             numSpawners = manager.GetNumSpawners();
+
+            agentsLeft = hourlyFlow - manager.GetTotalAgents();
+            
             timeBetweenWaves = 60f / ((float)hourlyFlow / numSpawners);
 
-            if (countdown <= 0f)
+            if (countdown <= 0f && agentsLeft > 0)
             {
                 SpawnAgent();
                 countdown = timeBetweenWaves;
             }
             countdown -= Time.deltaTime;
-            
+        } else {
+            countdown = 2f;
         }
+
     }
 
     //
@@ -52,7 +58,9 @@ public class Spawner : MonoBehaviour
         // TODO: MavMesh.SamplePosition.
         NavMeshHit hit;
         if (NavMesh.SamplePosition(transform.position, out hit, 2, 1)) {
-            Instantiate(agentPrefab, transform.position, transform.rotation);
+            Transform agent = Instantiate(agentPrefab, transform.position, transform.rotation);
+        } else {
+            Debug.Log("Spawn Failed.");
         }
         
         
@@ -60,7 +68,7 @@ public class Spawner : MonoBehaviour
 
     // Converts the raw simulation time into the relevant hourly index in flowTimings.
     public int ConvertSimTime(float time) {
-        return (int)Mathf.Floor((manager.GetFlowTimings().Length / 1440f) * Mathf.Floor(manager.GetSimTime()));
+        return (int)Mathf.Floor((manager.GetFlowTimings().Length / 1440f) * Mathf.Floor(time));
     }
 
 
