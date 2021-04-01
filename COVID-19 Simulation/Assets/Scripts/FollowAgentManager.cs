@@ -59,12 +59,13 @@ public class FollowAgentManager : MonoBehaviour
 
         timeAlive += Time.deltaTime;
 
-        if (navAgent.pathPending && leadManager.navAgent.pathPending) {
+        if (navAgent.pathPending) {
             coll.enabled = false;
             rend.enabled = false;
-        } else if (!navAgent.pathPending && !leadManager.navAgent.pathPending) {
+        } else if (!navAgent.pathPending) {
             coll.enabled = true;
             rend.enabled = true;
+            navAgent.SetDestination(leader.transform.position);
         }
         
         if (!isInfected) {
@@ -72,7 +73,7 @@ public class FollowAgentManager : MonoBehaviour
             rend.material.color = color;
         } 
 
-        navAgent.SetDestination(leader.transform.position);
+        
     }
     
     //

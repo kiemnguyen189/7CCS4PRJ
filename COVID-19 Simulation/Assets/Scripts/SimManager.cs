@@ -146,8 +146,9 @@ public class SimManager : MonoBehaviour
     public void RecordData() {
 
         dataManager.UpdatePopulation(totalAgents);
+        dataManager.UpdateInfected(totalSusceptible, totalInfected);
         dataManager.UpdateInfections(infectiousContacts);
-        //dataManager.UpdateDemographic(totalSingleShoppers, totalGroupShoppers, totalSingleCommuters, totalGroupCommuters);
+        dataManager.UpdateDemographic(totalSingleShoppers, totalGroupShoppers, totalSingleCommuters, totalGroupCommuters);
 
     }
 

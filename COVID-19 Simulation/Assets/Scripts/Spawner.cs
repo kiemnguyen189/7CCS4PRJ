@@ -16,13 +16,13 @@ public class Spawner : MonoBehaviour
     private int hourlyFlow;
     private int numSpawners;
     private int agentsLeft;
-    public float countdown = 2f;
+    public float countdown;
 
     //
     void Start() {
 
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
-        
+        countdown = Random.Range(1f, 10f);
 
     }
 
@@ -47,7 +47,7 @@ public class Spawner : MonoBehaviour
             }
             countdown -= Time.deltaTime;
         } else {
-            countdown = 2f;
+            countdown = Random.Range(1f, 10f);
         }
 
     }

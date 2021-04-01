@@ -129,15 +129,15 @@ public class AgentManager : MonoBehaviour
         if (navAgent.pathPending) {
             coll.enabled = false;
             rend.enabled = false;
-            foreach (Transform child in transform) {
-                child.gameObject.SetActive(false);
-            }
+            // foreach (Transform child in transform) {
+            //     child.gameObject.SetActive(false);
+            // }
         } else if (!navAgent.pathPending) {
             coll.enabled = true;
             rend.enabled = true;
-            foreach (Transform child in transform) {
-                child.gameObject.SetActive(true);
-            }
+            // foreach (Transform child in transform) {
+            //     child.gameObject.SetActive(true);
+            // }
         }
 
         // Destination controller.

@@ -139,8 +139,8 @@ public class BuildingManager : MonoBehaviour
             if (shopper.tag == child.tag) {
                 shoppers.Add(child.gameObject);
             }
-            
         }
+        UpdateText();
     }
 
     // Remove shopper agents from a building's list of shoppers currently inside.
@@ -151,6 +151,7 @@ public class BuildingManager : MonoBehaviour
                 shoppers.Remove(child.gameObject);
             }
         }
+        UpdateText();
     }
 
     // Returns a random door, depending or the type parameter. Will either return Entrance/Both or Exit/Both.

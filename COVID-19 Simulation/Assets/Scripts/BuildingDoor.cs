@@ -116,7 +116,7 @@ public class BuildingDoor : MonoBehaviour
     // Disables a Shopper for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
     IEnumerator RecreateShopper(GameObject shopper) {
         core.AddShopper(shopper);
-        core.UpdateText();
+        //core.UpdateText();
         shopper.GetComponent<AgentManager>().GatherFollowers();
         shopper.gameObject.SetActive(false);
         yield return new WaitForSeconds(Random.Range(1, respawnTime));
@@ -126,6 +126,7 @@ public class BuildingDoor : MonoBehaviour
         shopper.gameObject.SetActive(true);
         shopper.GetComponent<AgentManager>().UpdateDestinations();
         core.RemoveShopper(shopper);
+        //core.UpdateText();
     }
     
 
