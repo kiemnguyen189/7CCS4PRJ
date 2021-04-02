@@ -46,7 +46,6 @@ public class SimManager : MonoBehaviour
     [Header("Prefabs")]
     public Camera cam;                          // Scene Camera Object
     public Transform dots;
-    public Transform hit;
     public Transform infectHit;
 
     [Header("Settings")]
@@ -93,7 +92,6 @@ public class SimManager : MonoBehaviour
     
     public List<Vector3> contactLocations;      // A list of all agent contact/interaction locations in the environment.
     public List<Vector3> infectionLocations;    // A list of all infected agent contact and transfers in the environment.
-    public int totalContacts;                   // The Total number of contacts in the simulation run.
     public int infectiousContacts;              // The Total number of infectious contacts in the simulation run.
     
     
@@ -121,15 +119,17 @@ public class SimManager : MonoBehaviour
             countdown -= Time.deltaTime;
         } 
 
-        // TODO: Record stats every hour.
+        // Record data every minute (hour in simulation time).
         if (countdown <= 0f) { 
             countdown = 60f;
-            RecordData(); 
-            
+            RecordData();  
+            // If a day has passed.
+            if (simTime % 1440 == 0) {
+                infectiousContacts = 0;
+            }   
         }
 
         // If simulation reached sim length.
-        // TODO: Record metrics and display results when simfinished.
         if (simTime > simDuration) {
             RecordData(); 
             simFinished = true;
@@ -137,7 +137,6 @@ public class SimManager : MonoBehaviour
             guiManager.StartStopSimulation();
             
         }
-
         
         
     }
@@ -145,10 +144,10 @@ public class SimManager : MonoBehaviour
     // Intermediate method to update data structures in DataManager.
     public void RecordData() {
 
-        dataManager.UpdatePopulation(totalAgents);
-        dataManager.UpdateInfected(totalSusceptible, totalInfected);
-        dataManager.UpdateInfections(infectiousContacts);
-        dataManager.UpdateDemographic(totalSingleShoppers, totalGroupShoppers, totalSingleCommuters, totalGroupCommuters);
+        dataManager.UpdatePopulation(new List<int>() {totalAgents}, true);
+        dataManager.UpdateInfections(new List<int>() {infectiousContacts}, false);
+        dataManager.UpdateDemographic(new List<int>() {totalSingleShoppers, totalGroupShoppers, totalSingleCommuters, totalGroupCommuters}, true);
+        dataManager.UpdateInfected(new List<int>() {totalSusceptible, totalInfected}, true); 
 
     }
 
@@ -203,7 +202,6 @@ public class SimManager : MonoBehaviour
         totalSusceptible = 0;
         totalInfected = 0;
 
-        totalContacts = 0;
         infectiousContacts = 0;
 
         contactLocations.Clear();
@@ -350,10 +348,6 @@ public class SimManager : MonoBehaviour
         
         // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
     }
-
-    // Iterates the number of Total Contacts by 1.
-    public int GetTotalContactsNum() { return totalContacts; }
-    public void AddTotalContactNum() { totalContacts += 1; }
 
     // Iterates the number of Infectious Contacts by 1.
     public int GetInfectiousContactNum() { return infectiousContacts; }

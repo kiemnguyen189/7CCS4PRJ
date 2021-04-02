@@ -33,8 +33,8 @@ public class GUIManager : MonoBehaviour
     public float hOffset = 55;
 
     public Transform populationGraph;
-    public Transform demographicsGraph;
     public Transform infectionsGraph;
+    public Transform demographicsGraph;
     public Transform infectedGraph;
 
     // * Sim Settings
@@ -102,6 +102,10 @@ public class GUIManager : MonoBehaviour
         new List<int>() { 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 }
     };
 
+    public List<List<int>> test4 = new List<List<int>>() {
+        new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
+    };
+
     // Start is called before the first frame update
     void Start()
     {
@@ -117,6 +121,8 @@ public class GUIManager : MonoBehaviour
         isHidden = true;
 
         CloseData();
+    
+
     }
 
     // Update is called once per frame
@@ -261,64 +267,27 @@ public class GUIManager : MonoBehaviour
     // TODO: 
     public void UpdateAllGraphs() {
 
-        UpdateBarGraph(populationGraph, dataManager.GetPopulation(isCumulative, day), new Color(0,1,1,1));
-        UpdateStackedGraph(demographicsGraph, dataManager.GetDemographic(isCumulative, day), 
+        UpdateBarGraph(populationGraph, dataManager.GetPopulation(isCumulative, day), 
+        new List<Color>() { new Color(0,1,1,1) });
+        UpdateBarGraph(demographicsGraph, dataManager.GetDemographic(isCumulative, day), 
         new List<Color>() { new Color(0,1,1,1), new Color(0,0,1,1), new Color(0,1,0,1), new Color(0,0.3f,0,1) });
 
-        UpdateBarGraph(infectionsGraph, dataManager.GetInfections(isCumulative, day), new Color(1,0,0,1));
-        UpdateStackedGraph(infectedGraph, dataManager.GetInfected(isCumulative, day), 
+        UpdateBarGraph(infectionsGraph, dataManager.GetInfections(isCumulative, day), 
+        new List<Color>() { new Color(1,0,0,1) });
+        UpdateBarGraph(infectedGraph, dataManager.GetInfected(isCumulative, day), 
         new List<Color>() { new Color(0,1,0,1), new Color(1,0,0,1) });
 
     }
 
-    // Updates the bar graph.
-    // TODO: 
-    public void UpdateBarGraph(Transform graph, List<int> data, Color col) {
-
-        Transform mainBars = graph.Find("MainBars");
-        if (mainBars.childCount != 0) { Destroy(mainBars.GetChild(0).gameObject); }
-        Transform bars = Instantiate(barGraphPrefab, mainBars);
-
-        // Get max and min values in the data.
-        float max = (float)data[0];
-        float min = (float)data[0];
-        foreach (int val in data) { 
-            if (val > max) { max = val; } 
-            else if (val < min) { min = val; }
-        }
-        // Round the max and min to the place value of the second digit.
-        float minDigits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(min))-1));
-        max = Mathf.Ceil(max/10) * 10;
-        // If minimum value is only a single digit, set min to 0.
-        if (minDigits < 1) { min = 0;}
-        else { min = Mathf.Floor(min/minDigits) * minDigits; }
-
-        for (int j = 0; j < data.Count; j++) {
-            float heightValue = ((data[j]-min) / (max-min)) * maxHeight;
-            Transform bar = bars.transform.GetChild(j);
-            bar.GetComponent<RectTransform>().sizeDelta = new Vector2(10, heightValue);
-            bar.GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (j*10), (heightValue/2) + vOffset);
-            bar.GetComponent<Image>().color = col;
-        }
-        // Change the interval values on the yAxis.
-        Transform values = graph.Find("yAxis").Find("Values");
-        for (int i = 0; i <= 10; i++) {
-            values.GetChild(i).GetComponent<TextMeshProUGUI>().text = (max - (i*((max-min)/10))).ToString();
-        }
-    }
 
     // Updates the bar graph.
     // TODO: 
-    public void UpdateStackedGraph(Transform graph, List<List<int>> data, List<Color> cols) {
+    public void UpdateBarGraph(Transform graph, List<List<int>> data, List<Color> cols) {
 
         Transform mainBars = graph.Find("MainBars");
         // Reset old bar graph data.
-        if (mainBars.childCount != 0) {
-            foreach (Transform child in mainBars) { Destroy(child.gameObject); }
-        }
-        // Instantiate bar set prefabs.
-        for (int i = 0; i < data.Count; i++) {
-            Transform stack = Instantiate(barGraphPrefab, mainBars);
+        if (mainBars.childCount == 0) {
+            for (int i = 0; i < data.Count; i++) { Instantiate(barGraphPrefab, mainBars); }
         }
         
         // Total up each value of all sub lists first.
@@ -330,20 +299,16 @@ public class GUIManager : MonoBehaviour
             hourlyTotals.Add(temp);
         }
 
-        // Get max and min values of hourlyTotals.
+        // Get max value of hourlyTotals.
         float max = (float)data[0][0];
-        float min = (float)data[0][0];
         foreach (int val in hourlyTotals) { 
             if (val > max) { max = val; } 
-            else if (val < min) { min = val; }
         }
 
-        // Round the max and min to the place value of the second digit.
-        float minDigits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(min))-1));
+        // Round up the maximum value.
+        //float minDigits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(min))-1));
         max = Mathf.Ceil(max/10) * 10;
-        // If minimum value is only a single digit, set min to 0.
-        if (minDigits < 10) { min = 0;}
-        else { min = Mathf.Floor(min/minDigits) * minDigits; }
+        float min = 0;
 
         for (int i = 0; i < data[0].Count; i++) {
             // Stacked height of bars
@@ -406,7 +371,6 @@ public class GUIManager : MonoBehaviour
     //
     public void CloseData() {
         dataOverlay.SetActive(false);
-        // TODO: Reset data.
     }
 
     // Matches the shown text value of Agent Type chances to the Slider value.

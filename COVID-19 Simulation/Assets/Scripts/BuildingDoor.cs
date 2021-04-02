@@ -90,21 +90,6 @@ public class BuildingDoor : MonoBehaviour
 
     }
 
-    // ! Don't need OnTriggerStay for buffering due to entering checks.
-    // // Called when a Shopper stays inside Both door 'sphere'.
-    // private void OnTriggerStay(Collider other) {
-    //     AgentManager agent = other.GetComponent<AgentManager>();
-    //     // TODO: Check if the current door is at the top of the list of Directions.
-    //     // ? agent.destinations.Contains(gameObject.transform)
-    //     if (agent.destinations[0] == gameObject.transform && doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
-    //         float otherTimer = agent.UpdateBuildingBufferTime();
-    //         if (otherTimer <= 0f) {
-    //             StartCoroutine(RecreateShopper(other.gameObject));
-    //             agent.ResetBuildingBufferTime();
-    //         }
-    //     }
-    // }
-
     // Called when a Shopper leaves the Both door 'sphere' before their buildingBufferTimer runs out.
     private void OnTriggerExit(Collider other) {
         AgentManager agent = other.GetComponent<AgentManager>();
@@ -116,7 +101,6 @@ public class BuildingDoor : MonoBehaviour
     // Disables a Shopper for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
     IEnumerator RecreateShopper(GameObject shopper) {
         core.AddShopper(shopper);
-        //core.UpdateText();
         shopper.GetComponent<AgentManager>().GatherFollowers();
         shopper.gameObject.SetActive(false);
         yield return new WaitForSeconds(Random.Range(1, respawnTime));
@@ -126,7 +110,6 @@ public class BuildingDoor : MonoBehaviour
         shopper.gameObject.SetActive(true);
         shopper.GetComponent<AgentManager>().UpdateDestinations();
         core.RemoveShopper(shopper);
-        //core.UpdateText();
     }
     
 
