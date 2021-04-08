@@ -41,11 +41,6 @@ public class AgentManager : MonoBehaviour
     private Transform endNode;
     public Transform currentDestination;
     public List<Transform> destinations;
-    
-    
-    // Building based variables.
-    private static float baseBuildingBufferTime = 2;
-    private float buildingBufferTimer = baseBuildingBufferTime;
 
     // Agent Components.
     public Collider coll;
@@ -60,7 +55,7 @@ public class AgentManager : MonoBehaviour
         // * Manager initialization.
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
 
-        // * Agent spawning initialization.
+        // * Agent spawning initialisation.
         List<int> types = new List<int>() {0, 1, 2, 3};
         if (!(Random.Range(0, 100) < manager.GetRatioGroups())) { 
             types.RemoveRange(2, 2); // Single = [0, 1]
@@ -77,6 +72,7 @@ public class AgentManager : MonoBehaviour
             groupInfected = groupSize;
         }
         
+        // * Initialise using the agent blueprint values.
         agentType = (AgentType)manager.GetAgentBlueprint()[typeInt, 0];
         gameObject.tag = (string)manager.GetAgentBlueprint()[typeInt, 1];
         if (!isInfected) { color = (Color)manager.GetAgentBlueprint()[typeInt, 2]; } 
@@ -116,7 +112,6 @@ public class AgentManager : MonoBehaviour
         manager.AddNumAgents(agentType, groupSize, groupInfected);
 
         // * Rendering initialization.
-        //rend = GetComponent<Renderer>();
         rend.material.color = color;
             
     }
@@ -125,19 +120,15 @@ public class AgentManager : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-
+        // If the agent is calculating a path, disable collision and rendering.
         if (navAgent.pathPending) {
             coll.enabled = false;
             rend.enabled = false;
-            foreach (Transform child in transform) {
-                child.gameObject.SetActive(false);
-            }
+            transform.GetChild(0).gameObject.SetActive(false);
         } else if (!navAgent.pathPending) {
             coll.enabled = true;
             rend.enabled = true;
-            foreach (Transform child in transform) {
-                child.gameObject.SetActive(true);
-            }
+            transform.GetChild(0).gameObject.SetActive(true);
         }
 
         // Destination controller.
@@ -167,7 +158,6 @@ public class AgentManager : MonoBehaviour
         float spawnDelay = 0.0f;
         int count = 0;
         for (int i = 0; i < groupSize-1; i++) {
-            // TODO: Edit spawn position so it doesn't spawn inside the parent and bug out.
             Vector3 spawnPos = gameObject.transform.position;
             spawnPos.x += 2;
             NavMeshHit hit;
@@ -182,7 +172,7 @@ public class AgentManager : MonoBehaviour
 
     }
 
-    //
+    // Reposition all followers to the current position.
     public void GatherFollowers() {
         foreach (Transform child in transform) {
             if (child.name != "Radius") {
@@ -223,27 +213,12 @@ public class AgentManager : MonoBehaviour
     // Updates the list of destinations each agent has.
     public void UpdateDestinations() { destinations.RemoveAt(0); }
 
-    // Updates the buffer time of an agent, used to decide how long an agent should stay in a building.
-    public float UpdateBuildingBufferTime() {
-        buildingBufferTimer -= Time.deltaTime;
-        return buildingBufferTimer;
-    }
-
-    // Resets the building buffer time of an agent.
-    public float ResetBuildingBufferTime() {
-        buildingBufferTimer = baseBuildingBufferTime;
-        return buildingBufferTimer;
-    }
-
-
     // Detects interactions between agents through collisions.
     // Ensures that only one of the two interacting agents calls the TrackInteraction method.
     // This removes redundant duplicate calls which can affect performance and accuracy of metrics.
     private void OnCollisionEnter(Collision other) {
-        //Debug.Log("TEST: " + GetInstanceID() + ", " + gameObject.name + "=" + transform.position + " " + other.gameObject.GetInstanceID() + ", " + gameObject.name + "=" + other.transform.position);
-        // * Do not collide with non agents and within-group agents.
+        // Check for collisions with the environment.
         bool environmentCheck = ((other.gameObject.tag != "Spawner") && (other.gameObject.tag != "Despawner") && (other.gameObject.name != "Ground"));
-        //if (environmentCheck && !(other.transform.IsChildOf(transform))) {
         if (environmentCheck && (timeAlive >= 0.5f) && (other.gameObject.GetInstanceID() > gameObject.GetInstanceID())) {
             // Get the agent collided with. Can either be another leader or follower.
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
@@ -282,7 +257,6 @@ public class AgentManager : MonoBehaviour
         // Check if collision point is within a despawn node. If not, count infection.
         // This is due to the fact that there are possibilities that an infection can occur whilst an agent is being despawned.
         // This is known to adversely affect the accuracy of the infection counts.
-        // TODO: Check if iDot is within the bounds of any spawner.
         if (!currentDestination.GetComponent<Collider>().bounds.Contains(tempPoint)) {
             manager.AddInfectiousContactNum();
             manager.AddInfectionLocations(tempPoint);

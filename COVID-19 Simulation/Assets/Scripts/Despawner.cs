@@ -1,10 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+// Main class for the de-spawner nodes.
 public class Despawner : MonoBehaviour
 {
-
+    // Called when either an agent or vehicle collides with the de-spawner node.
     private void OnTriggerEnter(Collider other) {
         // Check if spawner is the final target of the vehicle;
         VehicleMovement vehicle = other.GetComponent<VehicleMovement>();

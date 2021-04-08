@@ -1,16 +1,17 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System;
 using Random=UnityEngine.Random;
 using UnityEngine;
 
-
+// Enumerated types of building doorway policies.
 public enum DoorwayMode {
     OneWay,
     TwoWay,
     Mixed
 }
 
+// Main manager class of the simulation.
 public class SimManager : MonoBehaviour
 {
 
@@ -33,36 +34,36 @@ public class SimManager : MonoBehaviour
 
     // An array of 24 integers, each representing the amount of total pedestrian flow per hour in a day.
     private static int[] flowTimings = new int[] {
-        100, 200, 300, 400, 500, 600,           // 00:00 to 05:00
-        700, 800, 900, 1000, 1100, 1200,        // 06:00 to 11:00
-        1300, 1400, 1600, 1800, 2000, 2000,     // 12:00 to 17:00
-        1600, 1200, 600, 400, 200, 100          // 18:00 to 23:00
+        100, 125, 150, 170, 200, 225,           // 00:00 to 05:00
+        250, 275, 300, 350, 400, 450,           // 06:00 to 11:00
+        500, 600, 700, 800, 1000, 1000,         // 12:00 to 17:00
+        900, 700, 500, 350, 250, 150            // 18:00 to 23:00
     };
 
-    public static GameObject[] spawners;        // A list of all agent spawners in the environment.
-    public static GameObject[] despawners;
-    public static GameObject[] buildings;       // A list of all buildings in the environment.
+    public static GameObject[] spawners;        
+    public static GameObject[] despawners;      
+    public static GameObject[] buildings;       
     
     [Header("Prefabs")]
-    public Camera cam;                          // Scene Camera Object
-    public Transform dots;
-    public Transform infectHit;
+    public Camera cam;                          
+    public Transform dots;                      // Placeholder object to hold all red infection dots on the map at the end of a run.
+    public Transform infectHit;                 // Prefab of a red dot marker for infection locations.
 
     [Header("Settings")]
-    public float simTime;
-    public float countdown = 60f;
-    public bool simStarted = false;             // Whether the simulation has been started or not.
-    public bool simFinished = false;            // Whether or not the simulation has finished its run.
-    public bool isPaused = false;               // Whether or not the simulation is currently paused.
-    public bool recorded = false;
+    public float simTime;                       
+    public float countdown = 60f;               // Countdown until data is recorded (records every hour in sim time).
+    public bool simStarted = false;             
+    public bool simFinished = false;            
+    public bool isPaused = false;               
+    public bool recorded = false;               // Has data been recorded in the dataManager yet.
     public float simSpeed = 1.0f;               // The current "playback speed" of the simulation, Min = 1/8x, Max = 8x.
-    public float simDuration = 1440f;              // The duration of the simulation in raw time. 1440 seconds in real time, equating to 1 day in sim time.
-    public bool showBuildingNum = true;
-    public bool showBuildingDoors = true;
+    public float simDuration = 1440f;           // The duration of the simulation in raw time. 1440 seconds in real time, equating to 1 day in sim time.
+    public bool showBuildingNum = true;         
+    public bool showBuildingDoors = true;       
 
     // * Initial Simulation User settings.
     [Header("Agent Parameters")]
-    public float ratioTypes;                 // The spawning ratio of Shopper agents. 100 = Only shoppers, 0 = Only Commuters.
+    public float ratioTypes;                    // The spawning ratio of Shopper agents. 100 = Only shoppers, 0 = Only Commuters.
     public float ratioGroups;                   // The spawning ratio of Group agents. 100 = Only groups, 0 = Only singles.
     public float ratioInfected;                 // The spawning ratio of Infected agents. 100 = Only infected, 0 = Infection free.
     public float infectionChance;               // The chance of an infected agent infecting another agent upon contact.
@@ -70,27 +71,26 @@ public class SimManager : MonoBehaviour
     public float radiusSize;                    // The Social Distancing radius of each agent. 
 
     [Header("Private Params")]
-    public float maxAgentSpeed;                 // The maximum movement speed of the NavMeshAgents.
-    public int maxDestinations;
+    public float maxAgentSpeed;                 
+    public int maxDestinations;                 
 
     [Header("Environment Parameters")]
     public DoorwayMode doorMode;                // The types of Entrances / Exits for each building. Types: [OneWay, TwoWay, Mixed].
-    public bool isPedestrianised;
+    public bool isPedestrianised;               
 
     // * Live Simulation Metrics.
     [Header("Simulation Metrics")]
-    public int totalAgents;                     // The Total number of agents currently in the simulation run.
-    public int totalShoppers;                   // The Total number of Shopper agents currently in the simulation run.
-    public int totalSingleShoppers;             // The Total number of Single Shopper agents currently in the simulation run.
-    public int totalGroupShoppers;              // The Total number of Group Shopper agents currently in the simulation run.
-    public int totalCommuters;                  // The Total number of Commuter agents currently in the simulation run.
-    public int totalSingleCommuters;            // The Total number of Single Commuter agents currently in the simulation run.
-    public int totalGroupCommuters;             // The Total number of Group Commuter agents currently in the simulation run.
+    public int totalAgents;                     
+    public int totalShoppers;                   
+    public int totalSingleShoppers;             
+    public int totalGroupShoppers;              
+    public int totalCommuters;                  
+    public int totalSingleCommuters;            
+    public int totalGroupCommuters;             
 
-    public int totalSusceptible;                // The Total number of Susceptible (Non-Infected) agents currently in the simulation run.
-    public int totalInfected;                   // The Total number of Infected agents currently in the simulation run.
+    public int totalSusceptible;                
+    public int totalInfected;                   
     
-    public List<Vector3> contactLocations;      // A list of all agent contact/interaction locations in the environment.
     public List<Vector3> infectionLocations;    // A list of all infected agent contact and transfers in the environment.
     public int infectiousContacts;              // The Total number of infectious contacts in the simulation run.
     
@@ -102,11 +102,10 @@ public class SimManager : MonoBehaviour
         guiManager = GameObject.Find("Manager").GetComponent<GUIManager>();
         dataManager = GameObject.Find("Manager").GetComponent<DataManager>();
 
+        // Retrieve environment objects.
         spawners = GameObject.FindGameObjectsWithTag("Spawner");
         despawners = GameObject.FindGameObjectsWithTag("Despawner");
         buildings = GameObject.FindGameObjectsWithTag("Building");
-
-        contactLocations = new List<Vector3>();
         
     }
 
@@ -122,12 +121,13 @@ public class SimManager : MonoBehaviour
         // Record data every minute (hour in simulation time).
         if (countdown <= 0f) { 
             countdown = 60f;
-            RecordData();  
-            // If a day has passed.
-            if (simTime % 1440 == 0) {
-                infectiousContacts = 0;
-            }   
+            RecordData();   
         }
+
+        // If a day has passed, reset the number of infectious contacts.
+        if (Mathf.Floor(simTime) % 1440f == 0f) {
+            infectiousContacts = 0;
+        }  
 
         // If simulation reached sim length.
         if (simTime > simDuration) {
@@ -138,29 +138,28 @@ public class SimManager : MonoBehaviour
             
         }
         
-        
     }
 
     // Intermediate method to update data structures in DataManager.
     public void RecordData() {
-
         dataManager.UpdatePopulation(new List<int>() {totalAgents}, true);
         dataManager.UpdateInfections(new List<int>() {infectiousContacts}, false);
         dataManager.UpdateDemographic(new List<int>() {totalSingleShoppers, totalGroupShoppers, totalSingleCommuters, totalGroupCommuters}, true);
         dataManager.UpdateInfected(new List<int>() {totalSusceptible, totalInfected}, true); 
-
     }
 
-    //
+    // Starts a simulation run.
     public void StartSim() {
         simStarted = true;
         simFinished = false;
         guiManager.CloseData();
         dataManager.ResetData();
         RemoveInfectiousContacts();
+        ResetMetrics();
     }
 
-    //
+    // Stops a simulation run.
+    // ! Note: This stop the simulation mid-run and will not display data.
     public void StopSim() {
         simStarted = false;
         if (simFinished) {
@@ -172,7 +171,7 @@ public class SimManager : MonoBehaviour
         
     }
 
-    //
+    // Pause and un-pause the simulation.
     public void PauseSim() {
         if (isPaused) {
             isPaused = false;
@@ -188,7 +187,7 @@ public class SimManager : MonoBehaviour
         simTime = 0;
     }
     
-    //
+    // Resets all of the metrics collected.
     public void ResetMetrics() {
 
         totalAgents = 0;
@@ -204,7 +203,6 @@ public class SimManager : MonoBehaviour
 
         infectiousContacts = 0;
 
-        contactLocations.Clear();
         infectionLocations.Clear();
 
     }
@@ -309,14 +307,31 @@ public class SimManager : MonoBehaviour
     // Returns the Total number of Infected agents currently in the simulation.
     public int GetTotalInfected() { return totalInfected; }
 
-    //
+    // Retrieves an array of all the spawners in the system.
     public GameObject[] GetSpawners() { return spawners; }
 
-    //
+    // Retrieves an array of all the buildings in the system
     public GameObject[] GetBuildings() { return buildings; }
 
     // -----------------------------------------------------------------------------------------------------------------------------
 
+    // Slow Down the simulation.
+    public void SlowDown() {
+        float speed = simSpeed;
+        if (speed > 0.125f) {
+            simSpeed = speed / 2.0f;
+            if (!isPaused) { Time.timeScale = simSpeed; }
+        }
+    }
+
+    // Speed Up the simulation.
+    public void SpeedUp() {
+        float speed = simSpeed;
+        if (speed < 8.0f) {
+            simSpeed = speed * 2.0f;
+            if (!isPaused) { Time.timeScale = simSpeed; }
+        }
+    }
 
     // Increases the number of agents of the respective type as well as total
     public void AddNumAgents(AgentType type, int num, int infected) {
@@ -329,7 +344,6 @@ public class SimManager : MonoBehaviour
         totalAgents += num;
         totalInfected += infected; 
         totalSusceptible += (num - infected); 
-        // ? Debug.Log("+TOTAL: "+ totalAgents +" || S: "+ totalShoppers +", GS: "+ totalGroupShoppers +" | C: "+ totalCommuters +", GC: "+ totalGroupCommuters);
     }
 
     // Decreases the number of agents of the respective type as well as total
@@ -345,8 +359,6 @@ public class SimManager : MonoBehaviour
         else { totalInfected -= infected; }
         if ((totalSusceptible - (num - infected)) < 0) { totalSusceptible = 0; }
         else { totalSusceptible -= (num - infected); }
-        
-        // ? Debug.Log("-TOTAL: "+ totalAgents +" || S:"+ totalShoppers +", GS:"+ totalGroupShoppers +" | C:"+ totalCommuters +", GC:"+ totalGroupCommuters);
     }
 
     // Iterates the number of Infectious Contacts by 1.
@@ -357,16 +369,10 @@ public class SimManager : MonoBehaviour
             totalInfected += 1;
             totalSusceptible -= 1;
         }
-        //Debug.Log("After: TotalAgents: " + totalAgents + ", TotalInfected: "  + totalInfected + ", TotalSusceptible: " + totalSusceptible);
-        //guiManager.PauseSimulation();
     }
 
-    //
+    // Returns the total number of spawners in the environment.
     public int GetNumSpawners() { return spawners.Length; }
-
-    // Returns and Adds a location of Contact to the list of Total Contacts.
-    public List<Vector3> GetContactLocations() { return contactLocations; }
-    public void AddContactLocations(Vector3 location) { contactLocations.Add(location); }
 
     // Returns and Adds a location of Infection to the list of Infectious Contacts.
     public List<Vector3> GetInfectionLocations() { return infectionLocations; }
@@ -380,16 +386,14 @@ public class SimManager : MonoBehaviour
         }
     }
 
-    //
+    // Removes all of the red dots showing the infection locations off of the map.
     public void RemoveInfectiousContacts() {
         foreach (Transform child in dots) {
             Destroy(child.gameObject);
         }
     }
 
-
     // Returns the Transform of the EndNode unique from the StartNode passed in.
-    // TODO: Set end node as a random Despawner object.
     public Transform SetEndNode(Vector3 startNode) {
         List<GameObject> starts = new List<GameObject>(spawners);
         List<GameObject> ends = new List<GameObject>(despawners);
@@ -410,7 +414,6 @@ public class SimManager : MonoBehaviour
     }
 
     // Returns a list of building locations that the agent can visit
-    // 
     public List<Transform> SetDestinations(int numDest) {
         List<GameObject> tempBuildings = new List<GameObject>(buildings);
         List<Transform> ret = new List<Transform>();

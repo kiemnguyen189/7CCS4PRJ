@@ -1,24 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
+// Main spawner class for human agents in the system.
+// Spawns in agents inside spawner objects at varied intervals throughout a day of a run.
 public class Spawner : MonoBehaviour
 {
 
     public SimManager manager;
 
-    public Transform agentPrefab;
+    public Transform agentPrefab;       // Prefab of an agent to spawn.
 
-    public bool isDense = false;            // Whether or not a spawner is located in a high traffic area (r.g. main roads/stations).
+    public float timeBetweenWaves;      // Time in seconds between each agent spawn.
+    private int hourlyFlow;             // Hourly flow data retrieved from the SimManager. Varies throughout the day.
+    private int numSpawners;            // Total number of spawners in the environment.
+    private int agentsLeft;             // Agents still needed to spawn in to fill up the hourlyFlow.
+    public float countdown;             // Timer countdown for each spawn.
 
-    public float timeBetweenWaves;
-    private int hourlyFlow;
-    private int numSpawners;
-    private int agentsLeft;
-    public float countdown;
-
-    //
+    // Start is called before the first frame update
     void Start() {
 
         manager = GameObject.Find("Manager").GetComponent<SimManager>();
@@ -35,33 +33,25 @@ public class Spawner : MonoBehaviour
             // The %24 is used for durations above a day (1440), so indexes stay within 0-23.
             hourlyFlow = manager.GetFlowTimings()[ConvertSimTime(manager.GetSimTime()) % 24];
             numSpawners = manager.GetNumSpawners();
-
             agentsLeft = hourlyFlow - manager.GetTotalAgents();
-            
             timeBetweenWaves = 60f / ((float)hourlyFlow / numSpawners);
-
             if (countdown <= 0f && agentsLeft > 0)
             {
                 SpawnAgent();
                 countdown = timeBetweenWaves;
             }
             countdown -= Time.deltaTime;
-        } else {
-            countdown = Random.Range(1f, 10f);
-        }
+        } else { countdown = Random.Range(1f, 10f); }   // Staggered spawning of agents.
 
     }
 
-    //
+    // Spawns a single agent into the system.
     public void SpawnAgent()
     {
-        // TODO: MavMesh.SamplePosition.
         NavMeshHit hit;
         if (NavMesh.SamplePosition(transform.position, out hit, 2, 1)) {
             Transform agent = Instantiate(agentPrefab, transform.position, transform.rotation);
-        } else {
-            Debug.Log("Spawn Failed.");
-        }
+        } else { Debug.Log("Spawn Failed."); }
         
         
     }

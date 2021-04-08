@@ -51,7 +51,7 @@ MonoBehaviour:
   manager: {fileID: 633487431973451590, guid: a4c989a1ae652fa4aa9e657568490fcd, type: 3}
   spawner: {fileID: 0}
   destinations: []
-  speed: 20
+  speed: 60
 --- !u!208 &2846969899103374415
 NavMeshObstacle:
   m_ObjectHideFlags: 0

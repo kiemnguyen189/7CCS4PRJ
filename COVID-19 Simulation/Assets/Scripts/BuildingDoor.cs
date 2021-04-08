@@ -1,8 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
+//using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+// Enumerated types of doorway nodes.
 public enum DoorType {
     Entrance,
     Exit,
@@ -10,19 +11,20 @@ public enum DoorType {
     None
 }
 
+// Manager for each doorway node of a building.
 public class BuildingDoor : MonoBehaviour
 {
     
-    public BuildingManager core;
-    public Material mat;
-    public TextMeshPro text;
-    public DoorType doorType;
+    public BuildingManager core;    // Central BuildingManager of the whole building.
+    public Material mat;            // Material of the doorway node.
+    public TextMeshPro text;        // Label of teh doorway node.
+    public DoorType doorType;       // Current enumerated type of the doorway node.
     
-    public Renderer rend;
-    public Color color;
-    public int respawnTime = 10;
+    public Renderer rend;           // Renderer.
+    public Color color;             // Doorway node colour.
+    public int respawnTime = 10;    // Max respawn time of an agent entering a building.
 
-
+    // Start is called before the first frame update.
     private void Start() {
         rend = GetComponent<Renderer>();
     }
@@ -31,13 +33,14 @@ public class BuildingDoor : MonoBehaviour
     public void UpdateFormat() {
         var textRot = transform.rotation.eulerAngles;
 
+        // Initialize the doorway node type.
         switch (doorType) {
             case DoorType.Entrance: SetDoorType("Entrance", new Color(0,1,0,0.5f), new Color(0,1,0,1), ">"); break;
             case DoorType.Exit:     SetDoorType("Exit",     new Color(1,0,0,0.5f), new Color(1,0,0,1), "<"); break;
             case DoorType.Both:     SetDoorType("Both",     new Color(0,0,1,0.5f), new Color(0,0,1,1), "="); break;
             case DoorType.None:     SetDoorType("None",     new Color(0,0,0,0.5f), new Color(0,0,0,1), "x"); break;
         }
-        rend.material.color = color;
+        rend.material.color = color;    // Set colour of the doorway node.
     }
 
     // Sets the formats of a door depending on the chosen door type.
@@ -90,26 +93,21 @@ public class BuildingDoor : MonoBehaviour
 
     }
 
-    // Called when a Shopper leaves the Both door 'sphere' before their buildingBufferTimer runs out.
-    private void OnTriggerExit(Collider other) {
-        AgentManager agent = other.GetComponent<AgentManager>();
-        if (agent != null && doorType == DoorType.Both && agent.agentType == AgentType.Shopper) {
-            agent.ResetBuildingBufferTime();
-        }
-    }
-
-    // Disables a Shopper for a short amount of time, then recreates it a few seconds later 10 units away in x and z direction.
+    // Disables a Shopper for a short amount of time, then recreates it a few seconds later.
     IEnumerator RecreateShopper(GameObject shopper) {
-        core.AddShopper(shopper);
-        shopper.GetComponent<AgentManager>().GatherFollowers();
-        shopper.gameObject.SetActive(false);
-        yield return new WaitForSeconds(Random.Range(1, respawnTime));
-        Vector3 spawnPos = core.ReturnRandomDoor("Exit").position;
-        spawnPos.y = shopper.transform.position.y;
-        shopper.transform.position = spawnPos;
-        shopper.gameObject.SetActive(true);
-        shopper.GetComponent<AgentManager>().UpdateDestinations();
-        core.RemoveShopper(shopper);
+        if (shopper != null) {
+            core.AddShopper(shopper);                                           // Add the shopper to the building's internal list of Shoppers
+            shopper.GetComponent<AgentManager>().GatherFollowers();             // Gather all followers of the main Shopper agent.
+            shopper.gameObject.SetActive(false);                                // Disable the agent.
+            yield return new WaitForSeconds(Random.Range(1, respawnTime));      // Keep agent disabled for a set duration.
+            Vector3 spawnPos = core.ReturnRandomDoor("Exit").position;          // Reposition the agent to an Exit doorway node.
+            spawnPos.y = shopper.transform.position.y;                          // Keep the y position constant.
+            shopper.transform.position = spawnPos;                              // Respawn position.
+            shopper.gameObject.SetActive(true);                                 // Re-enable the agent.
+            shopper.GetComponent<AgentManager>().UpdateDestinations();          // Remove the current doorway node from the agent's list of destinations.
+            core.RemoveShopper(shopper);                                        // Remove the Shopper agent from the building's internal list.
+        }
+        
     }
     
 

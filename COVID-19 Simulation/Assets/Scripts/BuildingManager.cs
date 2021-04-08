@@ -1,19 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+// Manager class for each building.
 public class BuildingManager : MonoBehaviour
 {
 
     public SimManager manager;
 
-    public List<GameObject> shoppers = new List<GameObject>();
-    public List<BuildingDoor> doors = new List<BuildingDoor>();
+    public List<GameObject> shoppers = new List<GameObject>();      // Internal list of Shoppers currently inside the building. 
+    public List<BuildingDoor> doors = new List<BuildingDoor>();     // List of all 4 doorway nodes if this building.
 
-    public TextMeshPro text;
-    public bool showOccupancy = true;
-    public bool showDoors = true;
+    public TextMeshPro text;                                        // The central label that shows the capacity of this building.
+    public bool showOccupancy = true;                               // Whether or not to show the central capacity label.
+    public bool showDoors = true;                                   // Whether or not to render the doorway nodes.
     
     // Start is called before the first frame update
     void Start() {
@@ -30,26 +30,20 @@ public class BuildingManager : MonoBehaviour
         // Combine the meshes of all the component cubes that make up the shape of the building into one mesh.
         Quaternion oldRot = transform.rotation;
         Vector3 oldPos = transform.position;
-
         transform.rotation = Quaternion.identity;
         transform.position = Vector3.zero;
-
         MeshFilter[] meshFilters = GetComponentsInChildren<MeshFilter>();
-        CombineInstance[] combine = new CombineInstance[6];
-        
+        CombineInstance[] combine = new CombineInstance[6];     // 5 cuboids + 1 parent mesh.
         for (int i = 0; i < 6; i++) {
             if (meshFilters[i].transform == transform) { continue; }
             combine[i].mesh = meshFilters[i+9].sharedMesh;
             combine[i].transform = meshFilters[i+9].transform.localToWorldMatrix;
             meshFilters[i+9].gameObject.SetActive(false);
         }
-
         transform.GetComponent<MeshFilter>().sharedMesh = new Mesh();
         transform.GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine);
-
         transform.rotation = oldRot;
         transform.position = oldPos;
-
         transform.gameObject.SetActive(true);
         
     }
@@ -59,14 +53,11 @@ public class BuildingManager : MonoBehaviour
 
         showOccupancy = manager.GetShowBuildingNum();
         showDoors = manager.GetShowBuildingDoors();
+        // Check to see if the SimManager setting is set to show occupancy.
+        if (showOccupancy) { text.gameObject.SetActive(true); } 
+        else { text.gameObject.SetActive(false); }
 
-        if (showOccupancy) {
-            text.gameObject.SetActive(true);
-        } else {
-            text.gameObject.SetActive(false);
-        }
-
-        // TODO: Maybe don't need to be in FixedUpdate.
+        // Check to see if the SimManager setting is set to render doorway nodes.
         if (showDoors) {
             foreach (BuildingDoor door in doors) {
                 door.LabelToggle(true);
@@ -79,6 +70,7 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
+        // If the run has finished, remove all shoppers stored in the list.
         if (!manager.simStarted) {
             shoppers.Clear();
             UpdateText();
@@ -86,9 +78,10 @@ public class BuildingManager : MonoBehaviour
 
     }
 
+    // Sets the doorway policy of the building depending on the Building Entrance Mode parameter set by the user.
     public void SetDoorMode() {
-        // TODO: Move to set doormodes in a method, not on Start.
         switch (manager.GetDoorMode()) {
+            // Randomly assign either North and South as entrances, or East and West, vice versa for exits.
             case DoorwayMode.OneWay:
                 int rand = Random.Range(0, 2);
                 if (rand == 0) {
@@ -105,11 +98,13 @@ public class BuildingManager : MonoBehaviour
                     doors[3].doorType = DoorType.Entrance;
                 }
                 break;
+            // Sets all the doors of this building to Two-way.
             case DoorwayMode.TwoWay:
                 foreach (BuildingDoor door in doors) {
                     door.doorType = DoorType.Both;
                 }
                 break;
+            // Random assignment of doorway nodes.
             case DoorwayMode.Mixed:
                 foreach (BuildingDoor door in doors) {
                     door.doorType = (DoorType)Random.Range(0, doors.Count - 1);
@@ -118,7 +113,7 @@ public class BuildingManager : MonoBehaviour
                 doors[Random.Range(0, doors.Count)].doorType = DoorType.Both;
                 break;
         }  
-
+        // Recalibrate the doorway nodes.
         foreach (BuildingDoor door in doors) {
             door.UpdateFormat();
         }       

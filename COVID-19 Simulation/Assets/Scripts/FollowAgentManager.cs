@@ -1,24 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
+// Manager class for all human follower agents. Follower agents are sub-agents that follow the main agent around.
 public class FollowAgentManager : MonoBehaviour
 {
 
     private SimManager manager;
 
-    public GameObject leader;
-    public AgentManager leadManager;
-    public NavMeshAgent navAgent;
-    public AgentType agentType;
-    private int typeInt;
+    public GameObject leader;           // The leading agent.
+    public AgentManager leadManager;    // The script component of the leading agent.
+    public NavMeshAgent navAgent;       // The navigation mesh agent component that handles the A* pathfinding around the map.
+    public AgentType agentType;         // The current agent type.
+    private int typeInt;                // Integer representing the agent type.
 
-    public bool isInfected;
-    public float timeAlive;
+    public bool isInfected;             // Whether or not this follower agent is infected or not.
+    public float timeAlive;             // The total amount of time this agent has spent in the system.
 
-    public Transform infectHit;
-
+    // Main agent components.
     public Collider coll;
     public Renderer rend;
     public Color color;
@@ -35,8 +33,6 @@ public class FollowAgentManager : MonoBehaviour
 
         gameObject.tag = leadManager.tag;
         color = leadManager.GetColor();
-
-        //rend = GetComponent<Renderer>();
         rend.material.color = color;
         
         isInfected = leadManager.GetInfection();
@@ -58,8 +54,8 @@ public class FollowAgentManager : MonoBehaviour
     private void FixedUpdate() {
 
         timeAlive += Time.deltaTime;
-
-        if (navAgent.pathPending) {
+        // If this agent and the lead agent does not have a valid path, disable the collider and rendering components.
+        if (navAgent.pathPending && leadManager.navAgent.pathPending) {
             coll.enabled = false;
             rend.enabled = false;
         } else if (!navAgent.pathPending) {
@@ -67,7 +63,7 @@ public class FollowAgentManager : MonoBehaviour
             rend.enabled = true;
             navAgent.SetDestination(leader.transform.position);
         }
-        
+        // Set the colour of this agent according to its infection state.
         if (!isInfected) {
             color = (Color)manager.GetAgentBlueprint()[typeInt, 2];
             rend.material.color = color;
@@ -76,18 +72,18 @@ public class FollowAgentManager : MonoBehaviour
         
     }
     
-    //
+    // Retrieves and sets the colour of this agent.
     public Color GetColor() { return color; }
     public void SetColor(Color col) { rend.material.color = col;}
 
-    //
+    // Retrieves the infection state of this agent.
     public bool GetInfection() { return isInfected; }
+    // Infects this agent, sets the colour and tracks the infection.
     public void SetInfection(Collision other) { 
         isInfected = true; 
         color = (Color)manager.GetAgentBlueprint()[typeInt, 3];
         rend.material.color = color;
         leadManager.AddGroupInfection();
-        //leadManager.TrackInfection(other);
         TrackInfection(other);
     }
 
@@ -96,23 +92,16 @@ public class FollowAgentManager : MonoBehaviour
     // Agents within the same group interacting with each other do not contribute to contact counts.
     // This is to model family and friend groups interactions with other groups.
     private void OnCollisionEnter(Collision other) {
-        // TODO: infection only counts.
         // * Check if the other object is not the map and not a spawner object.
-        bool environmentCheck = ((other.gameObject.tag != "Spawner") & (other.gameObject.name != "Ground"));  
-        // * Check if other object is not the parent of this object.
-        bool parentCheck = (transform.IsChildOf(other.transform));                 
-        // * Check if siblings have the same parent.                         
-        bool siblingCheck = (transform.parent == other.transform.parent);     
-        //if (environmentCheck && !parentCheck && !siblingCheck) {                          
+        bool environmentCheck = ((other.gameObject.tag != "Spawner") & (other.gameObject.name != "Ground"));                         
         if (environmentCheck && (timeAlive >= 0.5f) && (other.gameObject.GetInstanceID() > gameObject.GetInstanceID())) {
             AgentManager leadScript = other.collider.GetComponent<AgentManager>();
             FollowAgentManager followScript = other.collider.GetComponent<FollowAgentManager>();
-            //manager.PauseSim();
             Interact(other, leadScript, followScript);
         }
     }
 
-    // Params = other collider.
+    // The main interaction method between agents in the system.
     public void Interact(Collision other, AgentManager lead, FollowAgentManager follow) {
         // Infection chance.
         bool successful = (Random.Range(0, 100) < manager.GetInfectionChance());
@@ -132,7 +121,7 @@ public class FollowAgentManager : MonoBehaviour
         }
     }
 
-    //
+    // Tracks the infection interaction that has occurred between this agent and another agent.
     public void TrackInfection(Collision other) {
         Vector3 tempPoint = other.contacts[0].point;
         tempPoint.y = 1;
@@ -143,7 +132,6 @@ public class FollowAgentManager : MonoBehaviour
             manager.AddInfectiousContactNum();
             manager.AddInfectionLocations(tempPoint);
         }
-        //Transform iDot = Instantiate(infectHit, tempPoint, Quaternion.identity);  // TODO: Only show contact points visually at the end of the simulation.
     }
 
 

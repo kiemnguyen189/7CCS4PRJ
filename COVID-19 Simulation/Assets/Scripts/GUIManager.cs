@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// Manager class for all of the GUI components in the program.
 public class GUIManager : MonoBehaviour
 {
 
@@ -25,8 +26,8 @@ public class GUIManager : MonoBehaviour
 
     public TMP_Dropdown graphType;
     public TMP_Dropdown currentDay;
-    private bool isCumulative = false;
-    private int day = 1;
+    public bool isCumulative = false;
+    public int day = 1;
     // Set alignment values for bar positioning.
     public float maxHeight = 160;
     public float vOffset = 40;
@@ -45,8 +46,8 @@ public class GUIManager : MonoBehaviour
     public Button speedUpButton;
     public TextMeshProUGUI speedText;
     public TMP_Dropdown simLength;
-    public TextMeshProUGUI dayText;
-    public TextMeshProUGUI timeText;
+    public Toggle capacityToggle;
+    public Toggle doorToggle;
     public Button quitButton;
     
     // * Parameters
@@ -83,28 +84,11 @@ public class GUIManager : MonoBehaviour
     public TextMeshProUGUI infectiousContactsGUI;
 
     [Header("Bottom Bar")]
-    public Toggle capacityToggle;
-    public Toggle doorToggle;
+    public TextMeshProUGUI dayText;
+    public TextMeshProUGUI timeText;
     public Slider progressBar;
+    public TextMeshProUGUI percentageText;
 
-    public List<int> test0 = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 };
-    public List<int> test1 = new List<int>() { 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
-
-    public List<List<int>> test2 = new List<List<int>>() {
-        new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 },
-        new List<int>() { 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 }
-    };
-
-    public List<List<int>> test3 = new List<List<int>>() {
-        new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 },
-        new List<int>() { 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },
-        new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 },
-        new List<int>() { 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 }
-    };
-
-    public List<List<int>> test4 = new List<List<int>>() {
-        new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
-    };
 
     // Start is called before the first frame update
     void Start()
@@ -115,24 +99,24 @@ public class GUIManager : MonoBehaviour
             img.GetComponent<Image>().color = new Color(1,1,1,0);
         }
 
-        // List<string> temp = new List<string>() {"temp"};
-        // simLength.AddOptions(temp);
-
         isHidden = true;
 
         CloseData();
-    
 
     }
 
     // Update is called once per frame
     private void Update() {
 
+        float simTime = manager.GetSimTime();
+
         float dayTime = manager.GetSimTime()%1440;
         timeText.text = ((int)Mathf.Floor(dayTime/60)).ToString("D2") + ":" + ((int)dayTime%60).ToString("D2") + ":00";
-        dayText.text = ((int)Mathf.Ceil(manager.GetSimTime()/1440)).ToString("D2");
+        dayText.text = ((int)Mathf.Ceil(simTime/1440)).ToString("D2");
 
-        progressBar.value = (manager.GetSimTime() / manager.GetSimDuration()) * 100;
+        float completion = (simTime / manager.GetSimDuration()) * 100;
+        progressBar.value = completion;
+        percentageText.text = (int)completion + "%";
 
         totalAgentsGUI.text = "" + manager.GetTotalAgents();
         totalShoppersGUI.text = "" + manager.GetTotalShoppers();
@@ -215,22 +199,14 @@ public class GUIManager : MonoBehaviour
 
     // Slow Down the simulation.
     public void SlowDown() {
-        float speed = manager.GetSimSpeed();
-        if (speed > 0.125f) {
-            manager.SetSimSpeed(speed / 2.0f);
-            if (!manager.GetIsPaused()) { Time.timeScale = manager.GetSimSpeed(); }
-            speedText.text = manager.GetSimSpeed() + "x";
-        }
+        manager.SlowDown();
+        speedText.text = manager.GetSimSpeed() + "x";
     }
 
     // Speed Up the simulation.
     public void SpeedUp() {
-        float speed = manager.GetSimSpeed();
-        if (speed < 8.0f) {
-            manager.SetSimSpeed(speed * 2.0f);
-            if (!manager.GetIsPaused()) { Time.timeScale = manager.GetSimSpeed(); }
-            speedText.text = manager.GetSimSpeed() + "x";
-        }
+        manager.SpeedUp();
+        speedText.text = manager.GetSimSpeed() + "x";
     }
 
     // Sets the run duration of the simulation.
@@ -264,7 +240,7 @@ public class GUIManager : MonoBehaviour
         UpdateAllGraphs();
     }
 
-    // TODO: 
+    // Update the data in each of the graphs.
     public void UpdateAllGraphs() {
 
         UpdateBarGraph(populationGraph, dataManager.GetPopulation(isCumulative, day), 
@@ -280,10 +256,8 @@ public class GUIManager : MonoBehaviour
     }
 
 
-    // Updates the bar graph.
-    // TODO: 
+    // Updates a single bar graph.
     public void UpdateBarGraph(Transform graph, List<List<int>> data, List<Color> cols) {
-
         Transform mainBars = graph.Find("MainBars");
         // Reset old bar graph data.
         if (mainBars.childCount == 0) {
@@ -292,7 +266,6 @@ public class GUIManager : MonoBehaviour
         
         // Total up each value of all sub lists first.
         List<int> hourlyTotals = new List<int>();
-        // 0 to 23
         for (int i = 0; i < data[0].Count; i++) {
             int temp = 0;   // 0 to j
             for (int j = 0; j < data.Count; j++) { temp += data[j][i]; }
@@ -305,20 +278,20 @@ public class GUIManager : MonoBehaviour
             if (val > max) { max = val; } 
         }
 
-        // Round up the maximum value.
-        //float minDigits = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(min))-1));
-        max = Mathf.Ceil(max/10) * 10;
+        // Round up the maximum value and set min to 0.
+        float order = Mathf.Pow(10f, (Mathf.Floor(Mathf.Log10(max))));
+        max = Mathf.Ceil(max / order) * order;
         float min = 0;
 
         for (int i = 0; i < data[0].Count; i++) {
-            // Stacked height of bars
+            // Format front most set of bars.
             Transform front = mainBars.GetChild(data.Count-1);  // Get frontmost bar graph preset.
             float frontHeight = ((data[data.Count-1][i]-min) / (max-min)) * maxHeight;
             Transform frontBar = front.transform.GetChild(i);
             frontBar.GetComponent<RectTransform>().sizeDelta = new Vector2(10, frontHeight);
             frontBar.GetComponent<RectTransform>().anchoredPosition = new Vector2(hOffset + (i*10), (frontHeight/2) + vOffset);
             frontBar.GetComponent<Image>().color = cols[data.Count-1];
-
+            // Format stacked bars behind the front bars.
             float prevHeight = frontHeight;
             for (int j = data.Count-2; j >= 0; j--) {
                 Transform bars = mainBars.GetChild(j);  //  0 = backmost bar (should be largest), i = frontmost bar (smallest).
@@ -339,7 +312,7 @@ public class GUIManager : MonoBehaviour
         }
     }
 
-    //
+    // Show the results screen with the updated data.
     public void ShowData() {
         isHidden = false;
         dataOverlay.SetActive(true);
@@ -354,7 +327,7 @@ public class GUIManager : MonoBehaviour
 
     }
 
-    //
+    // Hide the results screen to show the interaction locations on the map.
     public void HideData() {
         dataOverlay.SetActive(true);
         if (!isHidden) {
@@ -368,7 +341,7 @@ public class GUIManager : MonoBehaviour
         }
     }
 
-    //
+    // Close the results screen.
     public void CloseData() {
         dataOverlay.SetActive(false);
     }
